@@ -10,6 +10,9 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.function.BiConsumer;
 
+/**
+ * Utility class to apply modifications to biomes.
+ **/
 public abstract class BiomeWriter {
     public void add(BiConsumer<BiomeWriter, BiomeContext> modifier) {
         modifier.accept(this, this.context());

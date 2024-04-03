@@ -21,7 +21,12 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 public class BiomeManagerImpl {
     public static void bootstrap() {
-        BiomeModifications.create(new ResourceLocation(Platform.MOD_ID, "biome_modifier")).add(ModificationPhase.ADDITIONS, context -> true, (selector, modifier) -> BiomeManager.INSTANCE.register(new FabricBiomeWriter(selector, modifier)));
+        BiomeModifications.create(new ResourceLocation(Platform.MOD_ID, "biome_modifier"))
+            .add(
+                ModificationPhase.ADDITIONS,
+                context -> true,
+                (selector, modifier) -> BiomeManager.INSTANCE.register(new FabricBiomeWriter(selector, modifier))
+            );
     }
 
     static class FabricBiomeWriter extends BiomeWriter {

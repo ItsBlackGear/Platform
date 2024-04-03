@@ -13,10 +13,10 @@ public class ModInstanceBuilderImpl {
         return new ModInstance(modId, common, postCommon, client, postClient) {
             @Override public void bootstrap() {
                 IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-                if (this.onPostCommon != null) bus.<FMLCommonSetupEvent>addListener(event -> this.onPostCommon.run());
-                if (this.onPostClient != null) bus.<FMLClientSetupEvent>addListener(event -> this.onPostClient.run());
-                if (this.onCommon != null) this.onCommon.run();
-                if (this.onClient != null) DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> this.onClient.run());
+                bus.<FMLCommonSetupEvent>addListener(event -> event.enqueueWork(this.onPostCommon));
+                bus.<FMLClientSetupEvent>addListener(event -> this.onPostClient.run());
+                this.onCommon.run();
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> this.onClient.run());
             }
         };
     }
