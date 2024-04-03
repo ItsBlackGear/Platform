@@ -10,5 +10,7 @@ public record RegistryBuilder(String modId) {
         return new Sample<>(resource, Registry.registerSimple(resource, bootstrap));
     }
 
+    public static void bootstrap() {}
+
     public record Sample<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {}
 }
