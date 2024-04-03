@@ -1,7 +1,7 @@
 package com.blackgear.platform.core.forge;
 
 import com.blackgear.platform.core.CoreRegistry;
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.minecraft.core.Registry;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;

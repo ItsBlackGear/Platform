@@ -1,7 +1,7 @@
 package com.blackgear.platform.common.entity.forge;
 
 import com.blackgear.platform.common.entity.TradeRegistry;
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.core.NonNullList;

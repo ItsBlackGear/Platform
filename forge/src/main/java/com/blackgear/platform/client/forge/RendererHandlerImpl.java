@@ -1,6 +1,6 @@
 package com.blackgear.platform.client.forge;
 
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;

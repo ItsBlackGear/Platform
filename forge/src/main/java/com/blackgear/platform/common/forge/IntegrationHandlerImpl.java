@@ -1,7 +1,7 @@
 package com.blackgear.platform.common.forge;
 
 import com.blackgear.platform.common.IntegrationHandler;
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;

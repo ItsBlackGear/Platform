@@ -1,7 +1,7 @@
 package com.blackgear.platform.client.forge;
 
 import com.blackgear.platform.client.ParticleRegistry;
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;

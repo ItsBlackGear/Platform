@@ -1,6 +1,6 @@
-package com.blackgear.platform.core.fabric;
+package com.blackgear.platform.fabric;
 
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.fabricmc.api.ModInitializer;
 
 public class PlatformFabric implements ModInitializer {

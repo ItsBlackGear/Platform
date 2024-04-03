@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.data;
 
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

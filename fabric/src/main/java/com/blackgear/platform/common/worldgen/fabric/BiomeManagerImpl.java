@@ -3,7 +3,7 @@ package com.blackgear.platform.common.worldgen.fabric;
 import com.blackgear.platform.common.worldgen.BiomeContext;
 import com.blackgear.platform.common.worldgen.BiomeManager;
 import com.blackgear.platform.common.worldgen.BiomeWriter;
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;

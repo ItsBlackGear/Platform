@@ -1,6 +1,6 @@
-package com.blackgear.platform.core.forge;
+package com.blackgear.platform.forge;
 
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod(Platform.MOD_ID)

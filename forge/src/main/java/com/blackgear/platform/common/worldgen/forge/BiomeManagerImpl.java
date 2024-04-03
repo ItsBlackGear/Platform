@@ -3,7 +3,7 @@ package com.blackgear.platform.common.worldgen.forge;
 import com.blackgear.platform.common.worldgen.BiomeContext;
 import com.blackgear.platform.common.worldgen.BiomeManager;
 import com.blackgear.platform.common.worldgen.BiomeWriter;
-import com.blackgear.platform.core.Platform;
+import com.blackgear.platform.Platform;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
