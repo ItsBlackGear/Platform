@@ -58,5 +58,16 @@ public class WorldGenRegistry {
         );
     }
 
+    /**
+     * Registers a Placed Feature
+     */
+    public Holder<PlacedFeature> register(String key, Holder<? extends ConfiguredFeature<?, ?>> feature, List<PlacementModifier> placements) {
+        return register(
+            BuiltinRegistries.PLACED_FEATURE,
+            new ResourceLocation(this.modId, key),
+            new PlacedFeature(Holder.hackyErase(feature), List.copyOf(placements))
+        );
+    }
+
     public void register() {}
 }
