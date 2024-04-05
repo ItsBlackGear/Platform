@@ -4,7 +4,8 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BlockEntityTypeMixin"
+    "BlockEntityTypeMixin",
+    "CreativeModeTabMixin"
   ],
   "client": [
   ],
