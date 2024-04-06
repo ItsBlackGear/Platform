@@ -13,3 +13,6 @@ accessible method net/minecraft/world/level/block/FireBlock setFlammable (Lnet/m
 # Registry Builder
 accessible method net/minecraft/core/Registry registerSimple (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/Registry$RegistryBootstrap;)Lnet/minecraft/core/Registry;
 accessible class net/minecraft/core/Registry$RegistryBootstrap
+
+# Entity Handler
+accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacements$Type;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V

@@ -10,6 +10,7 @@ import net.minecraft.world.level.ItemLike;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -22,6 +23,11 @@ public class CreativeTabs {
 
     @ExpectPlatform
     public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon, Consumer<List<ItemStack>> display) {
         throw new AssertionError();
     }
 

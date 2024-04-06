@@ -54,6 +54,11 @@ public class IntegrationHandler {
         AxeItem.STRIPPABLES.put(source, target);
     }
 
+    @ExpectPlatform
+    public static void setAsFuel(ItemLike item, int burnTime) {
+        throw new AssertionError();
+    }
+
     /**
      * Adds a custom interaction to a block.
      *

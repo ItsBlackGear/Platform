@@ -4,7 +4,9 @@ import com.blackgear.platform.common.IntegrationHandler;
 import com.blackgear.platform.Platform;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -18,6 +20,9 @@ import java.util.function.Consumer;
 )
 public class IntegrationHandlerImpl {
     private static final Set<Consumer<PlayerInteractEvent.RightClickBlock>> BLOCK_INTERACTIONS = ConcurrentHashMap.newKeySet();
+    private static final Set<Consumer<FurnaceFuelBurnTimeEvent>> FUEL_ENTRIES = ConcurrentHashMap.newKeySet();
+
+    // ========== Block Interactions ==========
 
     public static void addInteraction(IntegrationHandler.Interaction interaction) {
         BLOCK_INTERACTIONS.add(event -> {
@@ -32,5 +37,20 @@ public class IntegrationHandlerImpl {
     @SubscribeEvent
     public static void registerBlockInteraction(PlayerInteractEvent.RightClickBlock event) {
         BLOCK_INTERACTIONS.forEach(consumer -> consumer.accept(event));
+    }
+
+    // ========== Fuel Registry ==========
+
+    public static void setAsFuel(ItemLike item, int burnTime) {
+        FUEL_ENTRIES.add(event -> {
+            if (event.getItemStack().is(item.asItem())) {
+                event.setBurnTime(burnTime);
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public static void registerFuel(FurnaceFuelBurnTimeEvent event) {
+        FUEL_ENTRIES.forEach(consumer -> consumer.accept(event));
     }
 }
