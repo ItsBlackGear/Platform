@@ -4,9 +4,14 @@
   "version": "${version}",
 
   "name": "Platform",
-  "description": "",
-  "authors": [],
-  "contact": {},
+  "description": "Library mod that aims to ease up the development of mods based on Forge and Fabric",
+  "authors": [
+    "ItsBlackGear"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/platform",
+    "sources": "https://github.com/ItsBlackGear/Platform"
+  },
 
   "license": "MIT",
   "icon": "icon.png",
