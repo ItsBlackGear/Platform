@@ -7,11 +7,14 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -32,7 +35,7 @@ import java.util.function.Supplier;
     bus = Mod.EventBusSubscriber.Bus.MOD
 )
 public class RendererHandlerImpl {
-    private static final Set<Consumer<EntityRenderersEvent.RegisterRenderers>> ENTITY_RENDERERS = ConcurrentHashMap.newKeySet();
+    private static final Set<Consumer<EntityRenderersEvent.RegisterRenderers>> RENDERERS = ConcurrentHashMap.newKeySet();
     private static final Set<Consumer<EntityRenderersEvent.RegisterLayerDefinitions>> LAYER_DEFINITIONS = ConcurrentHashMap.newKeySet();
     private static final Set<Consumer<RegisterColorHandlersEvent.Block>> BLOCK_COLORS = ConcurrentHashMap.newKeySet();
     private static final Set<Consumer<RegisterColorHandlersEvent.Item>> ITEM_COLORS = ConcurrentHashMap.newKeySet();
@@ -69,15 +72,19 @@ public class RendererHandlerImpl {
         BLOCK_COLORS.forEach(consumer -> consumer.accept(event));
     }
 
-    // ========== EntityRenderer Registry ==========
+    // ========== Rendering Registry ==========
 
     public static <T extends Entity> void addEntityRenderer(Supplier<? extends EntityType<? extends T>> type, EntityRendererProvider<T> renderer) {
-        ENTITY_RENDERERS.add(event -> event.registerEntityRenderer(type.get(), renderer));
+        RENDERERS.add(event -> event.registerEntityRenderer(type.get(), renderer));
+    }
+
+    public static <T extends BlockEntity> void addBlockEntityRenderer(Supplier<BlockEntityType<T>> type, BlockEntityRendererProvider<? super T> renderer) {
+        RENDERERS.add(event -> event.registerBlockEntityRenderer(type.get(), renderer));
     }
 
     @SubscribeEvent
-    public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        ENTITY_RENDERERS.forEach(consumer -> consumer.accept(event));
+    public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        RENDERERS.forEach(consumer -> consumer.accept(event));
     }
 
     public static void addLayerDefinition(ModelLayerLocation layer, Supplier<LayerDefinition> definition) {
