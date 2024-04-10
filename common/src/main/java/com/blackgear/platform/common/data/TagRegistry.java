@@ -1,6 +1,5 @@
 package com.blackgear.platform.common.data;
 
-import com.blackgear.platform.Platform;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -23,7 +22,5 @@ public class TagRegistry<T> {
         return TagKey.create(this.registry, new ResourceLocation(this.modId, key));
     }
 
-    public void register() {
-        Platform.LOGGER.info("Initializing tags of type: " + this.registry.location().getPath() + " for mod: " + this.modId);
-    }
+    public void register() {}
 }

@@ -41,7 +41,7 @@ public class IntegrationHandlerImpl {
 
     // ========== Fuel Registry ==========
 
-    public static void setAsFuel(ItemLike item, int burnTime) {
+    public static void addFuel(ItemLike item, int burnTime) {
         FUEL_ENTRIES.add(event -> {
             if (event.getItemStack().is(item.asItem())) {
                 event.setBurnTime(burnTime);

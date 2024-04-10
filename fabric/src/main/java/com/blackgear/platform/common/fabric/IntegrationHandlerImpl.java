@@ -7,7 +7,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 
 public class IntegrationHandlerImpl {
-    public static void setAsFuel(ItemLike item, int burnTime) {
+    public static void addFuel(ItemLike item, int burnTime) {
         FuelRegistry.INSTANCE.add(item, burnTime);
     }
 

@@ -1,4 +1,4 @@
-package com.blackgear.platform.common.worldgen;
+package com.blackgear.platform.common.worldgen.modifier;
 
 import com.google.common.collect.Lists;
 import dev.architectury.injectables.annotations.ExpectPlatform;

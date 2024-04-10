@@ -1,7 +1,6 @@
 package com.blackgear.platform;
 
-import com.blackgear.platform.common.CreativeTabs;
-import com.blackgear.platform.common.worldgen.BiomeManager;
+import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

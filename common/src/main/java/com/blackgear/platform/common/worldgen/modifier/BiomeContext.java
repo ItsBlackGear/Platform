@@ -1,4 +1,4 @@
-package com.blackgear.platform.common.worldgen;
+package com.blackgear.platform.common.worldgen.modifier;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;

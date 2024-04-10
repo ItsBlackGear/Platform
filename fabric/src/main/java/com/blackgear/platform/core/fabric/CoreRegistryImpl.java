@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.fabric;
 
 import com.blackgear.platform.core.CoreRegistry;
-import com.blackgear.platform.Platform;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 
@@ -23,7 +22,5 @@ public class CoreRegistryImpl<T> extends CoreRegistry<T> {
     }
 
     @Override
-    protected void bootstrap() {
-        Platform.LOGGER.info("Initializing registry for: " + this.registry.toString() + " for mod: " + this.modId);
-    }
+    protected void bootstrap() {}
 }

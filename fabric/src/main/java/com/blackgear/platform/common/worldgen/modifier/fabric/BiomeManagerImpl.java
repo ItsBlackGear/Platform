@@ -1,8 +1,8 @@
-package com.blackgear.platform.common.worldgen.fabric;
+package com.blackgear.platform.common.worldgen.modifier.fabric;
 
-import com.blackgear.platform.common.worldgen.BiomeContext;
-import com.blackgear.platform.common.worldgen.BiomeManager;
-import com.blackgear.platform.common.worldgen.BiomeWriter;
+import com.blackgear.platform.common.worldgen.modifier.BiomeContext;
+import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
+import com.blackgear.platform.common.worldgen.modifier.BiomeWriter;
 import com.blackgear.platform.Platform;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;

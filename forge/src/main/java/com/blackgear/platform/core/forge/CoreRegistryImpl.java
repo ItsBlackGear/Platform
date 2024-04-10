@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.forge;
 
 import com.blackgear.platform.core.CoreRegistry;
-import com.blackgear.platform.Platform;
 import net.minecraft.core.Registry;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -30,6 +29,5 @@ public class CoreRegistryImpl<T extends ForgeRegistry<T>> extends CoreRegistry<T
     @Override
     protected void bootstrap() {
         this.registry.register(FMLJavaModLoadingContext.get().getModEventBus());
-        Platform.LOGGER.info("Initializing registry for: " + this.registry + " for mod: " + this.modId);
     }
 }
