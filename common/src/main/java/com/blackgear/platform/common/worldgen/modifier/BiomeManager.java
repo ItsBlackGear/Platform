@@ -39,6 +39,32 @@ public class BiomeManager {
      * <p>- The writer can be used to add features, spawns and carvers to a biome.
      * <p>- The context can be used to check if a biome is a certain biome or has a certain tag.
      *
+     * <p>Example of biome modification registry:</p>
+     *
+     * <pre>{@code
+     *
+     * BiomeManager.add((writer, context) -> {
+     *      // ========== Biome Tags ==========
+     *      if (context.is(BiomeTags.IS_OVERWORLD)) {
+     *          writer.addFeature(
+     *              GenerationStep.Decoration.RAW_GENERATION,
+     *              SurfacePlacements.BOULDER
+     *          );
+     *      }
+     *
+     *      // ========== Custom Biome ==========
+     *      if (context.is(CUSTOM_BIOME)) {
+     *          writer.addSpawn(
+     *              MobCategory.CREATURE,
+     *              new MobSpawnSettings.SpawnerData(
+     *                  ModEntities.DUCK.get(), 4, 2, 4
+     *              )
+     *          );
+     *      }
+     * });
+     *
+     * }</pre>
+     *
      * @param modifier biome modifications to register
      */
     public static void add(BiConsumer<BiomeWriter, BiomeContext> modifier) {

@@ -3,8 +3,44 @@ package com.blackgear.platform.core;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 
 /**
- * This class represents a mod instance, which includes both the common and client side of a mod.
+ * Utility class represents a mod instance, which includes both the common and client side of a mod.
  * It provides methods to set up and post-initialize the common and client side of the mod.
+ *
+ * <p>Example of a mod instance creation:</p>
+ *
+ * <pre>{@code
+ *
+ * ModInstance INSTANCE = ModInstance.create(MOD_ID)
+ *  // custom class holding all the common setup methods
+ * 	.common(CommonSetup::onStartup)
+ * 	.postCommon(CommonSetup::postStartup)
+ * 	// custom class holding all the client setup methods
+ * 	.client(ClientSetup::onStartup)
+ * 	.postClient(ClientSetup::postStartup)
+ * 	// build the mod instance
+ * 	.build();
+ *
+ * // For CommonSetup and ClientSetup, we just create two public static void methods.
+ * // Alternatively, you can also use lambda expressions like this:
+ *
+ * ModInstance INSTANCE = ModInstance.create(MOD_ID)
+ * 	.common(() -> {})
+ * 	.postCommon(() -> {})
+ * 	.client(() -> {})
+ * 	.postClient(() -> {})
+ * 	.build();
+ *
+ * // It is not mandatory to initialize all the methods, just the ones that you need.
+ * // Here's an example of an instance for a client-side only mod:
+ *
+ * ModInstance INSTANCE = ModInstance.create(MOD_ID)
+ * 	.client(() -> {})
+ * 	.postClient(() -> {})
+ * 	.build();
+ *
+ * // Alternatively, you can do the same for a server-side only mod:
+ *
+ * }</pre>
  *
  * @author ItsBlackGear
  */
