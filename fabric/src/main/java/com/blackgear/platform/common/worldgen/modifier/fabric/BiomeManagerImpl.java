@@ -59,8 +59,8 @@ public class BiomeManagerImpl {
         }
 
         @Override
-        public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
-            this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature.value());
+        public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            this.modifier.getGenerationSettings().addFeature(decoration, feature);
         }
 
         @Override
@@ -69,8 +69,8 @@ public class BiomeManagerImpl {
         }
 
         @Override
-        public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
-            this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver.value());
+        public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            this.modifier.getGenerationSettings().addCarver(carving, carver);
         }
     }
 }

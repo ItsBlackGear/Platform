@@ -1,16 +1,13 @@
 package com.blackgear.platform.common;
 
-import com.blackgear.platform.core.ModInstance;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import org.apache.commons.compress.utils.Lists;
 
-import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.Collection;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Utility class for creating and modifying {@link CreativeModeTab}.
@@ -18,82 +15,105 @@ import java.util.function.Supplier;
  * @author ItsBlackGear
  */
 public class CreativeTabs {
-    public static final List<BiConsumer<ItemStack, List<ItemStack>>> MODIFICATIONS = Lists.newArrayList();
-
     /**
-     * <p>Example of creating an empty creative tab (recommended for modded item-only tabs):</p>
+     * <p>Example of creating a creative tab:</p>
      *
      * <pre> {@code
      *
-     * CreativeModeTab CUSTOM_TAB = CreativeTabs.create(
-     * 	new ResourceLocation("mod_id", "custom_tab"),
-     * 	() -> new ItemStack(CUSTOM_ITEM);
-     * );
+     * CoreRegistry<CreativeModeTab> TABS = CoreRegistry.create(BuiltinRegistries.CREATIVE_MODE_TAB, MOD_ID);
      *
-     * // Use item properties to assign the item to the tab. Otherwise, it won't appear on creative inventory
-     * // search result.
-     * new Item(new Item.Properties().tab(CUSTOM_TAB));
+     * ResourceKey<CreativeModeTab> CUSTOM_TAB = TABS.resource(
+     *     "custom_tab",
+     *     () -> CreativeTabs.create(builder -> {
+     *         builder.title(Component.translatable("tab.custom_tab"));
+     *         builder.icon(() -> new ItemStack(CUSTOM_ITEM));
+     *         builder.displayItems((parameters, output) -> {
+     *             output.accept(new ItemStack(CUSTOM_ITEM));
+     *         });
+     *     }));
      *
      * } </pre>
      *
-     * @param location the text component to be displayed as the title
-     * @param icon the item stack to be displayed as the icon
+     * @param consumer the building components of the creative tab
      * @return custom creative tab
      */
     @ExpectPlatform
-    public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon) {
+    public static CreativeModeTab create(Consumer<CreativeModeTab.Builder> consumer) {
         throw new AssertionError();
     }
-
-    /**
-     * <p>Example of creating a creative tab with item stacks:</p>
-     *
-     * <pre>{@code
-     *
-     * CreativeModeTab CUSTOM_TAB = CreativeTabs.create(
-     *     new ResourceLocation("mod_id", "custom_tab"),
-     *     () -> new ItemStack(CUSTOM_ITEM),
-     *     stacks -> {
-     *         stacks.add(new ItemStack(Items.OAK_PLANKS));
-     *         stacks.add(new ItemStack(Items.OAK_STAIRS));
-     *         stacks.add(new ItemStack(Items.OAK_SLABS));
-     *     }
-     * );
-     *
-     * }</pre>
-     *
-     * @param location the text component to be displayed as the title
-     * @param icon the item stack to be displayed as the icon
-     * @param display the list of components to be displayed in order
-     * @return custom creative tab
-     */
-    @ExpectPlatform
-    public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon, Consumer<List<ItemStack>> display) {
-        throw new AssertionError();
-    }
-
+    
     /**
      * <p>Example of modifying a vanilla creative tab (recommended for adding items only):</p>
      *
      * <pre>{@code
      *
-     * CreativeTabs.modify((stack, stacks) -> {
-     *     if (stack.is(Items.CHICKEN_SPAWN_EGG)) {
-     *         stacks.add(new ItemStack(DUCK_SPAWN_EGG));
-     *         stacks.add(new ItemStack(TURKEY_SPAWN_EGG));
+     * CreativeTabs.modify(
+     *     CreativeModeTabs.getDefaultTab(),
+     *     (flags, output, operatorBlocks) -> {
+     *         output.addAllAfter(
+     *             new ItemStack(Items.CHICKEN_SPAWN_EGG),
+     *             List.of(
+     *                 new ItemStack(Items.DUCK_SPAWN_EGG),
+     *                 new ItemStack(Items.TURKEY_SPAWN_EGG)
+     *             )
+     *         );
      *     }
-     * });
+     * );
      *
      * }</pre>
-     *
-     * <p>
-     * It's recommended to implement this method on the post-common setup for {@link ModInstance}.
-     * Otherwise, you may receive the "Registry Object not present" error on Forge.
-     * </p>
-     *
-     * @param display the list of components to be displayed in order
      */
-    public static void modify(BiConsumer<ItemStack, List<ItemStack>> display) {
-        MODIFICATIONS.add(display);
+    @ExpectPlatform
+    public static void modify(CreativeModeTab tab, Modifier modifier) {
+        throw new AssertionError();
+    }
+    
+    @ExpectPlatform
+    public static void modify(ResourceKey<CreativeModeTab> key, Modifier modifier) {
+        throw new AssertionError();
+    }
+    
+    public interface Modifier {
+        void accept(FeatureFlagSet flags, Output output, boolean operatorBlocks);
+    }
+    
+    public interface Output extends CreativeModeTab.Output {
+        // ========== DEFAULT ===========
+        
+        @Override
+        default void accept(ItemStack stack, CreativeModeTab.TabVisibility tabVisibility) {
+            addAfter(ItemStack.EMPTY, stack, tabVisibility);
+        }
+        
+        // ========== ADD AFTER ===========
+        
+        void addAfter(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility);
+        
+        default void addAfter(ItemStack target, ItemStack stack) {
+            addAfter(target, stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        }
+        
+        default void addAllAfter(ItemStack target, Collection<ItemStack> stacks, CreativeModeTab.TabVisibility visibility) {
+            stacks.forEach(stack -> addAfter(target, stack, visibility));
+        }
+        
+        default void addAllAfter(ItemStack target, Collection<ItemStack> stacks) {
+            stacks.forEach(stack -> addAfter(target, stack));
+        }
+        
+        // ========== ADD BEFORE ===========
+        
+        void addBefore(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility);
+        
+        default void addBefore(ItemStack target, ItemStack stack) {
+            addBefore(target, stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        }
+        
+        default void addAllBefore(ItemStack target, Collection<ItemStack> stacks, CreativeModeTab.TabVisibility visibility) {
+            stacks.forEach(stack -> addBefore(target, stack, visibility));
+        }
+        
+        default void addAllBefore(ItemStack target, Collection<ItemStack> stacks) {
+            stacks.forEach(stack -> addBefore(target, stack));
+        }
     }
 }

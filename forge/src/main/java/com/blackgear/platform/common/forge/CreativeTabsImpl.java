@@ -1,38 +1,60 @@
 package com.blackgear.platform.common.forge;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
+import com.blackgear.platform.Platform;
+import com.blackgear.platform.common.CreativeTabs;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.fml.common.Mod;
 
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+@Mod.EventBusSubscriber(
+    modid = Platform.MOD_ID,
+    value = Dist.CLIENT,
+    bus = Mod.EventBusSubscriber.Bus.MOD
+)
 public class CreativeTabsImpl {
-    public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon) {
-        return new CreativeModeTab(location.toString().replace(":", ".")) {
-            @Override public ItemStack makeIcon() {
-                return icon.get();
-            }
-        };
+    private static final Set<Consumer<BuildCreativeModeTabContentsEvent>> MODIFICATIONS = ConcurrentHashMap.newKeySet();
+    
+    public static CreativeModeTab create(Consumer<CreativeModeTab.Builder> consumer) {
+        CreativeModeTab.Builder builder = CreativeModeTab.builder();
+        consumer.accept(builder);
+        return builder.build();
     }
-
-    public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon, Consumer<List<ItemStack>> display) {
-        return new CreativeModeTab(location.toString().replace(":", ".")) {
-            @Override public ItemStack makeIcon() {
-                return icon.get();
+    
+    public static void modify(ResourceKey<CreativeModeTab> key, CreativeTabs.Modifier modifier) {
+        modify(BuiltInRegistries.CREATIVE_MODE_TAB.get(key), modifier);
+    }
+    
+    public static void modify(CreativeModeTab tab, CreativeTabs.Modifier modifier) {
+        MODIFICATIONS.add(event -> {
+            if (event.getTab() == tab) {
+                modifier.accept(event.getFlags(), new CreativeTabs.Output() {
+                    @Override
+                    public void addAfter(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+                        if (target.isEmpty()) {
+                            event.getEntries().put(stack, visibility);
+                        } else {
+                            event.getEntries().putAfter(target, stack, visibility);
+                        }
+                    }
+                    
+                    @Override
+                    public void addBefore(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+                        if (target.isEmpty()) {
+                            event.getEntries().put(stack, visibility);
+                        } else {
+                            event.getEntries().putBefore(target, stack, visibility);
+                        }
+                    }
+                }, event.hasPermissions());
             }
-
-            @Override
-            public void fillItemList(NonNullList<ItemStack> items) {
-                if (display != null) {
-                    display.accept(items);
-                    return;
-                }
-
-                super.fillItemList(items);
-            }
-        };
+        });
     }
 }

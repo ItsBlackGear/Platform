@@ -6,8 +6,10 @@ import com.blackgear.platform.common.worldgen.modifier.BiomeWriter;
 import com.blackgear.platform.Platform;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
@@ -20,9 +22,11 @@ import net.minecraftforge.common.world.ModifiableBiomeInfo;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
+import java.util.Optional;
+
 public class BiomeManagerImpl {
     @Nullable
     private static Codec<PlatformBiomeModifier> codec = null;
@@ -31,9 +35,6 @@ public class BiomeManagerImpl {
         FMLJavaModLoadingContext.get().getModEventBus().<RegisterEvent>addListener(event -> {
             event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, entry -> {
                 entry.register(new ResourceLocation(Platform.MOD_ID, "biome_modifier_codec"), codec = Codec.unit(PlatformBiomeModifier.INSTANCE));
-            });
-            event.register(ForgeRegistries.Keys.BIOME_MODIFIERS, entry -> {
-                entry.register(new ResourceLocation(Platform.MOD_ID, "biome_modifier"), PlatformBiomeModifier.INSTANCE);
             });
         });
     }
@@ -44,7 +45,7 @@ public class BiomeManagerImpl {
         @Override
         public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             if (phase == Phase.ADD) {
-                BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome, builder));
+                BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome.unwrapKey(), builder));
             }
         }
 
@@ -55,17 +56,17 @@ public class BiomeManagerImpl {
     }
 
     static class ForgeBiomeWriter extends BiomeWriter {
-        private final Holder<Biome> biome;
+        private final Optional<ResourceKey<Biome>> biome;
         private final ModifiableBiomeInfo.BiomeInfo.Builder builder;
 
-        ForgeBiomeWriter(Holder<Biome> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+        ForgeBiomeWriter(Optional<ResourceKey<Biome>> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             this.biome = biome;
             this.builder = builder;
         }
 
         @Override
         public ResourceLocation name() {
-            return ForgeBiomeWriter.this.biome.unwrapKey().get().location();
+            return ForgeBiomeWriter.this.biome.get().location();
         }
 
         @Override
@@ -73,19 +74,43 @@ public class BiomeManagerImpl {
             return new BiomeContext() {
                 @Override
                 public boolean is(TagKey<Biome> tag) {
-                    return ForgeBiomeWriter.this.biome.is(tag);
+                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+                    if (server != null) {
+                        server.registryAccess()
+                            .registry(Registries.BIOME)
+                            .flatMap(biomes -> biomes.getHolder(ForgeBiomeWriter.this.biome.get()))
+                            .ifPresent(holder -> holder.is(tag));
+                    }
+                    
+                    return false;
                 }
 
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    return ForgeBiomeWriter.this.biome.is(biome);
+                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+                    if (server != null) {
+                        server.registryAccess()
+                            .registry(Registries.BIOME)
+                            .flatMap(biomes -> biomes.getHolder(ForgeBiomeWriter.this.biome.get()))
+                            .ifPresent(holder -> holder.is(biome));
+                    }
+                    
+                    return false;
                 }
             };
         }
 
         @Override
-        public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
-            this.builder.getGenerationSettings().addFeature(decoration, feature);
+        public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server != null) {
+                server.registryAccess()
+                    .registry(Registries.PLACED_FEATURE)
+                    .flatMap(features -> features.getHolder(feature))
+                    .ifPresent(placedFeature -> {
+                        this.builder.getGenerationSettings().addFeature(decoration, placedFeature);
+                    });
+            }
         }
 
         @Override
@@ -94,8 +119,16 @@ public class BiomeManagerImpl {
         }
 
         @Override
-        public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
-            this.builder.getGenerationSettings().addCarver(carving, carver);
+        public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server != null) {
+                server.registryAccess()
+                    .registry(Registries.CONFIGURED_CARVER)
+                    .flatMap(carvers -> carvers.getHolder(carver))
+                    .ifPresent(configuredCarver -> {
+                        this.builder.getGenerationSettings().addCarver(carving, configuredCarver);
+                    });
+            }
         }
     }
 }

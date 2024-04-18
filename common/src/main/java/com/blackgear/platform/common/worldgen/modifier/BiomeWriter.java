@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.worldgen.modifier;
 
-import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -22,9 +22,9 @@ public abstract class BiomeWriter {
 
     public abstract BiomeContext context();
 
-    public abstract void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature);
+    public abstract void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature);
 
     public abstract void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data);
 
-    public abstract void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver);
+    public abstract void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver);
 }

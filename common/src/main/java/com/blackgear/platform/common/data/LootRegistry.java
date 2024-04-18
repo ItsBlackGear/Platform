@@ -2,8 +2,8 @@ package com.blackgear.platform.common.data;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTables;
 
 /**
  * Utility class to apply modifications to Loot Tables
@@ -37,7 +37,7 @@ public class LootRegistry {
     }
 
     public interface LootTableModifier {
-        void modify(LootTables lootTables, ResourceLocation path, LootTableContext context, boolean builtin);
+        void modify(LootDataManager lootTables, ResourceLocation path, LootTableContext context, boolean builtin);
     }
 
     public interface LootTableContext {
