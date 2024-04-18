@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Platform",
-  "description": "Library mod that aims to ease up the development of mods based on Forge and Fabric",
+  "description": "Cross-Platform library mod based on Architectury to access both Forge and Fabric APIs",
   "authors": [
     "ItsBlackGear"
   ],
