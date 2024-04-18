@@ -18,7 +18,8 @@ public class SheetsMixin {
         cancellable = true
     )
     private static void platform$createSignMaterial(WoodType type, CallbackInfoReturnable<Material> cir) {
-        if (type instanceof WoodTypeRegistryImpl.WoodTypeImpl impl) {
+        if (type instanceof WoodTypeRegistryImpl.WoodTypeImpl) {
+            WoodTypeRegistryImpl.WoodTypeImpl impl = (WoodTypeRegistryImpl.WoodTypeImpl) type;
             cir.setReturnValue(
                 new Material(
                     Sheets.SIGN_SHEET,

@@ -40,7 +40,13 @@ import java.util.function.Supplier;
  *
  * @author ItsBlackGear
  */
-public record RegistryBuilder(String modId) {
+public class RegistryBuilder {
+    private final String modId;
+    
+    public RegistryBuilder(String modId) {
+        this.modId = modId;
+    }
+    
     public <T> Sample<T> create(String key, Supplier<T> bootstrap) {
         ResourceKey<Registry<T>> resource = ResourceKey.createRegistryKey(new ResourceLocation(this.modId, key));
         return new Sample<>(resource, Registry.registerSimple(resource, bootstrap));
@@ -48,5 +54,21 @@ public record RegistryBuilder(String modId) {
 
     public static void bootstrap() {}
 
-    public record Sample<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {}
+    public static class Sample<T> {
+        public final ResourceKey<Registry<T>> resource;
+        public final Registry<T> registry;
+        
+        public Sample(ResourceKey<Registry<T>> resource, Registry<T> registry) {
+            this.resource = resource;
+            this.registry = registry;
+        }
+        
+        public ResourceKey<Registry<T>> getResource() {
+            return this.resource;
+        }
+        
+        public Registry<T> getRegistry() {
+            return this.registry;
+        }
+    }
 }
