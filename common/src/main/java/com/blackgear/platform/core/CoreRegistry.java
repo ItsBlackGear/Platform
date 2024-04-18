@@ -56,15 +56,25 @@ public abstract class CoreRegistry<T> {
      *     MOD_ID
      * );
      *
+     * // Registry with Supplier
      * Supplier<Item> CUSTOM_ITEM = ITEMS.register(
      *     "custom_item",
      *     () -> new Item(new Item.Properties())
      * );
      *
+     * // Registry without Supplier
+     * // There is not much difference between the two,
+     * // at this point is just a matter of preference.
+     * Item CUSTOM_ITEM = ITEMS.register(
+     *     "custom_item",
+     *     new Item(new Item.Properties())
+     * );
+     *
      * }</pre>
      */
-    @SuppressWarnings("UnusedReturnValue")
     public abstract <E extends T> Supplier<E> register(String key, Supplier<E> entry);
+    
+    public abstract <E extends T> E register(String key, E entry);
 
     /**
      * Registers an entry into the CoreRegistry, returning a ResourceKey
@@ -88,6 +98,11 @@ public abstract class CoreRegistry<T> {
      * It's recommended to be used on entries that require a {@link ResourceKey}, features such as Biomes, Points of Interest, Instruments, etc.
      */
     public <E extends T> ResourceKey<T> resource(String key, Supplier<E> entry) {
+        this.register(key, entry);
+        return ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, key));
+    }
+    
+    public <E extends T> ResourceKey<T> resource(String key, E entry) {
         this.register(key, entry);
         return ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, key));
     }
@@ -115,4 +130,25 @@ public abstract class CoreRegistry<T> {
     }
 
     protected abstract void bootstrap();
+    
+    public static class SimpleRegistry<T> extends CoreRegistry<T> {
+        public SimpleRegistry(Registry<T> registry, String modId) {
+            super(registry, modId);
+        }
+        
+        @Override
+        public <E extends T> Supplier<E> register(String key, Supplier<E> entry) {
+            E value = Registry.register(this.registry, new ResourceLocation(this.modId, key), entry.get());
+            return () -> value;
+        }
+        
+        @Override
+        public <E extends T> E register(String key, E entry) {
+            Registry.register(this.registry, new ResourceLocation(this.modId, key), entry);
+            return entry;
+        }
+        
+        @Override
+        protected void bootstrap() {}
+    }
 }

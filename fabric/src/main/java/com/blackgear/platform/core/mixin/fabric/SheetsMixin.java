@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Sheets.class)
 public class SheetsMixin {
     @Inject(
-        method = "createSignMaterial",
+        method = "signTexture",
         at = @At("HEAD"),
         cancellable = true
     )

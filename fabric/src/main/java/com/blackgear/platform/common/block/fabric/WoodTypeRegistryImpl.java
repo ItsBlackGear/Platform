@@ -9,7 +9,7 @@ public class WoodTypeRegistryImpl {
     public static WoodType create(ResourceLocation location) {
         WoodType type = WoodType.register(new WoodTypeImpl(location));
         if (Environment.isClientSide()) {
-            Sheets.SIGN_MATERIALS.put(type, Sheets.createSignMaterial(type));
+            Sheets.SIGN_MATERIALS.put(type, Sheets.signTexture(type));
         }
 
         return type;

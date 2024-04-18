@@ -1,18 +1,18 @@
 accessWidener   v2  named
 
-# Wood Type Registry
+# Block Registry
 accessible method net/minecraft/world/level/block/state/properties/WoodType <init> (Ljava/lang/String;)V
 accessible method net/minecraft/world/level/block/state/properties/WoodType register (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
-accessible method net/minecraft/client/renderer/Sheets createSignMaterial (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/Material;
+mutable field net/minecraft/world/level/block/state/BlockBehaviour$Properties materialColor Ljava/util/function/Function;
+accessible field net/minecraft/world/level/block/state/BlockBehaviour$Properties materialColor Ljava/util/function/Function;
 
 # Integration Handler
-mutable field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
-accessible field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
+mutable field net/minecraft/world/item/AxeItem STRIPABLES Ljava/util/Map;
+accessible field net/minecraft/world/item/AxeItem STRIPABLES Ljava/util/Map;
 accessible method net/minecraft/world/level/block/FireBlock setFlammable (Lnet/minecraft/world/level/block/Block;II)V
 
 # Registry Builder
-accessible method net/minecraft/core/Registry registerSimple (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/Registry$RegistryBootstrap;)Lnet/minecraft/core/Registry;
-accessible class net/minecraft/core/Registry$RegistryBootstrap
+accessible method net/minecraft/core/Registry registerSimple (Lnet/minecraft/resources/ResourceKey;Ljava/util/function/Supplier;)Lnet/minecraft/core/Registry;
 
 # Entity Handler
 accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacements$Type;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V

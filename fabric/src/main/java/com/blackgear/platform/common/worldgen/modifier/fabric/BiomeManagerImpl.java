@@ -8,16 +8,14 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
 public class BiomeManagerImpl {
     public static void bootstrap() {
@@ -37,7 +35,7 @@ public class BiomeManagerImpl {
             this.selector = selector;
             this.modifier = modifier;
         }
-
+        
         @Override
         public ResourceLocation name() {
             return this.selector.getBiomeKey().location();
@@ -47,10 +45,10 @@ public class BiomeManagerImpl {
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
-                public boolean is(TagKey<Biome> tag) {
-                    return FabricBiomeWriter.this.selector.hasTag(tag);
+                public boolean is(Biome.BiomeCategory category) {
+                    return FabricBiomeWriter.this.selector.getBiome().getBiomeCategory() == category;
                 }
-
+                
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
                     return FabricBiomeWriter.this.selector.getBiomeKey() == biome;
@@ -59,8 +57,8 @@ public class BiomeManagerImpl {
         }
 
         @Override
-        public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
-            this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature.value());
+        public void addFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature) {
+            this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature);
         }
 
         @Override
@@ -69,8 +67,8 @@ public class BiomeManagerImpl {
         }
 
         @Override
-        public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
-            this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver.value());
+        public void addCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver) {
+            this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver);
         }
     }
 }

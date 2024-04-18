@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "BlockEntityTypeMixin",
-    "CreativeModeTabMixin",
-    "OverworldBiomeBuilderMixin"
+    "CreativeModeTabMixin"
   ],
   "client": [
   ],
