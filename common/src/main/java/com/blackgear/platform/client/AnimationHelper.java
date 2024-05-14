@@ -18,29 +18,29 @@ import java.util.Optional;
  */
 public class AnimationHelper {
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
-
+    
     public static void animate(HierarchicalModel<?> model, AnimationState state, AnimationDefinition definition, float time) {
         animate(model, state, definition, time, 1F);
     }
-
+    
     public static void animateWalk(HierarchicalModel<?> model, AnimationDefinition definition, float limbSwing, float limbSwingAmount, float maxSpeed, float scaleFactor) {
         long accumulatedTime = (long)(limbSwing * 50F * maxSpeed);
         float scale = Math.min(limbSwingAmount * scaleFactor, 1F);
         animate(model, definition, accumulatedTime, scale);
     }
-
+    
     public static void animate(HierarchicalModel<?> model, AnimationState state, AnimationDefinition definition, float time, float speed) {
         state.updateTime(time, speed);
         state.ifStarted(animationState -> animate(model, definition, animationState.getAccumulatedTime(), 1F));
     }
-
+    
     public static void applyStatic(HierarchicalModel<?> model, AnimationDefinition definition) {
         animate(model, definition, 0L, 1F);
     }
-
+    
     private static void animate(HierarchicalModel<?> model, AnimationDefinition definition, long accumulatedTime, float scale) {
         float elapsed = getElapsedSeconds(definition, accumulatedTime);
-
+        
         for (Map.Entry<String, List<AnimationChannel>> animation : definition.boneAnimations().entrySet()) {
             Optional<ModelPart> optional = model.getAnyDescendantWithName(animation.getKey());
             List<AnimationChannel> channel = animation.getValue();
@@ -57,7 +57,7 @@ public class AnimationHelper {
             }));
         }
     }
-
+    
     private static float getElapsedSeconds(AnimationDefinition definition, long accumulatedTime) {
         float seconds = (float)accumulatedTime / 1000F;
         return definition.looping() ? seconds % definition.lengthInSeconds() : seconds;

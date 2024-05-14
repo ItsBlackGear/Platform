@@ -4,6 +4,12 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.function.Supplier;
+
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+
 /**
  * Utility class to help registering new registries.
  *
@@ -43,8 +49,8 @@ public record RegistryBuilder(String modId) {
         ResourceKey<Registry<T>> resource = ResourceKey.createRegistryKey(new ResourceLocation(this.modId, key));
         return new Sample<>(resource, Registry.registerSimple(resource, bootstrap));
     }
-
+    
     public static void bootstrap() {}
-
+    
     public record Sample<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {}
 }

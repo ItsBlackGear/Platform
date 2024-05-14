@@ -3,6 +3,7 @@ package com.blackgear.platform.common.forge;
 import com.blackgear.platform.common.IntegrationHandler;
 import com.blackgear.platform.Platform;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -43,7 +44,7 @@ public class IntegrationHandlerImpl {
 
     public static void addFuel(ItemLike item, int burnTime) {
         FUEL_ENTRIES.add(event -> {
-            if (event.getItemStack().is(item.asItem())) {
+            if (event.getItemStack().getItem() == item.asItem()) {
                 event.setBurnTime(burnTime);
             }
         });

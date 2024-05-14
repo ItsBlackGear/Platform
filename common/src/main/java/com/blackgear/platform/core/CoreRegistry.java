@@ -56,16 +56,24 @@ public abstract class CoreRegistry<T> {
      *     MOD_ID
      * );
      *
+     * // Registry with Supplier
      * Supplier<Item> CUSTOM_ITEM = ITEMS.register(
      *     "custom_item",
      *     () -> new Item(new Item.Properties())
      * );
      *
+     * // Registry without Supplier
+     * // There is not much difference between the two,
+     * // at this point is just a matter of preference.
+     * Item CUSTOM_ITEM = ITEMS.register(
+     *     "custom_item",
+     *     new Item(new Item.Properties())
+     * );
+     *
      * }</pre>
      */
-    @SuppressWarnings("UnusedReturnValue")
     public abstract <E extends T> Supplier<E> register(String key, Supplier<E> entry);
-
+    
     /**
      * Registers an entry into the CoreRegistry, returning a ResourceKey
      *
@@ -110,9 +118,25 @@ public abstract class CoreRegistry<T> {
         if (this.isPresent) {
             throw new IllegalArgumentException("Duplication of Registry: " + this.registry);
         }
+        
         this.isPresent = true;
         this.bootstrap();
     }
 
     protected abstract void bootstrap();
+    
+    public static class SimpleRegistry<T> extends CoreRegistry<T> {
+        public SimpleRegistry(Registry<T> registry, String modId) {
+            super(registry, modId);
+        }
+        
+        @Override
+        public <E extends T> Supplier<E> register(String key, Supplier<E> entry) {
+            E value = Registry.register(this.registry, new ResourceLocation(this.modId, key), entry.get());
+            return () -> value;
+        }
+        
+        @Override
+        protected void bootstrap() {}
+    }
 }

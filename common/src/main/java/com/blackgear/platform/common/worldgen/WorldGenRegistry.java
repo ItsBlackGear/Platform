@@ -19,23 +19,23 @@ import java.util.List;
  **/
 public class WorldGenRegistry {
     protected final String modId;
-
+    
     private WorldGenRegistry(String modId) {
         this.modId = modId;
     }
-
+    
     /**
      * Creates a new instance of the WorldGenRegistry.
      */
     public static WorldGenRegistry create(String modId) {
         return new WorldGenRegistry(modId);
     }
-
+    
     @SuppressWarnings("unchecked")
     private static <V extends T, T> Holder<V> register(Registry<T> registry, ResourceLocation location, V holder) {
         return (Holder<V>) BuiltinRegistries.register(registry, location, holder);
     }
-
+    
     /**
      * Registers a Configured Feature
      */
@@ -46,7 +46,7 @@ public class WorldGenRegistry {
             new ConfiguredFeature<>(feature, configuration)
         );
     }
-
+    
     /**
      * Registers a Placed Feature
      */
@@ -57,7 +57,7 @@ public class WorldGenRegistry {
             new PlacedFeature(Holder.hackyErase(feature), List.of(placements))
         );
     }
-
+    
     /**
      * Registers a Placed Feature
      */
@@ -68,6 +68,6 @@ public class WorldGenRegistry {
             new PlacedFeature(Holder.hackyErase(feature), List.copyOf(placements))
         );
     }
-
+    
     public void register() {}
 }

@@ -27,7 +27,7 @@
     "platform-common.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.9",
-    "minecraft": ">=1.19.2"
+    "fabricloader": "*",
+    "minecraft": ">=1.16.5"
   }
 }

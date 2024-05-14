@@ -2,6 +2,8 @@ package com.blackgear.platform.core;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
 
+import java.util.function.Consumer;
+
 /**
  * Utility class represents a mod instance, which includes both the common and client side of a mod.
  * It provides methods to set up and post-initialize the common and client side of the mod.
@@ -47,11 +49,17 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 public abstract class ModInstance {
     public final String modId;
     public Runnable onCommon;
-    public Runnable onPostCommon;
+    public Consumer<ParallelDispatch> onPostCommon;
     public Runnable onClient;
-    public Runnable onPostClient;
+    public Consumer<ParallelDispatch> onPostClient;
 
-    public ModInstance(String modId, Runnable onCommon, Runnable onPostCommon, Runnable onClient, Runnable onPostClient) {
+    public ModInstance(
+        String modId,
+        Runnable onCommon,
+        Consumer<ParallelDispatch> onPostCommon,
+        Runnable onClient,
+        Consumer<ParallelDispatch> onPostClient
+    ) {
         this.modId = modId;
         this.onCommon = onCommon;
         this.onPostCommon = onPostCommon;
@@ -79,7 +87,7 @@ public abstract class ModInstance {
     /**
      * call the common setup instances for the mod post-initialization.
      **/
-    private void postCommonSetup(Runnable common) {
+    private void postCommonSetup(Consumer<ParallelDispatch> common) {
         this.onPostCommon = common;
     }
 
@@ -93,7 +101,7 @@ public abstract class ModInstance {
     /**
      * call the client setup instances for the mod post-initialization.
      **/
-    private void postClientSetup(Runnable client) {
+    private void postClientSetup(Consumer<ParallelDispatch> client) {
         this.onPostClient = client;
     }
 
@@ -105,22 +113,22 @@ public abstract class ModInstance {
             this.commonSetup(() -> {});
         }
         if (this.onPostCommon == null) {
-            this.postCommonSetup(() -> {});
+            this.postCommonSetup(dispatch -> {});
         }
         if (this.onClient == null) {
             this.clientSetup(() -> {});
         }
         if (this.onPostClient == null) {
-            this.postClientSetup(() -> {});
+            this.postClientSetup(dispatch -> {});
         }
     }
 
     public static class Builder {
         private final String modId;
         private Runnable onCommon;
-        private Runnable onPostCommon;
+        private Consumer<ParallelDispatch> onPostCommon;
         private Runnable onClient;
-        private Runnable onPostClient;
+        private Consumer<ParallelDispatch> onPostClient;
 
         protected Builder(String modId) {
             this.modId = modId;
@@ -131,7 +139,7 @@ public abstract class ModInstance {
             return this;
         }
 
-        public Builder postCommon(Runnable common) {
+        public Builder postCommon(Consumer<ParallelDispatch> common) {
             this.onPostCommon = common;
             return this;
         }
@@ -141,7 +149,7 @@ public abstract class ModInstance {
             return this;
         }
 
-        public Builder postClient(Runnable client) {
+        public Builder postClient(Consumer<ParallelDispatch> client) {
             this.onPostClient = client;
             return this;
         }
@@ -151,7 +159,13 @@ public abstract class ModInstance {
         }
 
         @ExpectPlatform
-        public static ModInstance builder(String modId, Runnable common, Runnable postCommon, Runnable client, Runnable postClient) {
+        public static ModInstance builder(
+            String modId,
+            Runnable common,
+            Consumer<ParallelDispatch> postCommon,
+            Runnable client,
+            Consumer<ParallelDispatch> postClient
+        ) {
             throw new AssertionError();
         }
     }

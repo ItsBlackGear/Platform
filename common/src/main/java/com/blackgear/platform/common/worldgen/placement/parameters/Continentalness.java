@@ -11,17 +11,17 @@ public enum Continentalness {
     NEAR_INLAND(Parameter.span(-0.11F, 0.03F)),
     MID_INLAND(Parameter.span(0.03F, 0.3F)),
     FAR_INLAND(Parameter.span(0.03F, 1.0F));
-
+    
     private final Parameter parameter;
-
+    
     Continentalness(Parameter parameter) {
         this.parameter = parameter;
     }
-
+    
     public Parameter point() {
         return this.parameter;
     }
-
+    
     public static Parameter span(Continentalness min, Continentalness max) {
         return Parameter.span(min.point(), max.point());
     }

@@ -31,7 +31,7 @@ public class ParticleRegistry {
     public static <T extends ParticleOptions, P extends ParticleType<T>> void create(Supplier<P> type, ParticleProvider<T> provider) {
         throw new AssertionError();
     }
-
+    
     /**
      * Registers a particle provider with the provided particle type.
      *
@@ -46,7 +46,7 @@ public class ParticleRegistry {
     public static <T extends ParticleOptions, P extends ParticleType<T>> void create(Supplier<P> type, Factory<T> factory) {
         throw new AssertionError();
     }
-
+    
     public interface Factory<T extends ParticleOptions> {
         @NotNull ParticleProvider<T> create(SpriteSet sprites);
     }

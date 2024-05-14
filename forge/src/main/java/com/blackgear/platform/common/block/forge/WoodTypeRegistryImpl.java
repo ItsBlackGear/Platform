@@ -11,7 +11,7 @@ public class WoodTypeRegistryImpl {
         if (Environment.isClientSide()) {
             Sheets.addWoodType(type);
         }
-
+        
         return type;
     }
 }

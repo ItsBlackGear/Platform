@@ -25,11 +25,11 @@ public class BiomeSpawnPlacement {
     public static final Climate.Parameter FULL_RANGE = Climate.Parameter.span(-1.0F, 1.0F);
     public static final Climate.Parameter FROZEN_RANGE = Temperatures.ICY.point();
     public static final Climate.Parameter UNFROZEN_RANGE = Temperatures.span(Temperatures.COOL, Temperatures.HOT);
-
+    
     private static void add(Pair<Climate.ParameterPoint, ResourceKey<Biome>> mapper) {
         BIOME_ENTRIES.add(mapper);
     }
-
+    
     /**
      * Register a custom biome placement without any presets for generation.
      *
@@ -77,7 +77,7 @@ public class BiomeSpawnPlacement {
             )
         );
     }
-
+    
     /**
      * Register a surface biome placement without a specific Weirdness preset.
      *
@@ -118,7 +118,7 @@ public class BiomeSpawnPlacement {
         addBiome(temperature, humidity, continentalness, erosion, Depth.SURFACE.point(), weirdness, offset, key);
         addBiome(temperature, humidity, continentalness, erosion, Depth.FLOOR.point(), weirdness, offset, key);
     }
-
+    
     /**
      * Register a custom underground biome placement.
      *
@@ -174,7 +174,7 @@ public class BiomeSpawnPlacement {
     ) {
         addBiome(temperature, humidity, continentalness, erosion, Depth.UNDERGROUND.point(), weirdness, offset, key);
     }
-
+    
     /**
      * Register a custom underground biome placement that only generates at the depths of the world.
      *
@@ -214,7 +214,7 @@ public class BiomeSpawnPlacement {
     ) {
         addBiome(temperature, humidity, continentalness, erosion, Depth.UNDERGROUND.point(), weirdness, offset, key);
     }
-
+    
     /**
      * Register a custom surface biome placement with a defined placement preset.
      *
@@ -292,9 +292,9 @@ public class BiomeSpawnPlacement {
             case PEAK -> addPeakBiome(temperature, humidity, continentalness, erosion, offset, key);
         }
     }
-
+    
     // ========== Surface Biome Placement Presets ==========
-
+    
     private static void addValleyBiome(
         Climate.Parameter temperature,
         Climate.Parameter humidity,
@@ -305,7 +305,7 @@ public class BiomeSpawnPlacement {
     ) {
         addSurfaceBiome(temperature, humidity, continentalness, erosion, Weirdness.VALLEY.point(), offset, key);
     }
-
+    
     private static void addLowSliceBiome(
         Climate.Parameter temperature,
         Climate.Parameter humidity,
@@ -317,7 +317,7 @@ public class BiomeSpawnPlacement {
         addSurfaceBiome(temperature, humidity, continentalness, erosion, Weirdness.LOW_SLICE_NORMAL_DESCENDING.point(), offset, key);
         addSurfaceBiome(temperature, humidity, continentalness, erosion, Weirdness.LOW_SLICE_VARIANT_ASCENDING.point(), offset, key);
     }
-
+    
     private static void addMidSliceBiome(
         Climate.Parameter temperature,
         Climate.Parameter humidity,
@@ -331,7 +331,7 @@ public class BiomeSpawnPlacement {
         addSurfaceBiome(temperature, humidity, continentalness, erosion, Weirdness.MID_SLICE_VARIANT_ASCENDING.point(), offset, key);
         addSurfaceBiome(temperature, humidity, continentalness, erosion, Weirdness.MID_SLICE_VARIANT_DESCENDING.point(), offset, key);
     }
-
+    
     private static void addHighSliceBiome(
         Climate.Parameter temperature,
         Climate.Parameter humidity,
@@ -345,7 +345,7 @@ public class BiomeSpawnPlacement {
         addSurfaceBiome(temperature, humidity, continentalness, erosion, Weirdness.HIGH_SLICE_VARIANT_ASCENDING.point(), offset, key);
         addSurfaceBiome(temperature, humidity, continentalness, erosion, Weirdness.HIGH_SLICE_VARIANT_DESCENDING.point(), offset, key);
     }
-
+    
     private static void addPeakBiome(
         Climate.Parameter temperature,
         Climate.Parameter humidity,

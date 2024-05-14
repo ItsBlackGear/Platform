@@ -4,11 +4,14 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BlockEntityTypeMixin",
-    "CreativeModeTabMixin",
-    "OverworldBiomeBuilderMixin"
+    "common.BlockEntityTypeMixin",
+    "common.CreativeModeTabMixin",
+    "common.OverworldBiomeBuilderMixin",
+    "core.access.LevelResourceAccessor"
   ],
   "client": [
+    "client.access.CameraAccessor",
+    "core.config.ClientHandshakePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1

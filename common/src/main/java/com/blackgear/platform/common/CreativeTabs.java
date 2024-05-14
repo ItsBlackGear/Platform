@@ -1,11 +1,11 @@
 package com.blackgear.platform.common;
 
 import com.blackgear.platform.core.ModInstance;
+import com.google.common.collect.Lists;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import org.apache.commons.compress.utils.Lists;
 
 import java.util.List;
 import java.util.function.BiConsumer;

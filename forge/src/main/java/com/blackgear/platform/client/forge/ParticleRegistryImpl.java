@@ -22,15 +22,15 @@ import java.util.function.Supplier;
 )
 public class ParticleRegistryImpl {
     private static final Set<Consumer<RegisterParticleProvidersEvent>> FACTORIES = ConcurrentHashMap.newKeySet();
-
+    
     public static <T extends ParticleOptions, P extends ParticleType<T>> void create(Supplier<P> type, ParticleProvider<T> provider) {
         FACTORIES.add(event -> event.register(type.get(), provider));
     }
-
+    
     public static <T extends ParticleOptions, P extends ParticleType<T>> void create(Supplier<P> type, ParticleRegistry.Factory<T> factory) {
         FACTORIES.add(event -> event.register(type.get(), factory::create));
     }
-
+    
     @SubscribeEvent
     public static void registerParticleProvider(RegisterParticleProvidersEvent event) {
         FACTORIES.forEach(consumer -> consumer.accept(event));

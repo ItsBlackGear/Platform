@@ -22,11 +22,14 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Predicate;
+
+
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class BiomeManagerImpl {
     @Nullable
     private static Codec<PlatformBiomeModifier> codec = null;
-
+    
     public static void bootstrap() {
         FMLJavaModLoadingContext.get().getModEventBus().<RegisterEvent>addListener(event -> {
             event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, entry -> {
@@ -37,32 +40,32 @@ public class BiomeManagerImpl {
             });
         });
     }
-
+    
     static class PlatformBiomeModifier implements BiomeModifier {
         private static final PlatformBiomeModifier INSTANCE = new PlatformBiomeModifier();
-
+        
         @Override
         public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             if (phase == Phase.ADD) {
                 BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome, builder));
             }
         }
-
+        
         @Override
         public Codec<? extends BiomeModifier> codec() {
             return codec != null ? codec : Codec.unit(INSTANCE);
         }
     }
-
+    
     static class ForgeBiomeWriter extends BiomeWriter {
         private final Holder<Biome> biome;
         private final ModifiableBiomeInfo.BiomeInfo.Builder builder;
-
+        
         ForgeBiomeWriter(Holder<Biome> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             this.biome = biome;
             this.builder = builder;
         }
-
+        
         @Override
         public ResourceLocation name() {
             return ForgeBiomeWriter.this.biome.unwrapKey().get().location();
@@ -72,27 +75,42 @@ public class BiomeManagerImpl {
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
+                public ResourceKey<Biome> key() {
+                    return ForgeBiomeWriter.this.biome.unwrapKey().get();
+                }
+                
+                @Override
+                public Biome biome() {
+                    return ForgeRegistries.BIOMES.getValue(ForgeBiomeWriter.this.name());
+                }
+                
+                @Override
                 public boolean is(TagKey<Biome> tag) {
                     return ForgeBiomeWriter.this.biome.is(tag);
                 }
-
+                
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    return ForgeBiomeWriter.this.biome.is(biome);
+                    return this.key() == biome;
+                }
+                
+                @Override
+                public boolean is(Predicate<BiomeContext> context) {
+                    return context.test(this);
                 }
             };
         }
-
+        
         @Override
         public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
             this.builder.getGenerationSettings().addFeature(decoration, feature);
         }
-
+        
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.builder.getMobSpawnSettings().addSpawn(category, data);
         }
-
+        
         @Override
         public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
             this.builder.getGenerationSettings().addCarver(carving, carver);
