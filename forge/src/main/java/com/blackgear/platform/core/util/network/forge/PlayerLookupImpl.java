@@ -9,6 +9,7 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,8 +23,9 @@ import java.util.stream.Collectors;
 
 public class PlayerLookupImpl {
     public static Collection<ServerPlayer> all(MinecraftServer server) {
-        Objects.requireNonNull(server, "server cannot be null");
+        Objects.requireNonNull(server, "The server cannot be null");
         
+        // return an immutable collection to guard against accidental removals.
         if (server.getPlayerList() != null) {
             return Collections.unmodifiableCollection(server.getPlayerList().getPlayers());
         }
@@ -41,7 +43,7 @@ public class PlayerLookupImpl {
         Objects.requireNonNull(level, "level cannot be null");
         Objects.requireNonNull(pos, "pos cannot be null");
         
-        return level.getChunkSource().chunkMap.getPlayers(pos, false).collect(Collectors.toList());
+        return level.getChunkSource().chunkMap.getPlayers(pos, false);
     }
     
     public static Collection<ServerPlayer> tracking(Entity entity) {
@@ -53,7 +55,10 @@ public class PlayerLookupImpl {
             TrackedEntityAccessor tracker = ((ChunkMapAccessor) map).getEntityMap().get(entity.getId());
             
             if (tracker != null) {
-                return Collections.unmodifiableCollection(tracker.getSeenBy());
+                return tracker.getSeenBy()
+                    .stream()
+                    .map(ServerPlayerConnection::getPlayer)
+                    .collect(Collectors.toUnmodifiableSet());
             }
             
             return Collections.emptySet();
@@ -64,6 +69,11 @@ public class PlayerLookupImpl {
     
     public static Collection<ServerPlayer> tracking(BlockEntity blockEntity) {
         Objects.requireNonNull(blockEntity, "blockEntity cannot be null");
+        
+        //noinspection ConstantConditions - IJ intrinsics don't know hasWorld == true will result in no null
+        if (!blockEntity.hasLevel() || blockEntity.getLevel().isClientSide()) {
+            throw new IllegalArgumentException("Only supported on server worlds!");
+        }
         
         return tracking((ServerLevel) blockEntity.getLevel(), blockEntity.getBlockPos());
     }

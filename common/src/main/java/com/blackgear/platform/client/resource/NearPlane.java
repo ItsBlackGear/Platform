@@ -80,7 +80,7 @@ public class NearPlane {
         CameraAccessor access = (CameraAccessor) camera;
         Minecraft minecraft = Minecraft.getInstance();
         double aspectRatio = (double) minecraft.getWindow().getWidth() / (double) minecraft.getWindow().getHeight();
-        double halfFOVScaled = Math.tan(minecraft.options.fov * (float) (Math.PI / 180.0) / 2.0) * 0.05F;
+        double halfFOVScaled = Math.tan(minecraft.options.fov().get() * (float) (Math.PI / 180.0) / 2.0) * 0.05F;
         double scaledAspectRatio = halfFOVScaled * aspectRatio;
         Vec3 forward = new Vec3(access.getForwards()).scale(0.05F);
         Vec3 left = new Vec3(access.getLeft()).scale(scaledAspectRatio);

@@ -1,10 +1,10 @@
 package com.blackgear.platform.core.mixin.core.networking;
 
-import com.blackgear.platform.core.util.network.AbstractNetworkAddon;
-import com.blackgear.platform.core.util.network.DisconnectPacketSource;
-import com.blackgear.platform.core.util.network.NetworkHandlerExtensions;
-import com.blackgear.platform.core.util.network.PacketCallbackListener;
-import com.blackgear.platform.core.util.network.server.ServerLoginNetworkAddon;
+import com.blackgear.platform.core.util.network.client.forge.AbstractNetworkAddon;
+import com.blackgear.platform.core.util.network.client.forge.DisconnectPacketSource;
+import com.blackgear.platform.core.util.network.client.forge.NetworkHandlerExtensions;
+import com.blackgear.platform.core.util.network.client.forge.PacketCallbackListener;
+import com.blackgear.platform.core.util.network.server.forge.ServerLoginNetworkAddon;
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -87,18 +87,6 @@ public abstract class ServerLoginPacketListenerImplMixin implements NetworkHandl
     private void platform$handlePlayTransitionNormal(CallbackInfo ci) {
         this.addon.handlePlayTransition();
     }
-    
-    @Inject(
-        method = "tick",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/server/players/PlayerList;placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;)V"
-        )
-    )
-    private void platform$handlePlayTransitionDelayed(CallbackInfo ci) {
-        this.addon.handlePlayTransition();
-    }
-    
     
     @Override
     public void sent(Packet<?> packet) {

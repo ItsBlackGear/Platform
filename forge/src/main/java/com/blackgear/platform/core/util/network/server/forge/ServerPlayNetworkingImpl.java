@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.util.network.server.forge;
 
 import com.blackgear.platform.core.util.network.PacketSender;
-import com.blackgear.platform.core.util.network.server.ServerNetworking;
 import com.blackgear.platform.core.util.network.server.ServerPlayNetworking.PlayChannelHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;

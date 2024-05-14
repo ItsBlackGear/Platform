@@ -2,7 +2,6 @@ package com.blackgear.platform.core.util.network.server.forge;
 
 import com.blackgear.platform.core.mixin.core.networking.access.ServerLoginPacketListenerImplAccessor;
 import com.blackgear.platform.core.util.network.server.ServerLoginNetworking.LoginQueryResponseHandler;
-import com.blackgear.platform.core.util.network.server.ServerNetworking;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;

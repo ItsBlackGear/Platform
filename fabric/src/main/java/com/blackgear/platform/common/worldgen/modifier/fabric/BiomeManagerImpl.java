@@ -8,14 +8,16 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.function.Predicate;
 
@@ -57,8 +59,8 @@ public class BiomeManagerImpl {
                 }
                 
                 @Override
-                public boolean is(Biome.BiomeCategory category) {
-                    return this.biome().getBiomeCategory() == category;
+                public boolean is(TagKey<Biome> tag) {
+                    return FabricBiomeWriter.this.selector.hasTag(tag);
                 }
                 
                 @Override
@@ -72,20 +74,20 @@ public class BiomeManagerImpl {
                 }
             };
         }
-
+        
         @Override
-        public void addFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature) {
-            this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature);
+        public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
+            this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature.value());
         }
-
+        
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.modifier.getSpawnSettings().addSpawn(category, data);
         }
-
+        
         @Override
-        public void addCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver) {
-            this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver);
+        public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
+            this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver.value());
         }
     }
 }

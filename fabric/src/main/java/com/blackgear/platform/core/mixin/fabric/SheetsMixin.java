@@ -13,13 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Sheets.class)
 public class SheetsMixin {
     @Inject(
-        method = "signTexture",
+        method = "createSignMaterial",
         at = @At("HEAD"),
         cancellable = true
     )
     private static void platform$createSignMaterial(WoodType type, CallbackInfoReturnable<Material> cir) {
-        if (type instanceof WoodTypeRegistryImpl.WoodTypeImpl) {
-            WoodTypeRegistryImpl.WoodTypeImpl impl = (WoodTypeRegistryImpl.WoodTypeImpl) type;
+        if (type instanceof WoodTypeRegistryImpl.WoodTypeImpl impl) {
             cir.setReturnValue(
                 new Material(
                     Sheets.SIGN_SHEET,

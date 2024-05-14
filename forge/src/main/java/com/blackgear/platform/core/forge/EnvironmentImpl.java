@@ -1,21 +1,21 @@
 package com.blackgear.platform.core.forge;
 
 import com.blackgear.platform.core.util.config.ConfigBuilder;
-import com.blackgear.platform.core.util.config.ForgeConfigBuilder;
+import com.blackgear.platform.core.util.config.forge.ForgeConfigBuilder;
 import com.blackgear.platform.core.util.config.ModConfig.Type;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraftforge.api.distmarker.Dist;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.thread.EffectiveSide;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;

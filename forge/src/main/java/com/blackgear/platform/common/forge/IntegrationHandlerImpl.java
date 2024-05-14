@@ -27,7 +27,7 @@ public class IntegrationHandlerImpl {
 
     public static void addInteraction(IntegrationHandler.Interaction interaction) {
         BLOCK_INTERACTIONS.add(event -> {
-            InteractionResult result = interaction.of(new UseOnContext((Player) event.getEntity(), event.getHand(), event.getHitVec()));
+            InteractionResult result = interaction.of(new UseOnContext(event.getEntity(), event.getHand(), event.getHitVec()));
             if (result != InteractionResult.PASS) {
                 event.setCanceled(true);
                 event.setCancellationResult(result);

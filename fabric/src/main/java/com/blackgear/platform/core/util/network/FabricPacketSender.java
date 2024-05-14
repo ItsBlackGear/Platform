@@ -3,6 +3,7 @@ package com.blackgear.platform.core.util.network;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketSendListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +27,11 @@ public class FabricPacketSender implements net.fabricmc.fabric.api.networking.v1
     
     @Override
     public void sendPacket(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> callback) {
+        this.sender.sendPacket(packet, callback);
+    }
+    
+    @Override
+    public void sendPacket(Packet<?> packet, @Nullable PacketSendListener callback) {
         this.sender.sendPacket(packet, callback);
     }
 }

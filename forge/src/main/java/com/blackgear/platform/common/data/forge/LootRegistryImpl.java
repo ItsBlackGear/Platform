@@ -10,9 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-@Mod.EventBusSubscriber(
-    modid = Platform.MOD_ID
-)
+@Mod.EventBusSubscriber(modid = Platform.MOD_ID)
 public class LootRegistryImpl {
     private static final Set<Consumer<LootTableLoadEvent>> MODIFICATIONS = ConcurrentHashMap.newKeySet();
 
@@ -26,7 +24,7 @@ public class LootRegistryImpl {
             );
         });
     }
-
+    
     @SubscribeEvent
     public static void onLootTableModify(LootTableLoadEvent event) {
         MODIFICATIONS.forEach(consumer -> consumer.accept(event));

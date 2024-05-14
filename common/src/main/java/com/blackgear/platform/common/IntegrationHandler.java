@@ -71,8 +71,8 @@ public class IntegrationHandler {
      * @param target The block that the source block becomes after being stripped.
      */
     public static void setStrippable(Block source, Block target) {
-        AxeItem.STRIPABLES = Maps.newHashMap(AxeItem.STRIPABLES);
-        AxeItem.STRIPABLES.put(source, target);
+        AxeItem.STRIPPABLES = Maps.newHashMap(AxeItem.STRIPPABLES);
+        AxeItem.STRIPPABLES.put(source, target);
     }
 
     /**

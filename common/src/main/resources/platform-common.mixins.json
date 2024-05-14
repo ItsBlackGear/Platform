@@ -2,11 +2,11 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.blackgear.platform.core.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "common.BlockEntityTypeMixin",
     "common.CreativeModeTabMixin",
-    "common.access.OverworldBiomeSourceAccessor",
+    "common.OverworldBiomeBuilderMixin",
     "core.access.LevelResourceAccessor"
   ],
   "client": [

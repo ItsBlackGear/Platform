@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.util.network.client.forge;
 
 import com.blackgear.platform.core.util.network.client.ClientLoginNetworking.LoginQueryRequestHandler;
-import com.blackgear.platform.core.util.network.client.ClientNetworking;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;

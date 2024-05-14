@@ -74,8 +74,6 @@ public abstract class CoreRegistry<T> {
      */
     public abstract <E extends T> Supplier<E> register(String key, Supplier<E> entry);
     
-    public abstract <E extends T> E register(String key, E entry);
-
     /**
      * Registers an entry into the CoreRegistry, returning a ResourceKey
      *
@@ -101,11 +99,6 @@ public abstract class CoreRegistry<T> {
         this.register(key, entry);
         return ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, key));
     }
-    
-    public <E extends T> ResourceKey<T> resource(String key, E entry) {
-        this.register(key, entry);
-        return ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, key));
-    }
 
     /**
      * Initializes the CoreRegistry at the Mod Initializer.
@@ -125,6 +118,7 @@ public abstract class CoreRegistry<T> {
         if (this.isPresent) {
             throw new IllegalArgumentException("Duplication of Registry: " + this.registry);
         }
+        
         this.isPresent = true;
         this.bootstrap();
     }
@@ -140,12 +134,6 @@ public abstract class CoreRegistry<T> {
         public <E extends T> Supplier<E> register(String key, Supplier<E> entry) {
             E value = Registry.register(this.registry, new ResourceLocation(this.modId, key), entry.get());
             return () -> value;
-        }
-        
-        @Override
-        public <E extends T> E register(String key, E entry) {
-            Registry.register(this.registry, new ResourceLocation(this.modId, key), entry);
-            return entry;
         }
         
         @Override

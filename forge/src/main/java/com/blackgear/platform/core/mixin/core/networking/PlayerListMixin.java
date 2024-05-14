@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.mixin.core.networking;
 
-import com.blackgear.platform.core.util.network.server.ServerNetworking;
+import com.blackgear.platform.core.util.network.server.forge.ServerNetworking;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;

@@ -1,13 +1,13 @@
 package com.blackgear.platform.common.worldgen.modifier;
 
-import com.blackgear.platform.core.mixin.common.access.OverworldBiomeSourceAccessor;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraft.world.level.biome.OverworldBiomeSource;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
  * Utility class designed to identify the biome or biomes for implementing biome-specific features.
  **/
 public interface BiomeContext {
-    Predicate<BiomeContext> OVERWORLD_BIOME = context -> OverworldBiomeSourceAccessor.getPossibleBiomes().contains(context.key());
+    Predicate<BiomeContext> OVERWORLD_BIOME = context -> MultiNoiseBiomeSource.Preset.OVERWORLD.possibleBiomes().anyMatch(context::is);
     
     ResourceKey<Biome> key();
     
     Biome biome();
     
-    boolean is(Biome.BiomeCategory category);
+    boolean is(TagKey<Biome> category);
     
     boolean is(ResourceKey<Biome> biome);
     
@@ -43,7 +43,7 @@ public interface BiomeContext {
         MobSpawnSettings settings = this.biome().getMobSettings();
         
         return Arrays.stream(MobCategory.values())
-            .flatMap(category -> settings.getMobs(category).stream())
+            .flatMap(category -> settings.getMobs(category).unwrap().stream())
             .anyMatch(spawner -> entities.contains(spawner.type));
     }
 }

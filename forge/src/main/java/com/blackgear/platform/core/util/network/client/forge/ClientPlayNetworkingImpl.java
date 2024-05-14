@@ -1,8 +1,6 @@
 package com.blackgear.platform.core.util.network.client.forge;
 
 import com.blackgear.platform.core.util.network.PacketSender;
-import com.blackgear.platform.core.util.network.client.ClientNetworking;
-import com.blackgear.platform.core.util.network.client.ClientPlayNetworkAddon;
 import com.blackgear.platform.core.util.network.client.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;

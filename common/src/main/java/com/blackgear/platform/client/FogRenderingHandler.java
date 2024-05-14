@@ -14,11 +14,6 @@ import java.util.Arrays;
 
 public class FogRenderingHandler {
     @ExpectPlatform
-    public static void addFogDensity(FogDensity density) {
-        throw new AssertionError();
-    }
-    
-    @ExpectPlatform
     public static void addFogRendering(FogRendering rendering) {
         throw new AssertionError();
     }
@@ -42,63 +37,13 @@ public class FogRenderingHandler {
         return Blocks.AIR.defaultBlockState();
     }
     
-    public interface FogDensity {
-        FogDensityContext setupDensity(FogDensityContext context);
-    }
-    
-    public static class FogDensityContext {
-        private final Camera camera;
-        private final FogRenderer.FogMode fogMode;
-        private float density = -1F;
-        private boolean cancellable = true;
-        
-        public FogDensityContext(Camera camera, FogRenderer.FogMode fogMode) {
-            this.camera = camera;
-            this.fogMode = fogMode;
-        }
-        
-        public Camera getCamera() {
-            return this.camera;
-        }
-        
-        public FogRenderer.FogMode getFogMode() {
-            return this.fogMode;
-        }
-        
-        public FogDensityContext setDensity(float density) {
-            this.density = density;
-            return this;
-        }
-        
-        public float getDensity() {
-            return this.density;
-        }
-        
-        public FogDensityContext setCancellable(boolean cancellable) {
-            this.cancellable = cancellable;
-            return this;
-        }
-        
-        public boolean isCancellable() {
-            return this.cancellable;
-        }
-        
-        public BlockState getStateAtCamera() {
-            return getStateOnCamera(this.camera);
-        }
-        
-        public FogDensityContext build() {
-            return new FogDensityContext(this.camera, this.fogMode).setDensity(this.density).setCancellable(this.cancellable);
-        }
-    }
-    
     public interface FogRendering {
         FogRenderingContext setupRendering(FogRenderingContext context);
     }
     
     public static class FogRenderingContext {
         private final Camera camera;
-        private final float farPlaneDistance;
+        private float farPlaneDistance;
         private FogRenderer.FogMode fogMode;
         private boolean cancellable = true;
         
@@ -118,6 +63,10 @@ public class FogRenderingHandler {
         
         public FogRenderer.FogMode getFogMode() {
             return this.fogMode;
+        }
+        
+        public void setFarPlaneDistance(float farPlaneDistance) {
+            this.farPlaneDistance = farPlaneDistance;
         }
         
         public float getFarPlaneDistance() {

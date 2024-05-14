@@ -1,10 +1,8 @@
 package com.blackgear.platform.core.mixin.fabric;
 
 import com.blackgear.platform.client.FogRenderingHandler.FogColorContext;
-import com.blackgear.platform.client.FogRenderingHandler.FogDensityContext;
 import com.blackgear.platform.client.FogRenderingHandler.FogRenderingContext;
 import com.blackgear.platform.client.fabric.FogRenderingHandlerImpl;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
@@ -32,7 +30,7 @@ public class FogRendererMixin {
         float bossColorModifier,
         CallbackInfo ci
     ) {
-        FogColorContext context = FogRenderingHandlerImpl.COLOR_HANDLER.invoker()
+        FogColorContext context = FogRenderingHandlerImpl.COLOR.invoker()
             .setupColor(new FogColorContext(activeRenderInfo, fogRed, fogGreen, fogBlue));
         
         if (context != null) {
@@ -49,27 +47,17 @@ public class FogRendererMixin {
         cancellable = true
     )
     private static void platform$setupFogDensity(
-        Camera activeRenderInfo,
-        FogRenderer.FogMode fogType,
+        Camera camera,
+        FogRenderer.FogMode fogMode,
         float farPlaneDistance,
         boolean nearFog,
+        float partialTicks,
         CallbackInfo ci
     ) {
-        FogRenderingContext rendering = FogRenderingHandlerImpl.RENDERING_HANDLER.invoker()
-            .setupRendering(new FogRenderingContext(activeRenderInfo, fogType, farPlaneDistance));
+        FogRenderingContext rendering = FogRenderingHandlerImpl.RENDERING.invoker()
+            .setupRendering(new FogRenderingContext(camera, fogMode, farPlaneDistance));
         if (rendering != null) {
             ci.cancel();
-        }
-        
-        FogDensityContext context = FogRenderingHandlerImpl.DENSITY_HANDLER.invoker()
-            .setupDensity(new FogDensityContext(activeRenderInfo, fogType));
-        
-        if (context != null && context.getDensity() >= 0) {
-            RenderSystem.fogDensity(context.getDensity());
-            
-            if (context.isCancellable()) {
-                ci.cancel();
-            }
         }
     }
 }

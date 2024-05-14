@@ -6,6 +6,10 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Supplier;
 
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+
 /**
  * Utility class to help registering new registries.
  *
@@ -40,35 +44,13 @@ import java.util.function.Supplier;
  *
  * @author ItsBlackGear
  */
-public class RegistryBuilder {
-    private final String modId;
-    
-    public RegistryBuilder(String modId) {
-        this.modId = modId;
-    }
-    
-    public <T> Sample<T> create(String key, Supplier<T> bootstrap) {
+public record RegistryBuilder(String modId) {
+    public <T> Sample<T> create(String key, Registry.RegistryBootstrap<T> bootstrap) {
         ResourceKey<Registry<T>> resource = ResourceKey.createRegistryKey(new ResourceLocation(this.modId, key));
         return new Sample<>(resource, Registry.registerSimple(resource, bootstrap));
     }
-
+    
     public static void bootstrap() {}
-
-    public static class Sample<T> {
-        public final ResourceKey<Registry<T>> resource;
-        public final Registry<T> registry;
-        
-        public Sample(ResourceKey<Registry<T>> resource, Registry<T> registry) {
-            this.resource = resource;
-            this.registry = registry;
-        }
-        
-        public ResourceKey<Registry<T>> getResource() {
-            return this.resource;
-        }
-        
-        public Registry<T> getRegistry() {
-            return this.registry;
-        }
-    }
+    
+    public record Sample<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {}
 }

@@ -1,9 +1,9 @@
 package com.blackgear.platform.core.mixin.core.networking;
 
-import com.blackgear.platform.core.util.network.AbstractNetworkAddon;
-import com.blackgear.platform.core.util.network.DisconnectPacketSource;
-import com.blackgear.platform.core.util.network.NetworkHandlerExtensions;
-import com.blackgear.platform.core.util.network.server.ServerPlayNetworkAddon;
+import com.blackgear.platform.core.util.network.client.forge.AbstractNetworkAddon;
+import com.blackgear.platform.core.util.network.client.forge.DisconnectPacketSource;
+import com.blackgear.platform.core.util.network.client.forge.NetworkHandlerExtensions;
+import com.blackgear.platform.core.util.network.server.forge.ServerPlayNetworkAddon;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundDisconnectPacket;
