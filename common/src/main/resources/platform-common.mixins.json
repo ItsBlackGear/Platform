@@ -4,10 +4,13 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "BlockEntityTypeMixin",
-    "CreativeModeTabMixin"
+    "common.BlockEntityTypeMixin",
+    "common.CreativeModeTabMixin",
+    "core.access.LevelResourceAccessor",
   ],
   "client": [
+    "client.access.CameraAccessor",
+    "core.config.ClientHandshakePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1

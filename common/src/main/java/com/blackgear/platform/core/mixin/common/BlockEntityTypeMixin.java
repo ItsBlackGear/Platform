@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin;
+package com.blackgear.platform.core.mixin.common;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SignBlock;
