@@ -16,6 +16,9 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.function.Predicate;
 
 @Mod.EventBusSubscriber(
     modid = Platform.MOD_ID,
@@ -45,13 +48,28 @@ public class BiomeManagerImpl {
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
+                public ResourceKey<Biome> key() {
+                    return ResourceKey.create(Registry.BIOME_REGISTRY, ForgeBiomeWriter.this.name());
+                }
+                
+                @Override
+                public Biome biome() {
+                    return ForgeRegistries.BIOMES.getValue(ForgeBiomeWriter.this.event.getName());
+                }
+                
+                @Override
                 public boolean is(Biome.BiomeCategory category) {
                     return ForgeBiomeWriter.this.event.getCategory() == category;
                 }
                 
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    return ResourceKey.create(Registry.BIOME_REGISTRY, ForgeBiomeWriter.this.name()) == biome;
+                    return this.key() == biome;
+                }
+                
+                @Override
+                public boolean is(Predicate<BiomeContext> context) {
+                    return context.test(this);
                 }
             };
         }

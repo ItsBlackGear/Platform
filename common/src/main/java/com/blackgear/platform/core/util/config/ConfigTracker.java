@@ -1,7 +1,7 @@
 package com.blackgear.platform.core.util.config;
 
 import com.blackgear.platform.core.Environment;
-import com.blackgear.platform.core.events.ConfigEvent;
+import com.blackgear.platform.core.events.ConfigEvents;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import org.apache.logging.log4j.LogManager;
@@ -74,7 +74,7 @@ public class ConfigTracker implements IConfigTracker {
         LOGGER.trace(CONFIG, "Loading config file type {} at {} for {}", config.getType(), config.getFileName(), config.getModId());
         final CommentedFileConfig configData = config.getHandler().reader(configBasePath).apply(config);
         config.setConfigData(configData);
-        ConfigEvent.LOADING.invoker().onModConfigLoading(config);
+        ConfigEvents.LOADING.invoker().onModConfigLoading(config);
         config.save();
     }
     
@@ -92,7 +92,7 @@ public class ConfigTracker implements IConfigTracker {
             final CommentedConfig commentedConfig = CommentedConfig.inMemory();
             modConfig.getSpec().correct(commentedConfig);
             modConfig.setConfigData(commentedConfig);
-            ConfigEvent.LOADING.invoker().onModConfigLoading(modConfig);
+            ConfigEvents.LOADING.invoker().onModConfigLoading(modConfig);
         });
     }
     

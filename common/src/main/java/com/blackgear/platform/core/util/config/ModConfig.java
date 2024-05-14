@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.util.config;
 
-import com.blackgear.platform.core.events.ConfigEvent;
+import com.blackgear.platform.core.events.ConfigEvents;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
@@ -76,7 +76,7 @@ public class ModConfig {
     
     public void acceptSyncedConfig(byte[] bytes) {
         this.setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
-        ConfigEvent.RELOADING.invoker().onModConfigReloading(this);
+        ConfigEvents.RELOADING.invoker().onModConfigReloading(this);
     }
     
     public enum Type {

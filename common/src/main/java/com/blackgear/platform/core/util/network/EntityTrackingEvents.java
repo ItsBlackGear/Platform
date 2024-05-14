@@ -7,7 +7,6 @@ import net.minecraft.world.entity.Entity;
 
 public class EntityTrackingEvents {
     public static final Event<StartTracking> START_TRACKING = EventFactory.create(StartTracking.class);
-    
     public static final Event<StopTracking> STOP_TRACKING = EventFactory.create(StopTracking.class);
     
     @FunctionalInterface

@@ -1,7 +1,7 @@
 package com.blackgear.platform.core.util.config;
 
 import com.blackgear.platform.core.Environment;
-import com.blackgear.platform.core.events.ConfigEvent;
+import com.blackgear.platform.core.events.ConfigEvents;
 import com.electronwill.nightconfig.core.ConfigFormat;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileWatcher;
@@ -165,7 +165,7 @@ public class ConfigFileTypeHandler {
                 );
                 
                 this.modConfig.getSpec().afterReload();
-                ConfigEvent.RELOADING.invoker().onModConfigReloading(this.modConfig);
+                ConfigEvents.RELOADING.invoker().onModConfigReloading(this.modConfig);
             }
         }
     }

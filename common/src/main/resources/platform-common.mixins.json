@@ -6,7 +6,8 @@
   "mixins": [
     "common.BlockEntityTypeMixin",
     "common.CreativeModeTabMixin",
-    "core.access.LevelResourceAccessor",
+    "common.access.OverworldBiomeSourceAccessor",
+    "core.access.LevelResourceAccessor"
   ],
   "client": [
     "client.access.CameraAccessor",

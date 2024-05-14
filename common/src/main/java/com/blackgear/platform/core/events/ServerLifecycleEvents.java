@@ -6,11 +6,8 @@ import net.minecraft.server.MinecraftServer;
 
 public class ServerLifecycleEvents {
     public static final Event<Starting> STARTING = EventFactory.create(Starting.class);
-    
     public static final Event<Started> STARTED = EventFactory.create(Started.class);
-    
     public static final Event<Stopping> STOPPING = EventFactory.create(Stopping.class);
-    
     public static final Event<Stopped> STOPPED = EventFactory.create(Stopped.class);
     
     @FunctionalInterface

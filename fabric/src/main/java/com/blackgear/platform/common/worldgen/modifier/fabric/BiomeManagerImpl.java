@@ -17,6 +17,8 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
+import java.util.function.Predicate;
+
 public class BiomeManagerImpl {
     public static void bootstrap() {
         BiomeModifications.create(new ResourceLocation(Platform.MOD_ID, "biome_modifier"))
@@ -45,13 +47,28 @@ public class BiomeManagerImpl {
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
+                public ResourceKey<Biome> key() {
+                    return FabricBiomeWriter.this.selector.getBiomeKey();
+                }
+                
+                @Override
+                public Biome biome() {
+                    return FabricBiomeWriter.this.selector.getBiome();
+                }
+                
+                @Override
                 public boolean is(Biome.BiomeCategory category) {
-                    return FabricBiomeWriter.this.selector.getBiome().getBiomeCategory() == category;
+                    return this.biome().getBiomeCategory() == category;
                 }
                 
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    return FabricBiomeWriter.this.selector.getBiomeKey() == biome;
+                    return this.key() == biome;
+                }
+                
+                @Override
+                public boolean is(Predicate<BiomeContext> context) {
+                    return context.test(this);
                 }
             };
         }
