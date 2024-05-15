@@ -31,7 +31,7 @@ public class WorldGenRegistry {
     public static WorldGenRegistry create(String modId) {
         return new WorldGenRegistry(modId);
     }
-    
+  
     public <T> void register(BootstapContext<T> context, ResourceKey<T> key, T entry) {
         context.register(key, entry);
     }

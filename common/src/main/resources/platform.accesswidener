@@ -1,6 +1,7 @@
 accessWidener   v2  named
 
-# Block Registry
+# Wood Type Registry
+#accessible method net/minecraft/world/level/block/state/properties/WoodType <init> (Ljava/lang/String;)V
 accessible method net/minecraft/world/level/block/state/properties/WoodType register (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
 accessible method net/minecraft/client/renderer/Sheets createSignMaterial (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/Material;
 

@@ -37,9 +37,6 @@ public class BiomeManagerImpl {
             event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, entry -> {
                 entry.register(new ResourceLocation(Platform.MOD_ID, "biome_modifier_codec"), codec = Codec.unit(PlatformBiomeModifier.INSTANCE));
             });
-            event.register(ForgeRegistries.Keys.BIOME_MODIFIERS, entry -> {
-                entry.register(new ResourceLocation(Platform.MOD_ID, "biome_modifier"), PlatformBiomeModifier.INSTANCE);
-            });
         });
     }
     
@@ -62,7 +59,7 @@ public class BiomeManagerImpl {
     static class ForgeBiomeWriter extends BiomeWriter {
         private final Optional<ResourceKey<Biome>> biome;
         private final ModifiableBiomeInfo.BiomeInfo.Builder builder;
-        
+      
         ForgeBiomeWriter(Optional<ResourceKey<Biome>> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             this.biome = biome;
             this.builder = builder;
