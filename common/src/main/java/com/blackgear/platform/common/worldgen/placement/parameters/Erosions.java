@@ -10,17 +10,17 @@ public enum Erosions {
     EROSION_4(Climate.Parameter.span(0.05F, 0.45F)),
     EROSION_5(Climate.Parameter.span(0.45F, 0.55F)),
     EROSION_6(Climate.Parameter.span(0.55F, 1.0F));
-
+    
     private final Climate.Parameter parameter;
-
+    
     Erosions(Climate.Parameter parameter) {
         this.parameter = parameter;
     }
-
+    
     public Climate.Parameter point() {
         return this.parameter;
     }
-
+    
     public static Climate.Parameter span(Erosions min, Erosions max) {
         return Climate.Parameter.span(min.point(), max.point());
     }

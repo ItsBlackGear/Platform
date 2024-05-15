@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -18,6 +17,8 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+
+import java.util.function.Predicate;
 
 public class BiomeManagerImpl {
     public static void bootstrap() {
@@ -37,7 +38,7 @@ public class BiomeManagerImpl {
             this.selector = selector;
             this.modifier = modifier;
         }
-
+        
         @Override
         public ResourceLocation name() {
             return this.selector.getBiomeKey().location();
@@ -47,27 +48,42 @@ public class BiomeManagerImpl {
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
+                public ResourceKey<Biome> key() {
+                    return FabricBiomeWriter.this.selector.getBiomeKey();
+                }
+                
+                @Override
+                public Biome biome() {
+                    return FabricBiomeWriter.this.selector.getBiome();
+                }
+                
+                @Override
                 public boolean is(TagKey<Biome> tag) {
                     return FabricBiomeWriter.this.selector.hasTag(tag);
                 }
-
+                
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    return FabricBiomeWriter.this.selector.getBiomeKey() == biome;
+                    return this.key() == biome;
+                }
+                
+                @Override
+                public boolean is(Predicate<BiomeContext> context) {
+                    return context.test(this);
                 }
             };
         }
-
+        
         @Override
         public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
             this.modifier.getGenerationSettings().addFeature(decoration, feature);
         }
-
+        
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.modifier.getSpawnSettings().addSpawn(category, data);
         }
-
+        
         @Override
         public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
             this.modifier.getGenerationSettings().addCarver(carving, carver);

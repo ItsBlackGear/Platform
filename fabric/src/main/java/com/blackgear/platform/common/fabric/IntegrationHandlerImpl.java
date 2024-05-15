@@ -10,7 +10,7 @@ public class IntegrationHandlerImpl {
     public static void addFuel(ItemLike item, int burnTime) {
         FuelRegistry.INSTANCE.add(item, burnTime);
     }
-
+    
     public static void addInteraction(IntegrationHandler.Interaction interaction) {
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> interaction.of(new UseOnContext(player, hand, hitResult)));
     }

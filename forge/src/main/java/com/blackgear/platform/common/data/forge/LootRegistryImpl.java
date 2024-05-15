@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 )
 public class LootRegistryImpl {
     private static final Set<Consumer<LootTableLoadEvent>> MODIFICATIONS = ConcurrentHashMap.newKeySet();
-
+    
     public static void modify(LootRegistry.LootTableModifier modifier) {
         MODIFICATIONS.add(event -> {
             modifier.modify(
@@ -26,7 +26,7 @@ public class LootRegistryImpl {
             );
         });
     }
-
+    
     @SubscribeEvent
     public static void onLootTableModify(LootTableLoadEvent event) {
         MODIFICATIONS.forEach(consumer -> consumer.accept(event));

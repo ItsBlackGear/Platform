@@ -48,16 +48,16 @@ public class RendererHandlerImpl {
     }
 
     // ========== Rendering Registry ==========
-
+    
     public static <T extends Entity> void addEntityRenderer(Supplier<? extends EntityType<? extends T>> type, EntityRendererProvider<T> renderer) {
         EntityRendererRegistry.register(type.get(), renderer);
     }
-
+    
     @SuppressWarnings("UnstableApiUsage")
     public static <T extends BlockEntity> void addBlockEntityRenderer(Supplier<BlockEntityType<T>> type, BlockEntityRendererProvider<? super T> renderer) {
         BlockEntityRendererRegistryImpl.register(type.get(), renderer);
     }
-
+    
     public static void addLayerDefinition(ModelLayerLocation layer, Supplier<LayerDefinition> definition) {
         EntityModelLayerRegistry.registerModelLayer(layer, definition::get);
     }

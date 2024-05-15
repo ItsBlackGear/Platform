@@ -20,22 +20,22 @@ import java.util.List;
  **/
 public class WorldGenRegistry {
     protected final String modId;
-
+    
     private WorldGenRegistry(String modId) {
         this.modId = modId;
     }
-
+    
     /**
      * Creates a new instance of the WorldGenRegistry.
      */
     public static WorldGenRegistry create(String modId) {
         return new WorldGenRegistry(modId);
     }
-
+  
     public <T> void register(BootstapContext<T> context, ResourceKey<T> key, T entry) {
         context.register(key, entry);
     }
-
+    
     /**
      * Registers a Configured Feature
      */
@@ -47,7 +47,7 @@ public class WorldGenRegistry {
     ) {
         context.register(key, new ConfiguredFeature<>(feature, configuration));
     }
-
+    
     /**
      * Registers a Configured Feature without custom configuration.
      */
@@ -58,7 +58,7 @@ public class WorldGenRegistry {
     ) {
         this.register(context, key, feature, FeatureConfiguration.NONE);
     }
-
+    
     /**
      * Registers a Placed Feature
      */
@@ -71,7 +71,7 @@ public class WorldGenRegistry {
     ) {
         context.register(key, new PlacedFeature(feature, List.copyOf(placements)));
     }
-
+    
     /**
      * Registers a Placed Feature
      */
@@ -96,6 +96,6 @@ public class WorldGenRegistry {
     ) {
         context.register(key, new NormalNoise.NoiseParameters(firstOctave, firstAmplitude, amplitudes));
     }
-
+    
     public void register() {}
 }

@@ -26,11 +26,12 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class BiomeManagerImpl {
     @Nullable
     private static Codec<PlatformBiomeModifier> codec = null;
-
+    
     public static void bootstrap() {
         FMLJavaModLoadingContext.get().getModEventBus().<RegisterEvent>addListener(event -> {
             event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, entry -> {
@@ -38,32 +39,32 @@ public class BiomeManagerImpl {
             });
         });
     }
-
+    
     static class PlatformBiomeModifier implements BiomeModifier {
         private static final PlatformBiomeModifier INSTANCE = new PlatformBiomeModifier();
-
+        
         @Override
         public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             if (phase == Phase.ADD) {
                 BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome.unwrapKey(), builder));
             }
         }
-
+        
         @Override
         public Codec<? extends BiomeModifier> codec() {
             return codec != null ? codec : Codec.unit(INSTANCE);
         }
     }
-
+    
     static class ForgeBiomeWriter extends BiomeWriter {
         private final Optional<ResourceKey<Biome>> biome;
         private final ModifiableBiomeInfo.BiomeInfo.Builder builder;
-
+      
         ForgeBiomeWriter(Optional<ResourceKey<Biome>> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             this.biome = biome;
             this.builder = builder;
         }
-
+        
         @Override
         public ResourceLocation name() {
             return ForgeBiomeWriter.this.biome.get().location();
@@ -72,6 +73,16 @@ public class BiomeManagerImpl {
         @Override
         public BiomeContext context() {
             return new BiomeContext() {
+                @Override
+                public ResourceKey<Biome> key() {
+                    return ForgeBiomeWriter.this.biome.get();
+                }
+                
+                @Override
+                public Biome biome() {
+                    return ForgeRegistries.BIOMES.getValue(ForgeBiomeWriter.this.name());
+                }
+                
                 @Override
                 public boolean is(TagKey<Biome> tag) {
                     MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -84,7 +95,7 @@ public class BiomeManagerImpl {
                     
                     return false;
                 }
-
+                
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
                     MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -97,9 +108,14 @@ public class BiomeManagerImpl {
                     
                     return false;
                 }
+                
+                @Override
+                public boolean is(Predicate<BiomeContext> context) {
+                    return context.test(this);
+                }
             };
         }
-
+        
         @Override
         public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -112,12 +128,12 @@ public class BiomeManagerImpl {
                     });
             }
         }
-
+        
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.builder.getMobSpawnSettings().addSpawn(category, data);
         }
-
+        
         @Override
         public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();

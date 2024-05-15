@@ -43,7 +43,7 @@ public class IntegrationHandlerImpl {
 
     public static void addFuel(ItemLike item, int burnTime) {
         FUEL_ENTRIES.add(event -> {
-            if (event.getItemStack().is(item.asItem())) {
+            if (event.getItemStack().getItem() == item.asItem()) {
                 event.setBurnTime(burnTime);
             }
         });

@@ -16,17 +16,17 @@ public enum Weirdness {
     PEAK_VARIANT(Parameter.span(0.56666666F, 0.7666667F)),
     HIGH_SLICE_VARIANT_DESCENDING(Parameter.span(0.7666667F, 0.93333334F)),
     MID_SLICE_VARIANT_DESCENDING(Parameter.span(0.93333334F, 1.0F));
-
+    
     private final Parameter parameter;
-
+    
     Weirdness(Parameter parameter) {
         this.parameter = parameter;
     }
-
+    
     public Parameter point() {
         return this.parameter;
     }
-
+    
     public static Parameter span(Weirdness min, Weirdness max) {
         return Parameter.span(min.point(), max.point());
     }

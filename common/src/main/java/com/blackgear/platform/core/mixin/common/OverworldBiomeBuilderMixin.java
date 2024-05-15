@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin;
+package com.blackgear.platform.core.mixin.common;
 
 import com.blackgear.platform.common.worldgen.placement.BiomeSpawnPlacement;
 import com.mojang.datafixers.util.Pair;

@@ -44,8 +44,8 @@ public record RegistryBuilder(String modId) {
         ResourceKey<Registry<T>> resource = ResourceKey.createRegistryKey(new ResourceLocation(this.modId, key));
         return new Sample<>(resource, BuiltInRegistries.registerSimple(resource, bootstrap));
     }
-
+    
     public static void bootstrap() {}
-
+    
     public record Sample<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {}
 }
