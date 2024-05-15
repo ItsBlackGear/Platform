@@ -1,25 +1,49 @@
 package com.blackgear.platform.common.fabric;
 
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.minecraft.resources.ResourceLocation;
+import com.blackgear.platform.common.CreativeTabs;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
+@SuppressWarnings("UnstableApiUsage")
 public class CreativeTabsImpl {
-    public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon) {
-        return FabricItemGroupBuilder.create(location)
-            .icon(icon)
-            .build();
+    public static CreativeModeTab create(Consumer<CreativeModeTab.Builder> consumer) {
+        CreativeModeTab.Builder builder = FabricItemGroup.builder();
+        consumer.accept(builder);
+        return builder.build();
     }
-
-    public static CreativeModeTab create(ResourceLocation location, Supplier<ItemStack> icon, Consumer<List<ItemStack>> display) {
-        return FabricItemGroupBuilder.create(location)
-            .icon(icon)
-            .appendItems(display)
-            .build();
+    
+    public static void modify(CreativeModeTab tab, CreativeTabs.Modifier modifier) {
+        BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(tab).ifPresent(key -> modify(key, modifier));
+    }
+    
+    public static void modify(ResourceKey<CreativeModeTab> key, CreativeTabs.Modifier modifier) {
+        ItemGroupEvents.modifyEntriesEvent(key).register(entries -> {
+            modifier.accept(entries.getEnabledFeatures(), new CreativeTabs.Output() {
+                @Override
+                public void addAfter(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+                    if (target.isEmpty()) {
+                        entries.accept(stack, visibility);
+                    } else {
+                        entries.addAfter(target, List.of(stack), visibility);
+                    }
+                }
+                
+                @Override
+                public void addBefore(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+                    if (target.isEmpty()) {
+                        entries.accept(stack, visibility);
+                    } else {
+                        entries.addBefore(target, List.of(stack), visibility);
+                    }
+                }
+            }, entries.shouldShowOpRestrictedItems());
+        });
     }
 }

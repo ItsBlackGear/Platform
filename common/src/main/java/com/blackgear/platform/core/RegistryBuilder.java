@@ -1,12 +1,7 @@
 package com.blackgear.platform.core;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.function.Supplier;
-
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
@@ -45,9 +40,9 @@ import net.minecraft.resources.ResourceLocation;
  * @author ItsBlackGear
  */
 public record RegistryBuilder(String modId) {
-    public <T> Sample<T> create(String key, Registry.RegistryBootstrap<T> bootstrap) {
+    public <T> Sample<T> create(String key, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
         ResourceKey<Registry<T>> resource = ResourceKey.createRegistryKey(new ResourceLocation(this.modId, key));
-        return new Sample<>(resource, Registry.registerSimple(resource, bootstrap));
+        return new Sample<>(resource, BuiltInRegistries.registerSimple(resource, bootstrap));
     }
     
     public static void bootstrap() {}

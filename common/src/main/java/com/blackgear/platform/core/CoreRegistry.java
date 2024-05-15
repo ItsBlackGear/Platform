@@ -124,19 +124,4 @@ public abstract class CoreRegistry<T> {
     }
 
     protected abstract void bootstrap();
-    
-    public static class SimpleRegistry<T> extends CoreRegistry<T> {
-        public SimpleRegistry(Registry<T> registry, String modId) {
-            super(registry, modId);
-        }
-        
-        @Override
-        public <E extends T> Supplier<E> register(String key, Supplier<E> entry) {
-            E value = Registry.register(this.registry, new ResourceLocation(this.modId, key), entry.get());
-            return () -> value;
-        }
-        
-        @Override
-        protected void bootstrap() {}
-    }
 }

@@ -1,5 +1,6 @@
 package com.blackgear.platform.core.util.network.client.forge;
 
+import com.blackgear.platform.core.mixin.core.networking.access.ClientHandshakePacketListenerImplAccessor;
 import com.blackgear.platform.core.util.network.FutureListeners;
 import com.blackgear.platform.core.util.network.PacketByteBufs;
 import com.blackgear.platform.core.util.network.client.ClientLoginConnectionEvents;
@@ -72,7 +73,7 @@ public class ClientLoginNetworkAddon extends AbstractNetworkAddon<LoginQueryRequ
                     listener = FutureListeners.union(listener, entry);
                 }
                 
-                this.listener.getConnection().send(packet, GenericFutureListenerHolder.create(listener));
+                ((ClientHandshakePacketListenerImplAccessor) this.listener).getConnection().send(packet, GenericFutureListenerHolder.create(listener));
             });
         } catch (Throwable exception) {
             LOGGER.error("Encountered exception while handling in channel with name \"{}\"", channel, exception);

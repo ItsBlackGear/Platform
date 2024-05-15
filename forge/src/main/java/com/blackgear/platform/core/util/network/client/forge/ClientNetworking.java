@@ -1,6 +1,7 @@
 package com.blackgear.platform.core.util.network.client.forge;
 
 import com.blackgear.platform.Platform;
+import com.blackgear.platform.core.mixin.core.networking.access.ClientHandshakePacketListenerImplAccessor;
 import com.blackgear.platform.core.mixin.core.networking.access.ConnectScreenAccessor;
 import com.blackgear.platform.core.mixin.core.networking.access.MinecraftAccessor;
 import com.blackgear.platform.core.util.network.*;
@@ -99,7 +100,8 @@ public class ClientNetworking {
                 ids.add(buffer.readResourceLocation());
             }
             
-            ((ChannelInfoHolder) listener.getConnection()).getPendingChannelNames().addAll(ids);
+            Connection connection = ((ClientHandshakePacketListenerImplAccessor) listener).getConnection();
+            ((ChannelInfoHolder) connection).getPendingChannelNames().addAll(ids);
             Platform.LOGGER.debug("Received accepted channels from the server");
             
             FriendlyByteBuf response = PacketByteBufs.create();

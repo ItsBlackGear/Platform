@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -76,8 +75,8 @@ public class BiomeManagerImpl {
         }
         
         @Override
-        public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
-            this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature.value());
+        public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            this.modifier.getGenerationSettings().addFeature(decoration, feature);
         }
         
         @Override
@@ -86,8 +85,8 @@ public class BiomeManagerImpl {
         }
         
         @Override
-        public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
-            this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver.value());
+        public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            this.modifier.getGenerationSettings().addCarver(carving, carver);
         }
     }
 }

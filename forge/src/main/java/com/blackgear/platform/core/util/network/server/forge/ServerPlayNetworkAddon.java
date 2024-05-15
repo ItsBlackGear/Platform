@@ -1,5 +1,6 @@
 package com.blackgear.platform.core.util.network.server.forge;
 
+import com.blackgear.platform.core.mixin.core.networking.access.ServerGamePacketListenerImplAccessor;
 import com.blackgear.platform.core.util.network.client.forge.AbstractChanneledNetworkAddon;
 import com.blackgear.platform.core.util.network.client.forge.ChannelInfoHolder;
 import com.blackgear.platform.core.util.network.client.forge.Networking;
@@ -24,7 +25,7 @@ public class ServerPlayNetworkAddon extends AbstractChanneledNetworkAddon<PlayCh
     private boolean sentInitialRegisterPacket;
     
     public ServerPlayNetworkAddon(ServerGamePacketListenerImpl listener, MinecraftServer server) {
-        super(ServerNetworking.PLAY, listener.getConnection());
+        super(ServerNetworking.PLAY, ((ServerGamePacketListenerImplAccessor) listener).getConnection());
         this.listener = listener;
         this.server = server;
         

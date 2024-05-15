@@ -10,14 +10,16 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-@Mod.EventBusSubscriber(modid = Platform.MOD_ID)
+@Mod.EventBusSubscriber(
+    modid = Platform.MOD_ID
+)
 public class LootRegistryImpl {
     private static final Set<Consumer<LootTableLoadEvent>> MODIFICATIONS = ConcurrentHashMap.newKeySet();
-
+    
     public static void modify(LootRegistry.LootTableModifier modifier) {
         MODIFICATIONS.add(event -> {
             modifier.modify(
-                event.getLootTableManager(),
+                null,
                 event.getName(),
                 pool -> event.getTable().addPool(pool),
                 true

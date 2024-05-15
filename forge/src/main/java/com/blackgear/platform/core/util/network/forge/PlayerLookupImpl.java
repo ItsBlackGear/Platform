@@ -48,7 +48,7 @@ public class PlayerLookupImpl {
     
     public static Collection<ServerPlayer> tracking(Entity entity) {
         Objects.requireNonNull(entity, "entity cannot be null");
-        ChunkSource manager = entity.level.getChunkSource();
+        ChunkSource manager = entity.level().getChunkSource();
         
         if (manager instanceof ServerChunkCache) {
             ChunkMap map = ((ServerChunkCache) manager).chunkMap;

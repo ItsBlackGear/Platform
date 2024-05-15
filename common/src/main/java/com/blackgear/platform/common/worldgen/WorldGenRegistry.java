@@ -1,14 +1,15 @@
 package com.blackgear.platform.common.worldgen;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
 import java.util.List;
 
@@ -31,42 +32,69 @@ public class WorldGenRegistry {
         return new WorldGenRegistry(modId);
     }
     
-    @SuppressWarnings("unchecked")
-    private static <V extends T, T> Holder<V> register(Registry<T> registry, ResourceLocation location, V holder) {
-        return (Holder<V>) BuiltinRegistries.register(registry, location, holder);
+    public <T> void register(BootstapContext<T> context, ResourceKey<T> key, T entry) {
+        context.register(key, entry);
     }
     
     /**
      * Registers a Configured Feature
      */
-    public <FC extends FeatureConfiguration, F extends Feature<FC>> Holder<ConfiguredFeature<FC, ?>> register(String key, F feature, FC configuration) {
-        return register(
-            BuiltinRegistries.CONFIGURED_FEATURE,
-            new ResourceLocation(this.modId, key),
-            new ConfiguredFeature<>(feature, configuration)
-        );
+    public <FC extends FeatureConfiguration, F extends Feature<FC>> void register(
+        BootstapContext<ConfiguredFeature<?, ?>> context,
+        ResourceKey<ConfiguredFeature<?, ?>> key,
+        F feature,
+        FC configuration
+    ) {
+        context.register(key, new ConfiguredFeature<>(feature, configuration));
+    }
+    
+    /**
+     * Registers a Configured Feature without custom configuration.
+     */
+    public void register(
+        BootstapContext<ConfiguredFeature<?, ?>> context,
+        ResourceKey<ConfiguredFeature<?, ?>> key,
+        Feature<NoneFeatureConfiguration> feature
+    ) {
+        this.register(context, key, feature, FeatureConfiguration.NONE);
     }
     
     /**
      * Registers a Placed Feature
      */
-    public Holder<PlacedFeature> register(String key, Holder<? extends ConfiguredFeature<?, ?>> feature, PlacementModifier... placements) {
-        return register(
-            BuiltinRegistries.PLACED_FEATURE,
-            new ResourceLocation(this.modId, key),
-            new PlacedFeature(Holder.hackyErase(feature), List.of(placements))
-        );
+    
+    public void register(
+        BootstapContext<PlacedFeature> context,
+        ResourceKey<PlacedFeature> key,
+        Holder<ConfiguredFeature<?, ?>> feature,
+        List<PlacementModifier> placements
+    ) {
+        context.register(key, new PlacedFeature(feature, List.copyOf(placements)));
     }
     
     /**
      * Registers a Placed Feature
      */
-    public Holder<PlacedFeature> register(String key, Holder<? extends ConfiguredFeature<?, ?>> feature, List<PlacementModifier> placements) {
-        return register(
-            BuiltinRegistries.PLACED_FEATURE,
-            new ResourceLocation(this.modId, key),
-            new PlacedFeature(Holder.hackyErase(feature), List.copyOf(placements))
-        );
+    public void register(
+        BootstapContext<PlacedFeature> context,
+        ResourceKey<PlacedFeature> key,
+        Holder<ConfiguredFeature<?, ?>> feature,
+        PlacementModifier... placements
+    ) {
+        this.register(context, key, feature, List.of(placements));
+    }
+    
+    /**
+     * Registers Noise Parameters
+     */
+    public void register(
+        BootstapContext<NormalNoise.NoiseParameters> context,
+        ResourceKey<NormalNoise.NoiseParameters> key,
+        int firstOctave,
+        double firstAmplitude,
+        double... amplitudes
+    ) {
+        context.register(key, new NormalNoise.NoiseParameters(firstOctave, firstAmplitude, amplitudes));
     }
     
     public void register() {}

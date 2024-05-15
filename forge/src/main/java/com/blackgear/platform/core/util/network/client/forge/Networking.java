@@ -1,10 +1,12 @@
 package com.blackgear.platform.core.util.network.client.forge;
 
 import com.blackgear.platform.Platform;
+import com.blackgear.platform.core.mixin.core.networking.access.ServerLoginPacketListenerImplAccessor;
 import com.blackgear.platform.core.util.network.PacketByteBufs;
 import com.blackgear.platform.core.util.network.server.ServerLoginConnectionEvents;
 import com.blackgear.platform.core.util.network.server.ServerLoginNetworking;
 import com.blackgear.platform.core.util.network.server.ServerPlayNetworking;
+import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
@@ -45,7 +47,8 @@ public class Networking {
                 channels.add(buf.readResourceLocation());
             }
             
-            ((ChannelInfoHolder) handler.getConnection()).getPendingChannelNames().addAll(channels);
+            Connection connection = ((ServerLoginPacketListenerImplAccessor) handler).getConnection();
+            ((ChannelInfoHolder) connection).getPendingChannelNames().addAll(channels);
             Platform.LOGGER.debug("Received accepted channels from the client for \"{}\"", handler.getUserName());
         });
     }

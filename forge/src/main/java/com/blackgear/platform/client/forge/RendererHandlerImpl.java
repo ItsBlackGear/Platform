@@ -28,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-@SuppressWarnings("removal")
 @Mod.EventBusSubscriber(
     modid = Platform.MOD_ID,
     value = Dist.CLIENT,

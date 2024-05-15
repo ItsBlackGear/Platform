@@ -1,7 +1,7 @@
 package com.blackgear.platform.client;
 
-import com.blackgear.platform.client.resource.NearPlane;
 import com.blackgear.platform.core.mixin.client.access.CameraAccessor;
+import com.blackgear.platform.core.mixin.client.access.NearPlaneAccessor;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.FogRenderer;
@@ -25,12 +25,13 @@ public class FogRenderingHandler {
     
     protected static BlockState getStateOnCamera(Camera camera) {
         if (camera.isInitialized()) {
-            NearPlane plane = NearPlane.getNearPlane(camera);
+            Camera.NearPlane plane = camera.getNearPlane();
+            
             CameraAccessor access = (CameraAccessor) camera;
             
-            for (Vec3 vector : Arrays.asList(plane.forward, plane.getTopLeft(), plane.getTopRight(), plane.getBottomLeft(), plane.getBottomRight())) {
+            for (Vec3 vector : Arrays.asList(((NearPlaneAccessor) plane).getForward(), plane.getTopLeft(), plane.getTopRight(), plane.getBottomLeft(), plane.getBottomRight())) {
                 Vec3 position = camera.getPosition().add(vector);
-                return access.getLevel().getBlockState(new BlockPos(position));
+                return access.getLevel().getBlockState(BlockPos.containing(position));
             }
         }
         
