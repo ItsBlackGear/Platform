@@ -1,16 +1,21 @@
 package com.blackgear.platform.common;
 
 import com.blackgear.platform.core.ModInstance;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for creating and modifying {@link CreativeModeTab}.
@@ -18,7 +23,7 @@ import java.util.function.Supplier;
  * @author ItsBlackGear
  */
 public class CreativeTabs {
-    public static final List<BiConsumer<ItemStack, List<ItemStack>>> MODIFICATIONS = Lists.newArrayList();
+    public static final List<Map<BiConsumer<ItemStack, List<ItemStack>>, Offset>> MODIFICATIONS = Lists.newArrayList();
 
     /**
      * <p>Example of creating an empty creative tab (recommended for modded item-only tabs):</p>
@@ -94,6 +99,103 @@ public class CreativeTabs {
      * @param display the list of components to be displayed in order
      */
     public static void modify(BiConsumer<ItemStack, List<ItemStack>> display) {
-        MODIFICATIONS.add(display);
+        MODIFICATIONS.add(ImmutableMap.of(display, Offset.AFTER));
+    }
+    
+    public static void modify(BiConsumer<ItemStack, List<ItemStack>> display, Offset offset) {
+        MODIFICATIONS.add(ImmutableMap.of(display, offset));
+    }
+    
+    public static void modify(Consumer<Output> output) {
+        output.accept(new Output() {
+            @Override
+            public void addItem(ItemStack target, ItemStack stack, Offset offset) {
+                modify((input, output) -> {
+                    if (input.sameItem(target)) {
+                        output.add(stack);
+                    }
+                }, offset);
+            }
+            
+            @Override
+            public void addItems(ItemStack target, Collection<ItemStack> stacks, Offset offset) {
+                modify((input, output) -> {
+                    if (input.sameItem(target)) {
+                        output.addAll(stacks);
+                    }
+                }, offset);
+            }
+        });
+    }
+    
+    public enum Offset {
+        BEFORE(0),
+        AFTER(1);
+        
+        public final int value;
+        
+        Offset(int offset) {
+            this.value = offset;
+        }
+    }
+    
+    public interface Output {
+        // After
+        
+        default void addAfter(ItemStack target, ItemStack stack) {
+            this.addItem(target, stack, Offset.AFTER);
+        }
+        
+        default void addAfter(ItemStack target, Collection<ItemStack> stacks) {
+            this.addItems(target, stacks, Offset.AFTER);
+        }
+        
+        default void addAfter(ItemStack target, ItemStack... stacks) {
+            this.addItems(target, Lists.newArrayList(stacks), Offset.AFTER);
+        }
+        
+        default void addAfter(ItemLike target, ItemLike stack) {
+            this.addItem(new ItemStack(target), new ItemStack(stack), Offset.AFTER);
+        }
+        
+        default void addAfter(ItemLike target, Collection<ItemLike> stacks) {
+            this.addItems(new ItemStack(target), stacks.stream().map(ItemStack::new).collect(Collectors.toList()), Offset.AFTER);
+        }
+        
+        default void addAfter(ItemLike target, ItemLike... stacks) {
+            this.addItems(new ItemStack(target), Lists.newArrayList(stacks).stream().map(ItemStack::new).collect(Collectors.toList()), Offset.AFTER);
+        }
+        
+        // Before
+        
+        default void addBefore(ItemStack target, ItemStack stack) {
+            this.addItem(target, stack, Offset.BEFORE);
+        }
+        
+        default void addBefore(ItemStack target, Collection<ItemStack> stacks) {
+            this.addItems(target, stacks, Offset.BEFORE);
+        }
+        
+        default void addBefore(ItemStack target, ItemStack... stacks) {
+            this.addItems(target, Lists.newArrayList(stacks), Offset.BEFORE);
+        }
+        
+        default void addBefore(ItemLike target, ItemLike stack) {
+            this.addItem(new ItemStack(target), new ItemStack(stack), Offset.BEFORE);
+        }
+        
+        default void addBefore(ItemLike target, Collection<ItemLike> stacks) {
+            this.addItems(new ItemStack(target), stacks.stream().map(ItemStack::new).collect(Collectors.toList()), Offset.BEFORE);
+        }
+        
+        default void addBefore(ItemLike target, ItemLike... stacks) {
+            this.addItems(new ItemStack(target), Lists.newArrayList(stacks).stream().map(ItemStack::new).collect(Collectors.toList()), Offset.BEFORE);
+        }
+        
+        // Implementation
+        
+        void addItem(ItemStack target, ItemStack stack, Offset offset);
+        
+        void addItems(ItemStack target, Collection<ItemStack> stacks, Offset offset);
     }
 }

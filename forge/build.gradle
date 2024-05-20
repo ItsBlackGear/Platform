@@ -30,10 +30,8 @@ configurations {
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
-    modImplementation "curse.maven:configured-457570:4462830"
-    modImplementation "curse.maven:catalogue-459701:3780550"
-
     forgeRuntimeLibrary implementation("com.github.LlamaLad7:MixinExtras:0.1.0-rc5")
+    shadowCommon("com.github.LlamaLad7:MixinExtras:0.1.0-rc5")
     annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.0-rc5")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
@@ -52,6 +50,7 @@ shadowJar {
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowCommon]
+    relocate "com.llamalad7.mixinextras", "com.blackgear.platform.mixinextras"
     archiveClassifier = "dev-shadow"
 }
 

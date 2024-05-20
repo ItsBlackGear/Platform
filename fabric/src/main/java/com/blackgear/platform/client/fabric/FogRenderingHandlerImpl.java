@@ -2,10 +2,9 @@ package com.blackgear.platform.client.fabric;
 
 import com.blackgear.platform.client.FogRenderingHandler.*;
 import com.blackgear.platform.core.util.event.Event;
-import com.blackgear.platform.core.util.event.EventFactory;
 
 public class FogRenderingHandlerImpl {
-    public static final Event<FogDensity> DENSITY_HANDLER = EventFactory.create(
+    public static final Event<FogDensity> DENSITY_HANDLER = Event.create(
         FogDensity.class,
         listener -> context -> {
             for (FogDensity density : listener) {
@@ -19,7 +18,7 @@ public class FogRenderingHandlerImpl {
             return null;
         }
     );
-    public static final Event<FogRendering> RENDERING_HANDLER = EventFactory.create(
+    public static final Event<FogRendering> RENDERING_HANDLER = Event.create(
         FogRendering.class,
         listener -> context -> {
             for (FogRendering renderer : listener) {
@@ -33,7 +32,7 @@ public class FogRenderingHandlerImpl {
             return null;
         }
     );
-    public static final Event<FogColor> COLOR_HANDLER = EventFactory.create(
+    public static final Event<FogColor> COLOR_HANDLER = Event.create(
         FogColor.class,
         listener -> context -> {
             for (FogColor color : listener) {

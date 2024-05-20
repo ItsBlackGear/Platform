@@ -1,6 +1,7 @@
 package com.blackgear.platform.fabric;
 
 import com.blackgear.platform.Platform;
+import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.events.ServerLifecycle;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -20,6 +21,10 @@ public class PlatformFabric implements ModInitializer {
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
             PlatformFabric.server = null;
         });
+
+        if (Environment.isClientSide()) {
+            FabricClientEvents.bootstrap();
+        }
         
         ServerLifecycle.bootstrap();
     }
