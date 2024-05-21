@@ -31,7 +31,7 @@ public class CoreRegistryImpl<T extends IForgeRegistryEntry<T>> extends CoreRegi
     }
     
     @Override
-    public <E extends T> E simpleRegister(String key, E entry) {
+    public <E extends T> E registerUnsafe(String key, E entry) {
         this.registry.register(key, () -> entry);
         return entry;
     }
