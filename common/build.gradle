@@ -2,6 +2,10 @@ architectury {
     common(rootProject.enabled_platforms.split(","))
 }
 
+configurations {
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
+}
+
 loom {
     accessWidenerPath = file("src/main/resources/platform.accesswidener")
 }
