@@ -143,7 +143,7 @@ public class ForgeClientEvents {
             
             @Override
             public FogType fogType() {
-                return null;
+                return event.getType();
             }
             
             @Override
