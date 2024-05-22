@@ -4,6 +4,7 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "client.access.ItemPropertiesAccessor",
     "client.access.NearPlaneAccessor",
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",

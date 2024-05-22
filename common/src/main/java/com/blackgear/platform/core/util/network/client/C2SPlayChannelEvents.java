@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.util.network.client;
 
 import com.blackgear.platform.core.util.event.Event;
-import com.blackgear.platform.core.util.event.EventFactory;
 import com.blackgear.platform.core.util.network.PacketSender;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,8 +12,8 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class C2SPlayChannelEvents {
-    public static final Event<Register> REGISTER = EventFactory.create(Register.class);
-    public static final Event<Unregister> UNREGISTER = EventFactory.create(Unregister.class);
+    public static final Event<Register> REGISTER = Event.create(Register.class);
+    public static final Event<Unregister> UNREGISTER = Event.create(Unregister.class);
     
     @Environment(EnvType.CLIENT) @FunctionalInterface
     public interface Register {

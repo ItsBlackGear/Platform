@@ -1,16 +1,20 @@
 package com.blackgear.platform.core.mixin.fabric;
 
-import com.blackgear.platform.client.FogRenderingHandler.FogColorContext;
-import com.blackgear.platform.client.FogRenderingHandler.FogRenderingContext;
-import com.blackgear.platform.client.fabric.FogRenderingHandlerImpl;
+import com.blackgear.platform.client.event.FogRenderEvents;
+import com.mojang.blaze3d.shaders.FogShape;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.material.FogType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(FogRenderer.class)
 public class FogRendererMixin {
@@ -22,28 +26,74 @@ public class FogRendererMixin {
         method = "setupColor",
         at = @At("HEAD"),
         cancellable = true)
-    private static void platform$setupFogColor(
-        Camera activeRenderInfo,
-        float partialTicks,
+    private static void platform$fogColor(
+        Camera camera,
+        float tickDelta,
         ClientLevel level,
         int renderDistanceChunks,
         float bossColorModifier,
         CallbackInfo ci
     ) {
-        FogColorContext context = FogRenderingHandlerImpl.COLOR.invoker()
-            .setupColor(new FogColorContext(activeRenderInfo, fogRed, fogGreen, fogBlue));
+        FogRenderEvents.ColorContext context = new FogRenderEvents.ColorContext() {
+            private boolean isValid = false;
+            
+            @Override
+            public Camera getCamera() {
+                return camera;
+            }
+            
+            @Override
+            public float getRed() {
+                return fogRed;
+            }
+            
+            @Override
+            public float getGreen() {
+                return fogGreen;
+            }
+            
+            @Override
+            public float getBlue() {
+                return fogBlue;
+            }
+            
+            @Override
+            public void setRed(float red) {
+                fogRed = red;
+            }
+            
+            @Override
+            public void setGreen(float green) {
+                fogGreen = green;
+            }
+            
+            @Override
+            public void setBlue(float blue) {
+                fogBlue = blue;
+            }
+            
+            @Override
+            public boolean isValid() {
+                return this.isValid;
+            }
+            
+            @Override
+            public void build() {
+                this.isValid = true;
+            }
+        };
         
-        if (context != null) {
-            fogRed = context.getRed();
-            fogGreen = context.getGreen();
-            fogBlue = context.getBlue();
+        FogRenderEvents.FOG_COLOR.invoker().setupColor(Minecraft.getInstance().gameRenderer, context, tickDelta);
+        
+        if (context.isValid()) {
             ci.cancel();
         }
     }
     
     @Inject(
         method = "setupFog",
-        at = @At("HEAD"),
+        at = @At("TAIL"),
+        locals = LocalCapture.CAPTURE_FAILHARD,
         cancellable = true
     )
     private static void platform$setupFogDensity(
@@ -51,12 +101,80 @@ public class FogRendererMixin {
         FogRenderer.FogMode fogMode,
         float farPlaneDistance,
         boolean nearFog,
-        float partialTicks,
-        CallbackInfo ci
+        float tickDelta,
+        CallbackInfo ci,
+        FogType fogType,
+        Entity entity,
+        FogRenderer.FogData data
     ) {
-        FogRenderingContext rendering = FogRenderingHandlerImpl.RENDERING.invoker()
-            .setupRendering(new FogRenderingContext(camera, fogMode, farPlaneDistance));
-        if (rendering != null) {
+        FogRenderEvents.RenderContext context = new FogRenderEvents.RenderContext() {
+            private float start = data.start;
+            private float end = data.end;
+            private FogShape shape = data.shape;
+            private boolean isValid = false;
+            
+            @Override
+            public Camera camera() {
+                return camera;
+            }
+            
+            @Override
+            public float fogStart() {
+                return this.start;
+            }
+            
+            @Override
+            public float fogEnd() {
+                return this.end;
+            }
+            
+            @Override
+            public FogShape fogShape() {
+                return this.shape;
+            }
+            
+            @Override
+            public FogType fogType() {
+                return fogType;
+            }
+            
+            @Override
+            public FogRenderer.FogMode fogMode() {
+                return fogMode;
+            }
+            
+            @Override
+            public void fogStart(float start) {
+                this.start = start;
+            }
+            
+            @Override
+            public void fogEnd(float end) {
+                this.end = end;
+            }
+            
+            @Override
+            public void fogShape(FogShape shape) {
+                this.shape = shape;
+            }
+            
+            @Override
+            public boolean isValid() {
+                return this.isValid;
+            }
+            
+            @Override
+            public void build() {
+                this.isValid = true;
+            }
+        };
+        
+        FogRenderEvents.FOG_RENDERING.invoker().setupRendering(Minecraft.getInstance().gameRenderer, context, data.start, data.end, tickDelta);
+        
+        if (context.isValid()) {
+            RenderSystem.setShaderFogStart(context.fogStart());
+            RenderSystem.setShaderFogEnd(context.fogEnd());
+            RenderSystem.setShaderFogShape(context.fogShape());
             ci.cancel();
         }
     }

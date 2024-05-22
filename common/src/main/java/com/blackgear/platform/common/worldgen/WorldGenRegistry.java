@@ -1,8 +1,10 @@
 package com.blackgear.platform.common.worldgen;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -18,21 +20,24 @@ import java.util.List;
  *
  * @author ItsBlackGear
  **/
-public class WorldGenRegistry {
+public class WorldGenRegistry<T> {
     protected final String modId;
+    protected final ResourceKey<? extends Registry<T>> registry;
     
-    private WorldGenRegistry(String modId) {
+    private WorldGenRegistry(ResourceKey<? extends Registry<T>> registry, String modId) {
+        this.registry = registry;
         this.modId = modId;
     }
     
-    /**
-     * Creates a new instance of the WorldGenRegistry.
-     */
-    public static WorldGenRegistry create(String modId) {
-        return new WorldGenRegistry(modId);
+    public static <T> WorldGenRegistry<T> of(ResourceKey<? extends Registry<T>> registry, String modId) {
+        return new WorldGenRegistry<>(registry, modId);
+    }
+    
+    public ResourceKey<T> create(String name) {
+        return ResourceKey.create(this.registry, new ResourceLocation(this.modId, name));
     }
   
-    public <T> void register(BootstapContext<T> context, ResourceKey<T> key, T entry) {
+    public void register(BootstapContext<T> context, ResourceKey<T> key, T entry) {
         context.register(key, entry);
     }
     

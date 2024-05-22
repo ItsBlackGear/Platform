@@ -2,6 +2,8 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
+archivesBaseName = "${rootProject.archivesBaseName}-Fabric"
+
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
 }
@@ -30,7 +32,10 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
     implementation('com.electronwill.night-config:core:3.6.0')
+    shadowCommon("com.electronwill.night-config:core:3.6.0")
+
     implementation('com.electronwill.night-config:toml:3.6.0')
+    shadowCommon("com.electronwill.night-config:toml:3.6.0")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
@@ -46,6 +51,7 @@ processResources {
 
 shadowJar {
     configurations = [project.configurations.shadowCommon]
+    relocate "com.electronwill.nightconfig", "com.blackgear.platform.nightconfig"
     archiveClassifier = "dev-shadow"
 }
 

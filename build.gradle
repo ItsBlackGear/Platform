@@ -36,14 +36,14 @@ allprojects {
     apply plugin: "maven-publish"
 
     archivesBaseName = rootProject.archives_base_name
-    version = rootProject.mod_version
+    version = "${rootProject.minecraft_version}-${rootProject.mod_version}"
     group = rootProject.maven_group
 
     repositories {
         mavenLocal()
         mavenCentral()
         maven { url "https://cursemaven.com" }
-        maven { url "https://maven.parchmentmc.org"}
+        maven { url "https://maven.parchmentmc.org" }
         maven { url "https://jitpack.io" }
     }
 
