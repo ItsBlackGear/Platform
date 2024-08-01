@@ -14,5 +14,11 @@ accessible method net/minecraft/world/level/block/FireBlock setFlammable (Lnet/m
 # Registry Builder
 accessible method net/minecraft/core/Registry registerSimple (Lnet/minecraft/resources/ResourceKey;Ljava/util/function/Supplier;)Lnet/minecraft/core/Registry;
 
+# Tags
+accessible method net/minecraft/tags/BlockTags bind (Ljava/lang/String;)Lnet/minecraft/tags/Tag$Named;
+accessible method net/minecraft/tags/EntityTypeTags bind (Ljava/lang/String;)Lnet/minecraft/tags/Tag$Named;
+accessible method net/minecraft/tags/FluidTags bind (Ljava/lang/String;)Lnet/minecraft/tags/Tag$Named;
+accessible method net/minecraft/tags/ItemTags bind (Ljava/lang/String;)Lnet/minecraft/tags/Tag$Named;
+
 # Entity Handler
 accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacements$Type;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V

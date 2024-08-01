@@ -1,5 +1,6 @@
 package com.blackgear.platform;
 
+import com.blackgear.platform.core.tags.PlatformTags;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
 import com.blackgear.platform.core.util.config.ConfigLoader;
@@ -13,7 +14,9 @@ public class Platform {
 
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
-
+		
+		PlatformTags.TAGS.instance();
+		
 		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
 	}

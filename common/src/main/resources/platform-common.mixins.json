@@ -6,11 +6,12 @@
   "mixins": [
     "client.access.ItemPropertiesAccessor",
     "common.BlockEntityTypeMixin",
-    "common.CreativeModeTabMixin",
+    "common.BushBlockMixin",
     "common.access.OverworldBiomeSourceAccessor",
     "core.access.LevelResourceAccessor"
   ],
   "client": [
+    "common.CreativeModeTabMixin",
     "client.access.CameraAccessor",
     "core.config.ClientHandshakePacketListenerImplMixin"
   ],

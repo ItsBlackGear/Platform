@@ -49,7 +49,7 @@ public class BlockProperties {
         }
         
         public Builder noCollision() {
-            this.properties.noOcclusion();
+            this.properties.noCollission();
             return this;
         }
         
@@ -178,11 +178,23 @@ public class BlockProperties {
         }
     }
     
-    public static boolean never(BlockState state, BlockGetter level, BlockPos pos, EntityType<?> entityType) {
+    public static boolean never(BlockState state, BlockGetter level, BlockPos pos, EntityType<?> entity) {
         return false;
+    }
+    
+    public static boolean always(BlockState state, BlockGetter level, BlockPos pos, EntityType<?> entity) {
+        return true;
+    }
+    
+    public static boolean ocelotOrParrot(BlockState state, BlockGetter level, BlockPos pos, EntityType<?> entity) {
+        return entity == EntityType.OCELOT || entity == EntityType.PARROT;
     }
     
     public static boolean never(BlockState state, BlockGetter level, BlockPos pos) {
         return false;
+    }
+    
+    public static boolean always(BlockState state, BlockGetter level, BlockPos pos) {
+        return true;
     }
 }
