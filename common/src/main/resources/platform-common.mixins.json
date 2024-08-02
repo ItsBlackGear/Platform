@@ -4,13 +4,13 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "client.access.ItemPropertiesAccessor",
     "common.BlockEntityTypeMixin",
     "common.BushBlockMixin",
     "common.access.OverworldBiomeSourceAccessor",
     "core.access.LevelResourceAccessor"
   ],
   "client": [
+    "client.access.ItemPropertiesAccessor",
     "common.CreativeModeTabMixin",
     "client.access.CameraAccessor",
     "core.config.ClientHandshakePacketListenerImplMixin"
