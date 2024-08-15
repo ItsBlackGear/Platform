@@ -74,7 +74,7 @@ public abstract class CoreRegistry<T> {
      */
     public abstract <E extends T> Supplier<E> register(String key, Supplier<E> entry);
     
-    public abstract <E extends T> E registerUnsafe(String key, E entry);
+    public abstract <E extends T> E registerSimple(String key, E entry);
     
     /**
      * Registers an entry into the CoreRegistry, returning a ResourceKey
@@ -102,8 +102,8 @@ public abstract class CoreRegistry<T> {
         return ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, key));
     }
     
-    public <E extends T> ResourceKey<T> resourceUnsafe(String key, E entry) {
-        this.registerUnsafe(key, entry);
+    public <E extends T> ResourceKey<T> resourceSimple(String key, E entry) {
+        this.registerSimple(key, entry);
         return ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, key));
     }
     
@@ -143,7 +143,7 @@ public abstract class CoreRegistry<T> {
         }
         
         @Override
-        public <E extends T> E registerUnsafe(String key, E entry) {
+        public <E extends T> E registerSimple(String key, E entry) {
             Registry.register(this.registry, new ResourceLocation(this.modId, key), entry);
             return entry;
         }

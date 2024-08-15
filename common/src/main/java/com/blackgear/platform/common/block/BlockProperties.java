@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.PushReaction;
 
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
@@ -171,6 +172,16 @@ public class BlockProperties {
         @ExpectPlatform
         public static void registerToolType(BlockBehaviour.Properties properties, ToolType toolType, int level) {
             throw new AssertionError();
+        }
+        
+        public Builder pushReaction(PushReaction reaction) {
+            ((BlockPropertiesExtension) this.properties).setPushReaction(reaction);
+            return this;
+        }
+        
+        public Builder offsetType(BlockBehaviour.OffsetType offset) {
+            ((BlockPropertiesExtension) this.properties).setOffsetType(offset);
+            return this;
         }
         
         public BlockBehaviour.Properties build() {

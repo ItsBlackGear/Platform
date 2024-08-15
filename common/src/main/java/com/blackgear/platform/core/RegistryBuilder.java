@@ -52,11 +52,11 @@ public class RegistryBuilder {
         return new Sample<>(resource, Registry.registerSimple(resource, bootstrap));
     }
 
-    public static void bootstrap() {}
+    public void bootstrap() {}
 
     public static class Sample<T> {
-        public final ResourceKey<Registry<T>> resource;
-        public final Registry<T> registry;
+        private final ResourceKey<Registry<T>> resource;
+        private final Registry<T> registry;
         
         public Sample(ResourceKey<Registry<T>> resource, Registry<T> registry) {
             this.resource = resource;

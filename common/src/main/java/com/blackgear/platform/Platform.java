@@ -1,5 +1,8 @@
 package com.blackgear.platform;
 
+import com.blackgear.platform.common.valueproviders.FloatProviderType;
+import com.blackgear.platform.common.valueproviders.IntProviderType;
+import com.blackgear.platform.core.registry.PlatformRegistries;
 import com.blackgear.platform.core.tags.PlatformTags;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
@@ -14,6 +17,11 @@ public class Platform {
 
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
+		
+		PlatformRegistries.bootstrap();
+		
+		IntProviderType.PROVIDERS.register();
+		FloatProviderType.PROVIDERS.register();
 		
 		PlatformTags.TAGS.instance();
 		
