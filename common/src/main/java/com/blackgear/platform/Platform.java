@@ -1,7 +1,10 @@
 package com.blackgear.platform;
 
-import com.blackgear.platform.common.valueproviders.FloatProviderType;
-import com.blackgear.platform.common.valueproviders.IntProviderType;
+import com.blackgear.platform.common.providers.height.HeightProviderType;
+import com.blackgear.platform.common.providers.math.FloatProviderType;
+import com.blackgear.platform.common.providers.math.IntProviderType;
+import com.blackgear.platform.common.registry.PlatformDecorators;
+import com.blackgear.platform.common.registry.PlatformFeatures;
 import com.blackgear.platform.core.registry.PlatformRegistries;
 import com.blackgear.platform.core.tags.PlatformTags;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
@@ -18,10 +21,14 @@ public class Platform {
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
 		
-		PlatformRegistries.bootstrap();
+		PlatformRegistries.BUILDER.bootstrap();
 		
 		IntProviderType.PROVIDERS.register();
 		FloatProviderType.PROVIDERS.register();
+		HeightProviderType.PROVIDERS.register();
+		
+		PlatformFeatures.FEATURES.register();
+		PlatformDecorators.DECORATOR.register();
 		
 		PlatformTags.TAGS.instance();
 		

@@ -40,7 +40,7 @@ import java.util.function.Supplier;
  *
  * @author ItsBlackGear
  */
-public class RegistryBuilder {
+public final class RegistryBuilder {
     private final String modId;
     
     public RegistryBuilder(String modId) {

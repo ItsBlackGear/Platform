@@ -7,7 +7,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraft.world.level.biome.OverworldBiomeSource;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -30,6 +30,8 @@ public interface BiomeContext {
     boolean is(ResourceKey<Biome> biome);
     
     boolean is(Predicate<BiomeContext> context);
+    
+    boolean hasFeature(ConfiguredFeature<?, ?> feature);
 
     default boolean hasEntity(Supplier<EntityType<?>>... entities) {
         return hasEntity(ImmutableSet.copyOf(entities));

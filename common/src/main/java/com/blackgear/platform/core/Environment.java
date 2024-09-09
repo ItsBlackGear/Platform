@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class Environment {
+public final class Environment {
     @ExpectPlatform
     public static boolean isClientSide() {
         throw new AssertionError();

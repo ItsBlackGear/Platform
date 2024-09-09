@@ -10,7 +10,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class ModInstanceBuilderImpl {
     public static ModInstance builder(

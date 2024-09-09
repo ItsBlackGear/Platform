@@ -1,4 +1,4 @@
-package com.blackgear.platform.common.valueproviders;
+package com.blackgear.platform.common.providers.math;
 
 import com.blackgear.platform.core.registry.PlatformRegistries;
 import com.blackgear.platform.core.util.ExtraCodecs;

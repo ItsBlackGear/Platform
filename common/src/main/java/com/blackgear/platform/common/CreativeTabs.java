@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  *
  * @author ItsBlackGear
  */
-public class CreativeTabs {
+public final class CreativeTabs {
     public static final List<Map<BiConsumer<ItemStack, List<ItemStack>>, Offset>> MODIFICATIONS = Lists.newArrayList();
 
     /**

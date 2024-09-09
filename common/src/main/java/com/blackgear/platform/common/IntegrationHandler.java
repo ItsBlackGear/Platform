@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.*;
  *
  * @author ItsBlackGear
  */
-public class IntegrationHandler {
+public final class IntegrationHandler {
 
     /**
      * <p>Example of creating a flammable block:</p>

@@ -8,7 +8,10 @@
     "common.BlockEntityTypeMixin",
     "common.BlockPropertiesMixin",
     "common.BushBlockMixin",
+    "common.DecorationContextMixin",
+    "common.access.BiomeGenerationSettingsAccessor",
     "common.access.BlockBehaviourAccessor",
+    "common.access.DecorationContextAccessor",
     "common.access.OverworldBiomeSourceAccessor",
     "core.access.LevelResourceAccessor"
   ],

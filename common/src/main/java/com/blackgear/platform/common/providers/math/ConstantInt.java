@@ -1,4 +1,4 @@
-package com.blackgear.platform.common.valueproviders;
+package com.blackgear.platform.common.providers.math;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;

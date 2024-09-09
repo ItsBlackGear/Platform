@@ -4,7 +4,7 @@ import net.minecraft.util.Mth;
 
 import java.util.Random;
 
-public class MathUtils {
+public final class MathUtils {
     /**
      * Maps a value from one range to another and clamps it within the new range.
      *
@@ -94,7 +94,7 @@ public class MathUtils {
      * @return A normally distributed random float.
      */
     public static float normal(Random random, float mean, float deviation) {
-        return mean + (float)random.nextGaussian() * deviation;
+        return mean + (float) random.nextGaussian() * deviation;
     }
     
     /**

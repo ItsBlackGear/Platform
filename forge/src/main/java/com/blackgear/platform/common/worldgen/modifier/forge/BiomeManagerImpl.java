@@ -4,15 +4,19 @@ import com.blackgear.platform.Platform;
 import com.blackgear.platform.common.worldgen.modifier.BiomeContext;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.common.worldgen.modifier.BiomeWriter;
+import com.blackgear.platform.core.util.ExtraCodecs;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -41,7 +45,7 @@ public class BiomeManagerImpl {
 
         @Override
         public ResourceLocation name() {
-            return ForgeBiomeWriter.this.event.getName();
+            return this.event.getName();
         }
 
         @Override
@@ -71,6 +75,17 @@ public class BiomeManagerImpl {
                 public boolean is(Predicate<BiomeContext> context) {
                     return context.test(this);
                 }
+                
+                @Override
+                public boolean hasFeature(ConfiguredFeature<?, ?> feature) {
+                    for (GenerationStep.Decoration decoration : GenerationStep.Decoration.values()) {
+                        if (ForgeBiomeWriter.this.event.getGeneration().getFeatures(decoration).stream().anyMatch(supplier -> ExtraCodecs.serializeAndCompareFeature(supplier.get(), feature))) {
+                            return true;
+                        }
+                    }
+                    
+                    return false;
+                }
             };
         }
 
@@ -80,13 +95,43 @@ public class BiomeManagerImpl {
         }
 
         @Override
-        public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
-            this.event.getSpawns().addSpawn(category, data);
+        public void removeFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature) {
+            this.event.getGeneration().getFeatures(decoration).removeIf(supplier -> ExtraCodecs.serializeAndCompareFeature(supplier.get(), feature));
         }
 
         @Override
+        public void addStructure(ConfiguredStructureFeature<?, ?> structure) {
+            this.event.getGeneration().addStructureStart(structure);
+        }
+        
+        @Override
+        public void removeStructure(ConfiguredStructureFeature<?, ?> structure) {
+            this.event.getGeneration().getStructures().removeIf(supplier -> ExtraCodecs.serializeAndCompareStructure(supplier.get(), structure));
+        }
+        
+        @Override
         public void addCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver) {
             this.event.getGeneration().addCarver(carving, carver);
+        }
+        
+        @Override
+        public void removeCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver) {
+            this.event.getGeneration().getCarvers(carving).removeIf(supplier -> ExtraCodecs.serializeAndCompareCarver(supplier.get(), carver));
+        }
+        
+        @Override
+        public void addSurface(ConfiguredSurfaceBuilder<?> surface) {
+            this.event.getGeneration().surfaceBuilder(surface);
+        }
+
+        @Override
+        public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
+            this.event.getSpawns().addSpawn(category, data);
+        }
+        
+        @Override
+        public void removeSpawn(EntityType<?> entity) {
+            this.event.getSpawns().getSpawner(entity.getCategory()).removeIf(spawner -> spawner.type == entity);
         }
     }
 }

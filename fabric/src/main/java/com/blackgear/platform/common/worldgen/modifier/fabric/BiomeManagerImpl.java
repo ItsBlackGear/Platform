@@ -10,12 +10,15 @@ import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 
 import java.util.function.Predicate;
 
@@ -70,6 +73,11 @@ public class BiomeManagerImpl {
                 public boolean is(Predicate<BiomeContext> context) {
                     return context.test(this);
                 }
+                
+                @Override
+                public boolean hasFeature(ConfiguredFeature<?, ?> feature) {
+                    return FabricBiomeWriter.this.selector.hasBuiltInFeature(feature);
+                }
             };
         }
 
@@ -77,15 +85,45 @@ public class BiomeManagerImpl {
         public void addFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature) {
             this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature);
         }
-
+        
         @Override
-        public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
-            this.modifier.getSpawnSettings().addSpawn(category, data);
+        public void removeFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature) {
+            this.modifier.getGenerationSettings().removeBuiltInFeature(decoration, feature);
+        }
+        
+        @Override
+        public void addStructure(ConfiguredStructureFeature<?, ?> structure) {
+            this.modifier.getGenerationSettings().addBuiltInStructure(structure);
+        }
+        
+        @Override
+        public void removeStructure(ConfiguredStructureFeature<?, ?> structure) {
+            this.modifier.getGenerationSettings().removeBuiltInStructure(structure);
         }
 
         @Override
         public void addCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver) {
             this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver);
+        }
+        
+        @Override
+        public void removeCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver) {
+            this.modifier.getGenerationSettings().removeBuiltInCarver(carving, carver);
+        }
+        
+        @Override
+        public void addSurface(ConfiguredSurfaceBuilder<?> surface) {
+            this.modifier.getGenerationSettings().setBuiltInSurfaceBuilder(surface);
+        }
+        
+        @Override
+        public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
+            this.modifier.getSpawnSettings().addSpawn(category, data);
+        }
+        
+        @Override
+        public void removeSpawn(EntityType<?> entity) {
+            this.modifier.getSpawnSettings().removeSpawnsOfEntityType(entity);
         }
     }
 }

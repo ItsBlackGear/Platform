@@ -9,4 +9,5 @@ public class PlatformTags {
     public static final TagRegistry TAGS = TagRegistry.of(Platform.MOD_ID);
     
     public static final Tag.Named<Block> DIRT = TAGS.blocks("dirt");
+    public static final Tag.Named<Block> FEATURES_CANNOT_REPLACE = TAGS.blocks("features_cannot_replace");
 }
