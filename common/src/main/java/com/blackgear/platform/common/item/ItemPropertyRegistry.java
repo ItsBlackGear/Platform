@@ -1,4 +1,4 @@
-package com.blackgear.platform.common.entity;
+package com.blackgear.platform.common.item;
 
 import com.blackgear.platform.core.mixin.client.access.ItemPropertiesAccessor;
 import net.fabricmc.api.EnvType;

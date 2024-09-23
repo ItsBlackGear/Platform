@@ -4,6 +4,7 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "access.SpawnPlacementsAccessor",
     "core.networking.ChunkMapMixin",
     "core.networking.ConnectionMixin",
     "core.networking.PlayerListMixin",

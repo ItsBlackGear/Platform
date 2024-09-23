@@ -32,9 +32,9 @@ configurations {
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
-    forgeRuntimeLibrary implementation("com.github.LlamaLad7:MixinExtras:0.1.0-rc5")
-    shadowCommon("com.github.LlamaLad7:MixinExtras:0.1.0-rc5")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.0-rc5")
+    forgeRuntimeLibrary implementation("io.github.LlamaLad7:MixinExtras:0.1.0-rc5")
+    shadowCommon("io.github.LlamaLad7:MixinExtras:0.1.0-rc5")
+    annotationProcessor("io.github.LlamaLad7:MixinExtras:0.1.0-rc5")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
