@@ -2,12 +2,15 @@ package com.blackgear.platform.common;
 
 import com.google.common.collect.Maps;
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A class that provides multiple methods for vanilla integration.
@@ -15,6 +18,25 @@ import net.minecraft.world.level.block.*;
  * @author ItsBlackGear
  */
 public final class IntegrationHandler {
+    public static final Object2FloatMap<BlockState> SHEARABLES = new Object2FloatOpenHashMap<>();
+    public static final Object2FloatMap<BlockState> SWORDABLES = new Object2FloatOpenHashMap<>();
+    
+    public static void setShearable(Block block, float destroySpeed) {
+        SHEARABLES.put(block.defaultBlockState(), destroySpeed);
+    }
+    
+    public static void setShearable(BlockState state, float destroySpeed) {
+        SHEARABLES.put(state, destroySpeed);
+    }
+    
+    public static void setSwordable(Block block, float destroySpeed) {
+        SWORDABLES.put(block.defaultBlockState(), destroySpeed);
+    }
+    
+    public static void setSwordable(BlockState state, float destroySpeed) {
+        SWORDABLES.put(state, destroySpeed);
+    }
+    
     /**
      * <p>Example of creating a flammable block:</p>
      *

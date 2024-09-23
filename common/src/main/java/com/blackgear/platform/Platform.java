@@ -1,5 +1,6 @@
 package com.blackgear.platform;
 
+import com.blackgear.platform.common.IntegrationHandler;
 import com.blackgear.platform.common.providers.height.HeightProviderType;
 import com.blackgear.platform.common.providers.math.FloatProviderType;
 import com.blackgear.platform.common.providers.math.IntProviderType;

@@ -9,12 +9,14 @@
     "access.DecorationContextAccessor",
     "access.OverworldBiomeSourceAccessor",
     "access.SpawnPlacementsAccessor",
-    "common.BlockMixin",
     "common.BlockEntityTypeMixin",
+    "common.BlockMixin",
     "common.BlockPropertiesMixin",
     "common.BlockStateBaseMixin",
     "common.BushBlockMixin",
     "common.DecorationContextMixin",
+    "common.ShearsItemMixin",
+    "common.SwordItemMixin",
     "core.access.LevelResourceAccessor"
   ],
   "client": [
