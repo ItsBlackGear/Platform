@@ -1,7 +1,7 @@
 package com.blackgear.platform.client.event;
 
 import com.blackgear.platform.client.resource.NearPlane;
-import com.blackgear.platform.core.mixin.client.access.CameraAccessor;
+import com.blackgear.platform.core.mixin.access.CameraAccessor;
 import com.blackgear.platform.core.util.event.Event;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;

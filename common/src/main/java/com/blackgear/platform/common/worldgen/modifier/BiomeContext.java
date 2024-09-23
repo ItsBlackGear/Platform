@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.worldgen.modifier;
 
-import com.blackgear.platform.core.mixin.common.access.OverworldBiomeSourceAccessor;
+import com.blackgear.platform.core.mixin.access.OverworldBiomeSourceAccessor;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;

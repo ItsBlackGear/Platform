@@ -1,6 +1,6 @@
 package com.blackgear.platform.client.resource;
 
-import com.blackgear.platform.core.mixin.client.access.CameraAccessor;
+import com.blackgear.platform.core.mixin.access.CameraAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;

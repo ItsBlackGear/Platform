@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin.client.access;
+package com.blackgear.platform.core.mixin.access;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;

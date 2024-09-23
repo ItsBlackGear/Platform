@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin.common.access;
+package com.blackgear.platform.core.mixin.access;
 
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.spongepowered.asm.mixin.Mixin;

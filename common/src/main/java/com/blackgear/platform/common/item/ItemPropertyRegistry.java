@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.item;
 
-import com.blackgear.platform.core.mixin.client.access.ItemPropertiesAccessor;
+import com.blackgear.platform.core.mixin.access.ItemPropertiesAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.item.ItemProperties;

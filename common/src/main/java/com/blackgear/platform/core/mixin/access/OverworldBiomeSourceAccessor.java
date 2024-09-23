@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin.common.access;
+package com.blackgear.platform.core.mixin.access;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;

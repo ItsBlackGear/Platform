@@ -1,5 +1,6 @@
 package com.blackgear.platform.common.block;
 
+import com.blackgear.platform.core.util.function.ToFloatFunction;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
@@ -16,7 +17,7 @@ import net.minecraft.world.level.material.PushReaction;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
-public class BlockProperties {
+public final class BlockProperties {
     public static Builder of(Material material) {
         return new Builder(BlockBehaviour.Properties.of(material));
     }
@@ -181,6 +182,16 @@ public class BlockProperties {
         
         public Builder offsetType(BlockBehaviour.OffsetType offset) {
             ((BlockPropertiesExtension) this.properties).setOffsetType(offset);
+            return this;
+        }
+        
+        public Builder maxHorizontalOffset(ToFloatFunction<BlockState> offsetByState) {
+            ((BlockPropertiesExtension) this.properties).setMaxHorizontalOffset(offsetByState);
+            return this;
+        }
+        
+        public Builder maxVerticalOffset(ToFloatFunction<BlockState> offsetByState) {
+            ((BlockPropertiesExtension) this.properties).setMaxVerticalOffset(offsetByState);
             return this;
         }
         

@@ -2,7 +2,7 @@ package com.blackgear.platform.common.worldgen.decorator;
 
 import com.blackgear.platform.common.worldgen.CaveSurface;
 import com.blackgear.platform.common.worldgen.Column;
-import com.blackgear.platform.core.mixin.common.access.DecorationContextAccessor;
+import com.blackgear.platform.core.mixin.access.DecorationContextAccessor;
 import com.blackgear.platform.core.util.BlockUtils;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
