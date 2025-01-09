@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.mixin.core.networking;
 
-import com.blackgear.platform.core.mixin.core.networking.access.TrackedEntityAccessor;
+import com.blackgear.platform.core.mixin.core.access.TrackedEntityAccessor;
 import com.blackgear.platform.core.util.network.ChunkMapExtensions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.server.level.ChunkMap;

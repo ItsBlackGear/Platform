@@ -1,7 +1,7 @@
 package com.blackgear.platform.core.util.network.forge;
 
-import com.blackgear.platform.core.mixin.core.networking.access.ChunkMapAccessor;
-import com.blackgear.platform.core.mixin.core.networking.access.TrackedEntityAccessor;
+import com.blackgear.platform.core.mixin.core.access.ChunkMapAccessor;
+import com.blackgear.platform.core.mixin.core.access.TrackedEntityAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.server.MinecraftServer;

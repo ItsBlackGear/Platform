@@ -1,8 +1,8 @@
 package com.blackgear.platform.core.util.network.server;
 
-import com.blackgear.platform.core.mixin.core.networking.access.ClientboundCustomQueryPacketAccessor;
-import com.blackgear.platform.core.mixin.core.networking.access.ServerLoginPacketListenerImplAccessor;
-import com.blackgear.platform.core.mixin.core.networking.access.ServerboundCustomQueryPacketAccessor;
+import com.blackgear.platform.core.mixin.core.access.ClientboundCustomQueryPacketAccessor;
+import com.blackgear.platform.core.mixin.core.access.ServerLoginPacketListenerImplAccessor;
+import com.blackgear.platform.core.mixin.core.access.ServerboundCustomQueryPacketAccessor;
 import com.blackgear.platform.core.util.network.AbstractNetworkAddon;
 import com.blackgear.platform.core.util.network.PacketByteBufs;
 import com.blackgear.platform.core.util.network.PacketSender;

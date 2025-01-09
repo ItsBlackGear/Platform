@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.mixin.common;
 
-import com.blackgear.platform.core.tags.PlatformTags;
+import com.blackgear.platform.core.tags.PBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.BushBlock;
@@ -18,7 +18,7 @@ public class BushBlockMixin {
         cancellable = true
     )
     private void platform$mayPlaceOn(BlockState state, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (state.is(PlatformTags.DIRT)) {
+        if (state.is(PBlockTags.DIRT)) {
             cir.setReturnValue(true);
         }
     }

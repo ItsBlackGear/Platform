@@ -61,4 +61,8 @@ public class EnvironmentImpl {
         new ModConfig(type, pair.getRight(), modId, fileName);
         return pair.getLeft();
     }
+    
+    public static Environment.Loader getLoader() {
+        return Environment.Loader.FABRIC;
+    }
 }

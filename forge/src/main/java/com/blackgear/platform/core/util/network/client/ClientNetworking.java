@@ -1,8 +1,7 @@
 package com.blackgear.platform.core.util.network.client;
 
 import com.blackgear.platform.Platform;
-import com.blackgear.platform.core.mixin.core.networking.access.ConnectScreenAccessor;
-import com.blackgear.platform.core.mixin.core.networking.access.MinecraftAccessor;
+import com.blackgear.platform.core.mixin.core.access.ConnectScreenAccessor;
 import com.blackgear.platform.core.util.network.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ConnectScreen;
@@ -42,7 +41,7 @@ public class ClientNetworking {
     
     @Nullable
     public static Connection getLoginConnection() {
-        final Connection connection = ((MinecraftAccessor) Minecraft.getInstance()).getPendingConnection();
+        final Connection connection = Minecraft.getInstance().pendingConnection;
         
         // Check if we are connecting to an integrated server. This will set the field on MinecraftClient
         if (connection != null) {

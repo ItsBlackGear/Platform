@@ -4,10 +4,17 @@
   "package": "com.blackgear.platform.core.mixin.fabric",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "common.LivingDeathMixin",
+    "common.LivingEntityMixin",
+    "common.ServerLevelMixin"
   ],
   "client": [
-    "FogRendererMixin",
-    "SheetsMixin"
+    "client.ClientLevelMixin",
+    "client.FogRendererMixin",
+    "client.GuiMixin",
+    "client.ModelBakeryMixin",
+    "client.SheetsMixin",
+    "common.PlayerAttackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

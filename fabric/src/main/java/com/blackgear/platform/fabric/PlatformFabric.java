@@ -25,6 +25,8 @@ public class PlatformFabric implements ModInitializer {
         if (Environment.isClientSide()) {
             FabricClientEvents.bootstrap();
         }
+
+        FabricCommonEvents.bootstrap();
         
         ServerLifecycle.bootstrap();
     }

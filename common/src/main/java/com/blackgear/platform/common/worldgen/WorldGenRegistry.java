@@ -7,14 +7,12 @@ import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderConfiguration;
 
 /**
  * Utility class, similar to the CoreRegistry, designed to register world generation features.
- *
  * @author ItsBlackGear
  **/
 public class WorldGenRegistry {
@@ -34,22 +32,11 @@ public class WorldGenRegistry {
     private static <V extends T, T> V register(Registry<T> registry, ResourceLocation location, V holder) {
         return BuiltinRegistries.register(registry, location, holder);
     }
-
-    /**
-     * Registers a Configured Feature
-     */
-    public <FC extends FeatureConfiguration, F extends Feature<FC>> ConfiguredFeature<FC, ?> register(String key, ConfiguredFeature<FC, ?> feature) {
-        return register(
-            BuiltinRegistries.CONFIGURED_FEATURE,
-            new ResourceLocation(this.modId, key),
-            feature
-        );
-    }
     
     /**
      * Registers a Configured Feature
      */
-    public <FC extends FeatureConfiguration, F extends Feature<FC>> ConfiguredFeature<FC, ?> feature(String key, ConfiguredFeature<FC, ?> feature) {
+    public <FC extends FeatureConfiguration> ConfiguredFeature<FC, ?> feature(String key, ConfiguredFeature<FC, ?> feature) {
         return register(
             BuiltinRegistries.CONFIGURED_FEATURE,
             new ResourceLocation(this.modId, key),
@@ -60,7 +47,7 @@ public class WorldGenRegistry {
     /**
      * Registers a Configured Structure
      */
-    public <FC extends FeatureConfiguration, F extends Feature<FC>> ConfiguredStructureFeature<FC, ?> structure(String key, ConfiguredStructureFeature<FC, ?> structure) {
+    public <FC extends FeatureConfiguration> ConfiguredStructureFeature<FC, ?> structure(String key, ConfiguredStructureFeature<FC, ?> structure) {
         return register(
             BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE,
             new ResourceLocation(this.modId, key),

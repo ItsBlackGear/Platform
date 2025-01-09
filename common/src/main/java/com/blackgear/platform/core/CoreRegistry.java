@@ -125,6 +125,7 @@ public abstract class CoreRegistry<T> {
         if (this.isPresent) {
             throw new IllegalArgumentException("Duplication of Registry: " + this.registry);
         }
+        
         this.isPresent = true;
         this.bootstrap();
     }
@@ -144,8 +145,7 @@ public abstract class CoreRegistry<T> {
         
         @Override
         public <E extends T> E registerVanilla(String key, E entry) {
-            Registry.register(this.registry, new ResourceLocation(this.modId, key), entry);
-            return entry;
+            return Registry.register(this.registry, new ResourceLocation(this.modId, key), entry);
         }
         
         @Override

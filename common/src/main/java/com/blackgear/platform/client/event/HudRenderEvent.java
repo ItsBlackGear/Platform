@@ -2,7 +2,15 @@ package com.blackgear.platform.client.event;
 
 import com.blackgear.platform.core.util.event.Event;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceLocation;
 
 public class HudRenderEvent {
     public static final Event<RenderHud> RENDER_HUD = Event.create(RenderHud.class);
@@ -13,11 +21,50 @@ public class HudRenderEvent {
     }
     
     public interface RenderContext {
-        Window getWindow();
+        default Window window() {
+            return this.minecraft().getWindow();
+        }
         
-        int getScreenWidth();
+        default int screenWidth() {
+            return this.window().getGuiScaledWidth();
+        }
         
-        int getScreenHeight();
+        default int screenHeight() {
+            return this.window().getGuiScaledHeight();
+        }
+        
+        default Minecraft minecraft() {
+            return Minecraft.getInstance();
+        }
+        
+        default LocalPlayer player() {
+            return this.minecraft().player;
+        }
+        
+        default Gui gui() {
+            return this.minecraft().gui;
+        }
+        
+        default void renderTextureOverlay(ResourceLocation texture, float alpha) {
+            RenderSystem.disableDepthTest();
+            RenderSystem.depthMask(false);
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, alpha);
+            RenderSystem.disableAlphaTest();
+            this.minecraft().getTextureManager().bind(texture);
+            Tesselator tesselator = Tesselator.getInstance();
+            BufferBuilder bufferBuilder = tesselator.getBuilder();
+            bufferBuilder.begin(7, DefaultVertexFormat.POSITION_TEX);
+            bufferBuilder.vertex(0.0, this.screenHeight(), -90.0).uv(0.0F, 1.0F).endVertex();
+            bufferBuilder.vertex(this.screenWidth(), this.screenHeight(), -90.0).uv(1.0F, 1.0F).endVertex();
+            bufferBuilder.vertex(this.screenWidth(), 0.0, -90.0).uv(1.0F, 0.0F).endVertex();
+            bufferBuilder.vertex(0.0, 0.0, -90.0).uv(0.0F, 0.0F).endVertex();
+            tesselator.end();
+            RenderSystem.depthMask(true);
+            RenderSystem.enableDepthTest();
+            RenderSystem.enableAlphaTest();
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        }
     }
     
     public enum ElementType {

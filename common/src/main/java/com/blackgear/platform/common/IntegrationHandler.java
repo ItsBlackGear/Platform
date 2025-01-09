@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.*;
@@ -36,7 +37,11 @@ public final class IntegrationHandler {
     public static void setSwordable(BlockState state, float destroySpeed) {
         SWORDABLES.put(state, destroySpeed);
     }
-    
+
+    public static void setFlattenable(Block from, BlockState to) {
+        ShovelItem.FLATTENABLES.put(from, to);
+    }
+
     /**
      * <p>Example of creating a flammable block:</p>
      *

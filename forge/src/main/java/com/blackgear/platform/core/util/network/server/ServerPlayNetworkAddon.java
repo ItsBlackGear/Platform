@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.util.network.server;
 
-import com.blackgear.platform.core.mixin.core.networking.access.ServerboundCustomPayloadPacketAccessor;
+import com.blackgear.platform.core.mixin.core.access.ServerboundCustomPayloadPacketAccessor;
 import com.blackgear.platform.core.util.network.AbstractChanneledNetworkAddon;
 import com.blackgear.platform.core.util.network.ChannelInfoHolder;
 import com.blackgear.platform.core.util.network.Networking;

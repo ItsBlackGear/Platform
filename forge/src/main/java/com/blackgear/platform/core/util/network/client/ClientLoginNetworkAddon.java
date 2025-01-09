@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.util.network.client;
 
-import com.blackgear.platform.core.mixin.core.networking.access.ClientboundCustomQueryPacketAccessor;
+import com.blackgear.platform.core.mixin.core.access.ClientboundCustomQueryPacketAccessor;
 import com.blackgear.platform.core.util.network.AbstractNetworkAddon;
 import com.blackgear.platform.core.util.network.FutureListeners;
 import com.blackgear.platform.core.util.network.PacketByteBufs;

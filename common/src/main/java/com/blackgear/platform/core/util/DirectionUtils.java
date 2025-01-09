@@ -1,21 +1,29 @@
 package com.blackgear.platform.core.util;
 
+import com.blackgear.platform.core.mixin.access.DirectionAccessor;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 public class DirectionUtils {
-    public static final Codec<Direction> CODEC = StringRepresentable.fromEnum(Direction::values, Direction::byName);
+    public static final Codec<Direction> CODEC = StringRepresentable.fromEnum(Direction::values, DirectionUtils::byName);
     public static final Codec<Direction> VERTICAL_CODEC = CODEC.flatXmap(DirectionUtils::verifyVertical, DirectionUtils::verifyVertical);
+    
+    @Nullable
+    public static Direction byName(@Nullable String name) {
+        return name == null ? null : DirectionAccessor.getBY_NAME().get(name.toLowerCase(Locale.ROOT));
+    }
     
     private static DataResult<Direction> verifyVertical(Direction direction) {
         return direction.getAxis().isVertical()

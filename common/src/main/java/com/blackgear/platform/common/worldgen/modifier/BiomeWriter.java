@@ -24,41 +24,83 @@ public abstract class BiomeWriter {
 
     public abstract BiomeContext context();
 
+    public void addFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature, boolean condition) {
+        if (condition) {
+            this.addFeature(decoration, feature);
+        }
+    }
+
+    public void removeFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature, boolean condition) {
+        if (condition) {
+            this.removeFeature(decoration, feature);
+        }
+    }
+
     public abstract void addFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature);
 
     public abstract void removeFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> feature);
 
     public void replaceFeature(GenerationStep.Decoration decoration, ConfiguredFeature<?, ?> replacement, ConfiguredFeature<?, ?> feature) {
-        this.addFeature(decoration, replacement);
-        this.removeFeature(decoration, feature);
+        if (this.context().hasFeature(feature)) {
+            this.addFeature(decoration, replacement);
+            this.removeFeature(decoration, feature);
+        }
     }
-    
+
+    public void addStructure(ConfiguredStructureFeature<?, ?> structure, boolean condition) {
+        if (condition) {
+            this.addStructure(structure);
+        }
+    }
+
+    public void removeStructure(ConfiguredStructureFeature<?, ?> structure, boolean condition) {
+        if (condition) {
+            this.removeStructure(structure);
+        }
+    }
+
     public abstract void addStructure(ConfiguredStructureFeature<?, ?> structure);
 
     public abstract void removeStructure(ConfiguredStructureFeature<?, ?> structure);
-    
-    public void replaceStructure(ConfiguredStructureFeature<?, ?> replacement, ConfiguredStructureFeature<?, ?> structure) {
-        this.addStructure(replacement);
-        this.removeStructure(structure);
+
+    public void addCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver, boolean condition) {
+        if (condition) {
+            this.addCarver(carving, carver);
+        }
+    }
+
+    public void removeCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver, boolean condition) {
+        if (condition) {
+            this.removeCarver(carving, carver);
+        }
     }
 
     public abstract void addCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver);
 
     public abstract void removeCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> carver);
-    
-    public void replaceCarver(GenerationStep.Carving carving, ConfiguredWorldCarver<?> replacement, ConfiguredWorldCarver<?> carver) {
-        this.addCarver(carving, replacement);
-        this.removeCarver(carving, carver);
-    }
 
     public abstract void addSurface(ConfiguredSurfaceBuilder<?> surface);
+
+    public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data, boolean condition) {
+        if (condition) {
+            this.addSpawn(category, data);
+        }
+    }
+
+    public void removeSpawn(EntityType<?> entity, boolean condition) {
+        if (condition) {
+            this.removeSpawn(entity);
+        }
+    }
 
     public abstract void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data);
     
     public abstract void removeSpawn(EntityType<?> entity);
     
     public void replaceSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
-        this.removeSpawn(data.type);
-        this.addSpawn(category, data);
+        if (this.context().hasEntity(() -> data.type)) {
+            this.removeSpawn(data.type);
+            this.addSpawn(category, data);
+        }
     }
 }

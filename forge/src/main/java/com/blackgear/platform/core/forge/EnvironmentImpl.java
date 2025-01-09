@@ -1,5 +1,6 @@
 package com.blackgear.platform.core.forge;
 
+import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.util.config.ConfigBuilder;
 import com.blackgear.platform.core.util.config.ForgeConfigBuilder;
 import com.blackgear.platform.core.util.config.ModConfig.Type;
@@ -84,5 +85,9 @@ public class EnvironmentImpl {
             default:
                 throw new UnsupportedOperationException("Unknown config type: " + type);
         }
+    }
+    
+    public static Environment.Loader getLoader() {
+        return Environment.Loader.FORGE;
     }
 }

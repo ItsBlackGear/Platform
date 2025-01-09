@@ -3,30 +3,55 @@ package com.blackgear.platform.core.util;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import net.minecraft.world.level.levelgen.synth.PerlinNoise;
 
 public final class NoiseUtils {
     /**
      * Creates a NormalNoise instance with the given parameters.
      *
-     * @param random    The random number generator.
-     * @param offset    The offset for the noise.
-     * @param octaves   The octaves for the noise.
+     * @param random        The random number generator.
+     * @param amplitudes    The amplitudes for the noise.
+     * @param octaves       The octaves for the noise.
      * @return A NormalNoise instance.
      */
-    public static NormalNoise normal(WorldgenRandom random, int offset, double... octaves) {
-        return NormalNoise.create(random, offset, new DoubleArrayList(octaves));
+    public static NormalNoise normal(WorldgenRandom random, int amplitudes, double... octaves) {
+        return NormalNoise.create(random, amplitudes, new DoubleArrayList(octaves));
     }
     
     /**
      * Creates a NormalNoise instance with the given parameters.
      *
-     * @param seed      The seed to use.
-     * @param offset    The offset for the noise.
-     * @param octaves   The octaves for the noise.
+     * @param seed          The seed to use.
+     * @param amplitudes    The amplitudes for the noise.
+     * @param octaves       The octaves for the noise.
      * @return A NormalNoise instance.
      */
-    public static NormalNoise normal(long seed, int offset, double... octaves) {
-        return NormalNoise.create(new WorldgenRandom(seed), offset, new DoubleArrayList(octaves));
+    public static NormalNoise normal(long seed, int amplitudes, double... octaves) {
+        return NormalNoise.create(new WorldgenRandom(seed), amplitudes, new DoubleArrayList(octaves));
+    }
+    
+    /**
+     * Creates a PerlinNoise instance with the given parameters.
+     *
+     * @param random        The random number generator.
+     * @param amplitudes    The amplitudes for the noise.
+     * @param octaves       The octaves for the noise.
+     * @return A PerlinNoise instance.
+     */
+    public static PerlinNoise perlin(WorldgenRandom random, int amplitudes, double... octaves) {
+        return PerlinNoise.create(random, amplitudes, new DoubleArrayList(octaves));
+    }
+    
+    /**
+     * Creates a PerlinNoise instance with the given parameters.
+     *
+     * @param seed          The seed to use.
+     * @param amplitudes    The amplitudes for the noise.
+     * @param octaves       The octaves for the noise.
+     * @return A PerlinNoise instance.
+     */
+    public static PerlinNoise perlin(long seed, int amplitudes, double... octaves) {
+        return PerlinNoise.create(new WorldgenRandom(seed), amplitudes, new DoubleArrayList(octaves));
     }
     
     /**
