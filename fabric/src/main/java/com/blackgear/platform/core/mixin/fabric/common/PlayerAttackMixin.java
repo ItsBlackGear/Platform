@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.mixin.fabric.common;
 
 import com.blackgear.platform.common.events.EntityEvents;
-import com.blackgear.platform.core.events.EventCallback;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -26,7 +25,7 @@ public class PlayerAttackMixin {
         cancellable = true
     )
     private void platform$onAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (EventCallback.invoke(callback -> () -> EntityEvents.ON_ATTACK.invoker().attack((LivingEntity) (Object) this, source, amount, callback))) {
+        if (!EntityEvents.ON_ATTACK.invoker().attack((LivingEntity) (Object) this, source, amount)) {
             cir.setReturnValue(false);
         }
     }

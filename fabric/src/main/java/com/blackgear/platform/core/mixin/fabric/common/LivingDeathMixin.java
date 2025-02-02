@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.mixin.fabric.common;
 
 import com.blackgear.platform.common.events.EntityEvents;
-import com.blackgear.platform.core.events.EventCallback;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,7 +24,7 @@ public class LivingDeathMixin {
         cancellable = true
     )
     private void platform$onDeath(DamageSource source, CallbackInfo info) {
-        if (EventCallback.invoke(callback -> () -> EntityEvents.ON_DEATH.invoker().death((LivingEntity) (Object) this, source, callback))) {
+        if (!EntityEvents.ON_DEATH.invoker().death((LivingEntity) (Object) this, source)) {
             info.cancel();
         }
     }

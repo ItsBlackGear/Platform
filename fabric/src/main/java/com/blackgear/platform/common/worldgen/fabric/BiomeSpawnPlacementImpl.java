@@ -23,8 +23,13 @@ public class BiomeSpawnPlacementImpl {
     public static void addEdgeBiome(ResourceKey<Biome> parent, ResourceKey<Biome> edge, double weight) {
         OverworldBiomes.addEdgeBiome(parent, edge, weight);
     }
-    
+
     public static void addBiomeVariant(ResourceKey<Biome> replaced, ResourceKey<Biome> variant, double chance, Temperature... temperatures) {
+        if (temperatures.length == 0) {
+            OverworldBiomes.addBiomeVariant(replaced, variant, chance);
+            return;
+        }
+
         for (Temperature temperature : temperatures) {
             OverworldBiomes.addBiomeVariant(replaced, variant, chance, getType(temperature));
         }

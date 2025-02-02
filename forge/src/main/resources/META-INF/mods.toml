@@ -1,17 +1,16 @@
 modLoader="javafml"
+license="LGPLv3"
 loaderVersion="[36,)"
-license="MIT"
 issueTrackerURL="https://github.com/ItsBlackGear/Platform/issues"
 
 [[mods]]
-   modId="platform"
-   version="${version}"
-   displayName="Platform"
-
-   logoFile="icon.png"
-
+   modId = "platform"
+   version = "${version}"
+   displayName = "Platform"
+   displayURL = "https://github.com/ItsBlackGear/Platform"
    authors = "ItsBlackGear"
-   description="Cross-Platform library mod based on Architectury to access both Forge and Fabric APIs"
+   description = "Cross-Platform library mod based on Architectury to access both Forge and Fabric APIs"
+   logoFile = "icon.png"
 
 [[dependencies.platform]]
    modId="forge"

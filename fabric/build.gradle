@@ -1,8 +1,6 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow"
 }
-
-archivesBaseName = "${rootProject.archivesBaseName}-Fabric"
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
@@ -14,16 +12,20 @@ architectury {
 }
 
 configurations {
-    common
-    shadowCommon // Don't use shadow from the shadow plugin since it *excludes* files.
+    common {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
-}
 
-configurations.configureEach {
-    resolutionStrategy {
-        force("net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}")
+    // Files in this configuration will be bundled into your mod using the Shadow plugin.
+    // Don't use the `shadow` configuration from the plugin itself as it's meant for excluding files.
+    shadowBundle {
+        canBeResolved = true
+        canBeConsumed = false
     }
 }
 
@@ -31,16 +33,14 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-//    include("com.electronwill.night-config:core:3.6.0")
     implementation('com.electronwill.night-config:core:3.6.0')
-    shadowCommon('com.electronwill.night-config:core:3.6.0')
+    shadowBundle('com.electronwill.night-config:core:3.6.0')
 
-//    include("com.electronwill.night-config:toml:3.6.0")
     implementation('com.electronwill.night-config:toml:3.6.0')
-    shadowCommon('com.electronwill.night-config:toml:3.6.0')
+    shadowBundle('com.electronwill.night-config:toml:3.6.0')
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+    shadowBundle project(path: ":common", configuration: "transformProductionFabric")
 }
 
 processResources {
@@ -52,7 +52,7 @@ processResources {
 }
 
 shadowJar {
-    configurations = [project.configurations.shadowCommon]
+    configurations = [project.configurations.shadowBundle]
     relocate "com.electronwill.nightconfig", "com.blackgear.platform.nightconfig"
     archiveClassifier = "dev-shadow"
 }
@@ -64,33 +64,8 @@ remapJar {
     archiveClassifier = null
 }
 
-jar {
-    archiveClassifier.set("dev")
-}
-
-sourcesJar {
-    def commonSources = project(":common").sourcesJar
-    dependsOn commonSources
-    from commonSources.archiveFile.map { zipTree(it) }
-    duplicatesStrategy(DuplicatesStrategy.INCLUDE)
-}
-
-components.java {
-    withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
-        skip()
-    }
-}
-
-publishing {
-    publications {
-        mavenFabric(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-" + project.name
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
+configurations.configureEach {
+    resolutionStrategy {
+        force("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
     }
 }

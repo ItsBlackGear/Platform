@@ -79,18 +79,14 @@ public class BiomeInitLayerMixin {
     private void transformVariants(Context context, int value, CallbackInfoReturnable<Integer> cir) {
         int biomeId = cir.getReturnValueI();
         ResourceKey<Biome> biome = Biomes.byId(biomeId);
-        
-        // Determine what special case this is...
         Temperature climate = null;
-        
+
         if (biome == BADLANDS_PLATEAU || biome == WOODED_BADLANDS_PLATEAU) {
             climate = Temperature.HOT;
-        } else if (biome == JUNGLE) {
-            climate = Temperature.WARM;
-        } else if (biome == GIANT_TREE_TAIGA) {
+        } else if (biome == JUNGLE || biome == GIANT_TREE_TAIGA) {
             climate = Temperature.WARM;
         }
-        
+
         cir.setReturnValue(InternalBiomeUtils.transformBiome(context, biome, climate));
     }
 }

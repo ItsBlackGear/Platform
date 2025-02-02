@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.mixin.fabric.common;
 
 import com.blackgear.platform.common.events.EntityEvents;
-import com.blackgear.platform.core.events.EventCallback;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +19,7 @@ public class LivingEntityMixin {
     private void platform$onAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this instanceof Player) return;
 
-        if (EventCallback.invoke(callback -> () -> EntityEvents.ON_ATTACK.invoker().attack((LivingEntity) (Object) this, source, amount, callback))) {
+        if (!EntityEvents.ON_ATTACK.invoker().attack((LivingEntity) (Object) this, source, amount)) {
             cir.setReturnValue(false);
         }
     }

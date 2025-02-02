@@ -20,7 +20,7 @@ public abstract class ItemModelShaperMixin {
         at = @At("HEAD"),
         cancellable = true
     )
-    private void vb$getItemHeldModel(ItemStack stack, CallbackInfoReturnable<BakedModel> cir) {
+    private void platform$getItemHeldModel(ItemStack stack, CallbackInfoReturnable<BakedModel> cir) {
         ModelManager modelManager = this.getModelManager();
         
         ItemTransformations.MODELS_IN_HAND.entrySet()
