@@ -1,6 +1,8 @@
 package com.blackgear.platform.client;
 
 import com.mojang.math.Vector3f;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.Keyframe;
@@ -16,6 +18,7 @@ import java.util.Optional;
 /**
  * Backport the updated animation system from 1.20+
  */
+@Environment(EnvType.CLIENT)
 public class AnimationHelper {
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
     

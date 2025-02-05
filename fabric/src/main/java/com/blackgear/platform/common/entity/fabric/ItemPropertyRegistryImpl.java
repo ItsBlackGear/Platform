@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.entity.fabric;
 
-import com.blackgear.platform.core.mixin.client.access.ItemPropertiesAccessor;
+import com.blackgear.platform.core.mixin.client.forge.access.ItemPropertiesAccessor;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;

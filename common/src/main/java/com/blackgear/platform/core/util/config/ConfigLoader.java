@@ -3,7 +3,7 @@ package com.blackgear.platform.core.util.config;
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.events.ServerLifecycleEvents;
-import com.blackgear.platform.core.mixin.core.access.LevelResourceAccessor;
+import com.blackgear.platform.core.mixin.access.LevelResourceAccessor;
 import com.blackgear.platform.core.util.network.PacketByteBufs;
 import com.blackgear.platform.core.util.network.client.ClientLoginNetworking;
 import com.blackgear.platform.core.util.network.server.ServerLoginConnectionEvents;

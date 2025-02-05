@@ -1,8 +1,8 @@
 package com.blackgear.platform.core.util.network.client.forge;
 
 import com.blackgear.platform.Platform;
-import com.blackgear.platform.core.mixin.core.networking.access.ConnectScreenAccessor;
-import com.blackgear.platform.core.mixin.core.networking.access.MinecraftAccessor;
+import com.blackgear.platform.core.mixin.forge.core.networking.access.ConnectScreenAccessor;
+import com.blackgear.platform.core.mixin.forge.core.networking.access.MinecraftAccessor;
 import com.blackgear.platform.core.util.network.*;
 import com.blackgear.platform.core.util.network.client.ClientLoginNetworking;
 import com.blackgear.platform.core.util.network.client.ClientPlayConnectionEvents;

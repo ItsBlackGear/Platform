@@ -13,8 +13,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class EnvironmentImpl {
+    private static final Supplier<Supplier<BlockableEventLoop<?>>> CLIENT_EXECUTOR = () -> Minecraft::getInstance;
+
     public static boolean isClientSide() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
@@ -32,8 +35,8 @@ public class EnvironmentImpl {
     }
     
     public static BlockableEventLoop<?> getGameExecutor() {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            return Minecraft.getInstance();
+        if (Environment.isClientSide()) {
+            return CLIENT_EXECUTOR.get().get();
         } else {
             return Environment.getCurrentServer().orElseThrow(() -> new IllegalStateException("No server available"));
         }
@@ -57,5 +60,9 @@ public class EnvironmentImpl {
         Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
         new ModConfig(type, pair.getRight(), modId, fileName);
         return pair.getLeft();
+    }
+
+    public static Environment.Loader getLoader() {
+        return Environment.Loader.FABRIC;
     }
 }

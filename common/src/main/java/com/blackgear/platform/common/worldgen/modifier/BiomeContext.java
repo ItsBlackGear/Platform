@@ -1,6 +1,7 @@
 package com.blackgear.platform.common.worldgen.modifier;
 
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -8,6 +9,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 public interface BiomeContext {
     Predicate<BiomeContext> OVERWORLD_BIOME = context -> MultiNoiseBiomeSource.Preset.OVERWORLD.possibleBiomes().anyMatch(context::is);
     
-    ResourceKey<Biome> key();
+    ResourceKey<Biome> resource();
     
     Biome biome();
     
@@ -31,8 +33,10 @@ public interface BiomeContext {
     
     boolean is(Predicate<BiomeContext> context);
 
-    default boolean hasEntity(Supplier<EntityType<?>>... entities) {
-        return hasEntity(ImmutableSet.copyOf(entities));
+    boolean hasFeature(Holder<PlacedFeature> feature);
+
+    default boolean hasEntity(Supplier<EntityType<?>> entities) {
+        return hasEntity(ImmutableSet.of(entities));
     }
     
     default boolean hasEntity(Set<Supplier<EntityType<?>>> entitySet) {

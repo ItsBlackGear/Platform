@@ -4,6 +4,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -39,7 +41,7 @@ public class WorldGenRegistry {
     /**
      * Registers a Configured Feature
      */
-    public <FC extends FeatureConfiguration, F extends Feature<FC>> Holder<ConfiguredFeature<FC, ?>> register(String key, F feature, FC configuration) {
+    public <FC extends FeatureConfiguration, F extends Feature<FC>> Holder<ConfiguredFeature<FC, ?>> configuredFeature(String key, F feature, FC configuration) {
         return register(
             BuiltinRegistries.CONFIGURED_FEATURE,
             new ResourceLocation(this.modId, key),
@@ -50,7 +52,7 @@ public class WorldGenRegistry {
     /**
      * Registers a Placed Feature
      */
-    public Holder<PlacedFeature> register(String key, Holder<? extends ConfiguredFeature<?, ?>> feature, PlacementModifier... placements) {
+    public Holder<PlacedFeature> placedFeature(String key, Holder<? extends ConfiguredFeature<?, ?>> feature, PlacementModifier... placements) {
         return register(
             BuiltinRegistries.PLACED_FEATURE,
             new ResourceLocation(this.modId, key),
@@ -61,11 +63,22 @@ public class WorldGenRegistry {
     /**
      * Registers a Placed Feature
      */
-    public Holder<PlacedFeature> register(String key, Holder<? extends ConfiguredFeature<?, ?>> feature, List<PlacementModifier> placements) {
+    public Holder<PlacedFeature> placedFeature(String key, Holder<? extends ConfiguredFeature<?, ?>> feature, List<PlacementModifier> placements) {
         return register(
             BuiltinRegistries.PLACED_FEATURE,
             new ResourceLocation(this.modId, key),
             new PlacedFeature(Holder.hackyErase(feature), List.copyOf(placements))
+        );
+    }
+
+    /**
+     * Registers a Configured Carver
+     */
+    public <CC extends CarverConfiguration> Holder<ConfiguredWorldCarver<CC>> carver(String name, ConfiguredWorldCarver<CC> carver) {
+        return register(
+            BuiltinRegistries.CONFIGURED_CARVER,
+            new ResourceLocation(this.modId, name),
+            carver
         );
     }
     

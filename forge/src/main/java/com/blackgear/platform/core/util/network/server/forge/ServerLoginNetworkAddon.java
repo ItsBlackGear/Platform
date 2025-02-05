@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.util.network.server.forge;
 
-import com.blackgear.platform.core.mixin.core.networking.access.ServerLoginPacketListenerImplAccessor;
+import com.blackgear.platform.core.mixin.forge.core.networking.access.ServerLoginPacketListenerImplAccessor;
 import com.blackgear.platform.core.util.network.client.forge.AbstractNetworkAddon;
 import com.blackgear.platform.core.util.network.client.forge.GenericFutureListenerHolder;
 import com.blackgear.platform.core.util.network.PacketByteBufs;

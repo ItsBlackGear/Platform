@@ -75,4 +75,19 @@ public class Environment {
         new ModConfig(type, pair.getRight(), modId, fileName);
         return pair.getLeft();
     }
+
+    @ExpectPlatform
+    public static Loader getLoader() {
+        throw new AssertionError();
+    }
+
+    public static boolean isForge() {
+        return getLoader() == Loader.FORGE;
+    }
+
+    public static boolean isFabric() {
+        return getLoader() == Loader.FABRIC;
+    }
+
+    public enum Loader { FORGE, FABRIC }
 }

@@ -3,6 +3,7 @@ package com.blackgear.platform;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
 import com.blackgear.platform.core.util.config.ConfigLoader;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,5 +17,9 @@ public class Platform {
 
 		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
+	}
+
+	public static ResourceLocation resource(String path) {
+		return new ResourceLocation(MOD_ID, path);
 	}
 }

@@ -1,5 +1,6 @@
 package com.blackgear.platform.core.forge;
 
+import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.util.config.ConfigBuilder;
 import com.blackgear.platform.core.util.config.forge.ForgeConfigBuilder;
 import com.blackgear.platform.core.util.config.ModConfig.Type;
@@ -74,15 +75,14 @@ public class EnvironmentImpl {
     }
     
     private static ModConfig.Type forge(Type type) {
-        switch (type) {
-            case COMMON:
-                return ModConfig.Type.COMMON;
-            case CLIENT:
-                return ModConfig.Type.CLIENT;
-            case SERVER:
-                return ModConfig.Type.SERVER;
-            default:
-                throw new UnsupportedOperationException("Unknown config type: " + type);
-        }
+        return switch (type) {
+            case COMMON -> ModConfig.Type.COMMON;
+            case CLIENT -> ModConfig.Type.CLIENT;
+            case SERVER -> ModConfig.Type.SERVER;
+        };
+    }
+
+    public static Environment.Loader getLoader() {
+        return Environment.Loader.FORGE;
     }
 }

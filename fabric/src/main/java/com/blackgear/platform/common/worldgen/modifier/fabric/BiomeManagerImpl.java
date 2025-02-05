@@ -12,6 +12,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -23,7 +24,7 @@ import java.util.function.Predicate;
 
 public class BiomeManagerImpl {
     public static void bootstrap() {
-        BiomeModifications.create(new ResourceLocation(Platform.MOD_ID, "biome_modifier"))
+        BiomeModifications.create(Platform.resource("biome_modifier"))
             .add(
                 ModificationPhase.ADDITIONS,
                 context -> true,
@@ -49,28 +50,33 @@ public class BiomeManagerImpl {
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
-                public ResourceKey<Biome> key() {
-                    return FabricBiomeWriter.this.selector.getBiomeKey();
+                public ResourceKey<Biome> resource() {
+                    return selector.getBiomeKey();
                 }
                 
                 @Override
                 public Biome biome() {
-                    return FabricBiomeWriter.this.selector.getBiome();
+                    return selector.getBiome();
                 }
                 
                 @Override
                 public boolean is(TagKey<Biome> tag) {
-                    return FabricBiomeWriter.this.selector.hasTag(tag);
+                    return selector.hasTag(tag);
                 }
                 
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    return this.key() == biome;
+                    return this.resource() == biome;
                 }
                 
                 @Override
                 public boolean is(Predicate<BiomeContext> context) {
                     return context.test(this);
+                }
+
+                @Override
+                public boolean hasFeature(Holder<PlacedFeature> feature) {
+                    return selector.hasBuiltInPlacedFeature(feature.value());
                 }
             };
         }
@@ -79,15 +85,30 @@ public class BiomeManagerImpl {
         public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
             this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature.value());
         }
-        
+
+        @Override
+        public void removeFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
+            this.modifier.getGenerationSettings().removeBuiltInFeature(decoration, feature.value());
+        }
+
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.modifier.getSpawnSettings().addSpawn(category, data);
         }
-        
+
+        @Override
+        public void removeSpawn(EntityType<?> entity) {
+            this.modifier.getSpawnSettings().removeSpawnsOfEntityType(entity);
+        }
+
         @Override
         public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
             this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver.value());
+        }
+
+        @Override
+        public void removeCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
+            this.modifier.getGenerationSettings().removeBuiltInCarver(carving, carver.value());
         }
     }
 }

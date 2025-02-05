@@ -3,9 +3,7 @@ package com.blackgear.platform.forge;
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.client.event.FogRenderEvents;
 import com.blackgear.platform.client.event.HudRenderEvent;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.shaders.FogShape;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -30,34 +28,25 @@ public class ForgeClientEvents {
         float tickDelta = event.getPartialTick();
         
         Minecraft minecraft = Minecraft.getInstance();
-        HudRenderEvent.RenderContext context = new HudRenderEvent.RenderContext() {
-            @Override
-            public Window getWindow() {
-                return event.getWindow();
-            }
-            
-            @Override
-            public int getScreenWidth() {
-                return event.getWindow().getGuiScaledWidth();
-            }
-            
-            @Override
-            public int getScreenHeight() {
-                return event.getWindow().getGuiScaledHeight();
-            }
-        };
+        HudRenderEvent.RenderContext context = new HudRenderEvent.RenderContext() {};
         
         if (Minecraft.useFancyGraphics()) {
             HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.VIGNETTE, context);
-        } else if (minecraft.gameMode.canHurtPlayer()) {
-            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.HEALTH, context);
-        } else if (minecraft.gameMode.hasExperience()) {
-            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.EXPERIENCE, context);
-        } else if (minecraft.options.getCameraType().isFirstPerson()) {
-            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.FIRST_PERSON, context);
-        } else {
-            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.DEFAULT, context);
         }
+
+        if (minecraft.gameMode.canHurtPlayer()) {
+            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.HEALTH, context);
+        }
+
+        if (minecraft.gameMode.hasExperience()) {
+            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.EXPERIENCE, context);
+        }
+
+        if (minecraft.options.getCameraType().isFirstPerson()) {
+            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.FIRST_PERSON, context);
+        }
+
+        HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.DEFAULT, context);
     }
     
     @SubscribeEvent
@@ -118,7 +107,7 @@ public class ForgeClientEvents {
         FogRenderEvents.RenderContext context = new FogRenderEvents.RenderContext() {
             private float start = event.getNearPlaneDistance();
             private float end = event.getFarPlaneDistance();
-            private FogShape shape = event.getFogShape();;
+            private FogShape shape = event.getFogShape();
             private boolean isValid = false;
             
             @Override

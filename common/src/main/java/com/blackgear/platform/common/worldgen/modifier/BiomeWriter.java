@@ -2,11 +2,11 @@ package com.blackgear.platform.common.worldgen.modifier;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.function.BiConsumer;
@@ -25,7 +25,27 @@ public abstract class BiomeWriter {
 
     public abstract void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature);
 
-    public abstract void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data);
+    public abstract void removeFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature);
+
+    public void replaceFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature, Holder<PlacedFeature> replacement) {
+        if (this.context().hasFeature(feature)) {
+            this.removeFeature(decoration, feature);
+            this.addFeature(decoration, replacement);
+        }
+    }
 
     public abstract void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver);
+
+    public abstract void removeCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver);
+
+    public abstract void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data);
+
+    public abstract void removeSpawn(EntityType<?> data);
+
+    public void replaceSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
+        if (this.context().hasEntity(() -> data.type)) {
+            this.removeSpawn(data.type);
+            this.addSpawn(category, data);
+        }
+    }
 }

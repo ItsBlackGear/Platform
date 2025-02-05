@@ -5,7 +5,6 @@ import com.blackgear.platform.core.ModInstance;
 import com.blackgear.platform.core.ParallelDispatch;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class ModInstanceBuilderImpl {
     public static ModInstance builder(
