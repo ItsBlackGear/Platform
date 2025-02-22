@@ -9,7 +9,7 @@ public interface IConfigSpec<T extends IConfigSpec<T>> extends UnmodifiableConfi
         return (T) this;
     }
     
-    void acceptConfig(CommentedConfig config);
+    void setConfig(CommentedConfig config);
     
     boolean isCorrecting();
     

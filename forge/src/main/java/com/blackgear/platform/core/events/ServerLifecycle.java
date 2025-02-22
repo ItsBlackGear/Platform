@@ -9,21 +9,21 @@ import net.minecraftforge.fml.event.server.*;
 public class ServerLifecycle {
     @SubscribeEvent
     public static void onServerStartup(FMLServerStartingEvent event) {
-        ServerLifecycleEvents.STARTING.invoker().starting(event.getServer());
+        ServerLifecycleEvents.STARTING.invoker().onLifecycle(event.getServer());
     }
     
     @SubscribeEvent
     public static void onServerStarted(FMLServerStartedEvent event) {
-        ServerLifecycleEvents.STARTED.invoker().started(event.getServer());
+        ServerLifecycleEvents.STARTED.invoker().onLifecycle(event.getServer());
     }
     
     @SubscribeEvent
     public static void onServerStopping(FMLServerStoppingEvent event) {
-        ServerLifecycleEvents.STOPPING.invoker().stopping(event.getServer());
+        ServerLifecycleEvents.STOPPING.invoker().onLifecycle(event.getServer());
     }
     
     @SubscribeEvent
     public static void onServerStopped(FMLServerStoppedEvent event) {
-        ServerLifecycleEvents.STOPPED.invoker().stopped(event.getServer());
+        ServerLifecycleEvents.STOPPED.invoker().onLifecycle(event.getServer());
     }
 }

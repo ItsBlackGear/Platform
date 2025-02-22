@@ -25,6 +25,11 @@ public final class Environment {
     public static boolean hasModLoaded(String modId) {
         throw new AssertionError();
     }
+
+    @ExpectPlatform
+    public static String getModVersion(String modId) {
+        throw new AssertionError();
+    }
     
     @ExpectPlatform
     public static Optional<MinecraftServer> getCurrentServer() {

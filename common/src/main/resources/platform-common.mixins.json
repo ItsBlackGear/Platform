@@ -27,6 +27,7 @@
     "common.ShearsItemMixin",
     "common.SwordItemMixin",
     "common.WorldCarverMixin",
+    "config.ServerMainMixin",
     "core.access.LevelResourceAccessor"
   ],
   "client": [
@@ -39,8 +40,8 @@
     "client.ItemModelShaperMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
-    "common.CreativeModeTabMixin",
-    "core.config.ClientHandshakePacketListenerImplMixin"
+    "client.SkullBlockRendererMixin",
+    "common.CreativeModeTabMixin"
   ],
   "injectors": {
     "defaultRequire": 1

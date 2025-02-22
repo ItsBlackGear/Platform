@@ -14,13 +14,7 @@ public class PlatformFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         Platform.bootstrap();
-        
-        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            PlatformFabric.server = server;
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            PlatformFabric.server = null;
-        });
+        registerServerLifecycle();
 
         if (Environment.isClientSide()) {
             FabricClientEvents.bootstrap();
@@ -30,7 +24,12 @@ public class PlatformFabric implements ModInitializer {
         
         ServerLifecycle.bootstrap();
     }
-    
+
+    private static void registerServerLifecycle() {
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> PlatformFabric.server = server);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> PlatformFabric.server = null);
+    }
+
     @Nullable
     public static MinecraftServer getServer() {
         return server;

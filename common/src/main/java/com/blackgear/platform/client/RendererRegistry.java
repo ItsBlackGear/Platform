@@ -20,14 +20,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RendererRegistry {
-    public static final Map<ModelLayerLocation, ModelLayerProvider> MODEL_PROVIDERS = new HashMap<>();
-    
+    public static final Map<ModelLayerLocation, ModelLayerProvider> MODEL_PROVIDERS = new ConcurrentHashMap<>();
+
     @ExpectPlatform
     public static void addBlockRenderType(RenderType type, Block... blocks) {
         throw new AssertionError();

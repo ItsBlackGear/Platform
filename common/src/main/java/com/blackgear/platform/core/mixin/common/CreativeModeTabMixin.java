@@ -19,16 +19,14 @@ public class CreativeModeTabMixin {
         at = @At("TAIL")
     )
     private void fillItemList(NonNullList<ItemStack> items, CallbackInfo ci) {
-        CreativeTabs.MODIFICATIONS.forEach(map -> {
-            map.forEach((display, offset) -> {
-                for (int i = 0; i < items.size(); i++) {
-                    ItemStack stack = items.get(i);
-                    List<ItemStack> stacks = new ArrayList<>();
-                    display.accept(stack, stacks);
-                    items.addAll(i + offset.value, stacks);
-                    i += stacks.size();
-                }
-            });
-        });
+        CreativeTabs.MODIFICATIONS.forEach(map -> map.forEach((display, offset) -> {
+            for (int i = 0; i < items.size(); i++) {
+                ItemStack stack = items.get(i);
+                List<ItemStack> stacks = new ArrayList<>();
+                display.accept(stack, stacks);
+                items.addAll(i + offset.value, stacks);
+                i += stacks.size();
+            }
+        }));
     }
 }

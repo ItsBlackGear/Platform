@@ -7,26 +7,14 @@
     "access.SpawnPlacementsAccessor",
     "core.LootTableMixin",
     "core.LootTablesMixin",
-    "core.access.ChunkMapAccessor",
-    "core.access.ClientboundCustomQueryPacketAccessor",
     "core.access.RegionHillsLayerAccessor",
-    "core.access.ServerboundCustomPayloadPacketAccessor",
-    "core.access.ServerboundCustomQueryPacketAccessor",
-    "core.access.ServerLoginPacketListenerImplAccessor",
-    "core.access.TrackedEntityAccessor",
     "core.biome.BiomeInitLayerMixin",
     "core.biome.RegionHillsLayerMixin",
     "core.biome.RiverMixerLayerMixin",
-    "core.biome.ShoreLayerMixin",
-    "core.networking.ChunkMapMixin",
-    "core.networking.ConnectionMixin",
-    "core.networking.PlayerListMixin",
-    "core.networking.ServerEntityMixin",
-    "core.networking.ServerGamePacketListenerImplMixin",
-    "core.networking.ServerLoginPacketListenerImplMixin"
+    "core.biome.ShoreLayerMixin"
   ],
   "client": [
-    "core.access.ConnectScreenAccessor"
+    "core.networking.MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1
