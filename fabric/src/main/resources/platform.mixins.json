@@ -10,12 +10,13 @@
     "ServerLevelMixin"
   ],
   "client": [
-    "client.AbstractClientPlayerMixin",
     "client.ClientLevelMixin",
     "client.FogRendererMixin",
     "client.GuiMixin",
+    "client.MinecraftMixin",
     "client.ModelBakeryMixin",
-    "client.SheetsMixin"
+    "client.SheetsMixin",
+    "client.SkullBlockRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

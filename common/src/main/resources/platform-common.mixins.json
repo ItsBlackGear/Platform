@@ -14,17 +14,18 @@
     "common.CreativeModeTabMixin",
     "common.OverworldBiomeBuilderMixin",
     "common.ShearsItemMixin",
-    "common.SwordItemMixin"
+    "common.SwordItemMixin",
+    "config.ServerMainMixin"
   ],
   "client": [
-    "client.forge.ItemEntityRendererMixin",
-    "client.forge.ItemModelShaperMixin",
-    "client.forge.ItemRendererMixin",
-    "client.forge.MinecraftMixin",
-    "client.forge.access.CameraAccessor",
-    "client.forge.access.ItemPropertiesAccessor",
-    "client.forge.access.NearPlaneAccessor",
-    "config.ClientHandshakePacketListenerImplMixin"
+    "client.AbstractClientPlayerMixin",
+    "client.ItemEntityRendererMixin",
+    "client.ItemModelShaperMixin",
+    "client.ItemRendererMixin",
+    "client.MinecraftMixin",
+    "client.access.CameraAccessor",
+    "client.access.ItemPropertiesAccessor",
+    "client.access.NearPlaneAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

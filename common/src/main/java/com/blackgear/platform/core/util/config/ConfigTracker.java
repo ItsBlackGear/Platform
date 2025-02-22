@@ -1,6 +1,5 @@
 package com.blackgear.platform.core.util.config;
 
-import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.events.ConfigEvents;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
@@ -14,9 +13,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConfigTracker implements IConfigTracker {
-    private static final Logger LOGGER = LogManager.getLogger();
-    public static final Marker CONFIG = MarkerManager.getMarker("CONFIG");
-    public static final Marker CORE = MarkerManager.getMarker("CORE");
+    public static final Logger LOGGER = LogManager.getLogger();
+    static final Marker CONFIG = MarkerManager.getMarker("CONFIG");
     public static final ConfigTracker INSTANCE = new ConfigTracker();
     private final ConcurrentHashMap<String, ModConfig> fileMap;
     private final EnumMap<ModConfig.Type, Set<ModConfig>> configSets;
@@ -33,33 +31,15 @@ public class ConfigTracker implements IConfigTracker {
     
     void trackConfig(final ModConfig config) {
         if (this.fileMap.containsKey(config.getFileName())) {
-            LOGGER.error(CONFIG,
-                "Detected config file conflict {} between {} and {}",
-                config.getFileName(),
-                this.fileMap.get(config.getFileName()).getModId(), config.getModId()
-            );
-            
+            LOGGER.error(CONFIG, "Detected config file conflict {} between {} and {}", config.getFileName(), this.fileMap.get(config.getFileName()).getModId(), config.getModId());
             throw new RuntimeException("Config conflict detected!");
         }
-        
         this.fileMap.put(config.getFileName(), config);
         this.configSets.get(config.getType()).add(config);
         this.configsByMod.computeIfAbsent(config.getModId(), (k) -> new EnumMap<>(ModConfig.Type.class)).put(config.getType(), config);
-        LOGGER.debug(CONFIG,
-            "Config file {} for {} tracking",
-            config.getFileName(),
-            config.getModId()
-        );
-        
-        loadConfig(config, Environment.getConfigDir());
+        LOGGER.debug(CONFIG, "Config file {} for {} tracking", config.getFileName(), config.getModId());
     }
-    
-    private void loadConfig(ModConfig config, Path configBasePath) {
-        if (config.getType() != ModConfig.Type.SERVER) {
-            openConfig(config, configBasePath);
-        }
-    }
-    
+
     public void loadConfigs(ModConfig.Type type, Path configBasePath) {
         LOGGER.debug(CONFIG, "Loading configs type {}", type);
         this.configSets.get(type).forEach(config -> openConfig(config, configBasePath));
@@ -72,17 +52,18 @@ public class ConfigTracker implements IConfigTracker {
     
     private void openConfig(final ModConfig config, final Path configBasePath) {
         LOGGER.trace(CONFIG, "Loading config file type {} at {} for {}", config.getType(), config.getFileName(), config.getModId());
-        final CommentedFileConfig configData = config.getHandler().reader(configBasePath).apply(config);
+        final CommentedFileConfig configData = config.reader(configBasePath).apply(config);
         config.setConfigData(configData);
-        ConfigEvents.LOADING.invoker().onModConfigLoading(config);
+        ConfigEvents.LOADING.invoker().onModConfig(config);
         config.save();
     }
-    
+
     private void closeConfig(final ModConfig config, final Path configBasePath) {
         if (config.getConfigData() != null) {
             LOGGER.trace(CONFIG, "Closing config file type {} at {} for {}", config.getType(), config.getFileName(), config.getModId());
+            config.unload(configBasePath);
+            ConfigEvents.UNLOADING.invoker().onModConfig(config);
             config.save();
-            config.getHandler().unload(configBasePath, config);
             config.setConfigData(null);
         }
     }
@@ -92,10 +73,17 @@ public class ConfigTracker implements IConfigTracker {
             final CommentedConfig commentedConfig = CommentedConfig.inMemory();
             modConfig.getSpec().correct(commentedConfig);
             modConfig.setConfigData(commentedConfig);
-            ConfigEvents.LOADING.invoker().onModConfigLoading(modConfig);
+            ConfigEvents.LOADING.invoker().onModConfig(modConfig);
         });
     }
-    
+
+    public String getConfigFileName(String modId, ModConfig.Type type) {
+        return Optional.ofNullable(this.configsByMod.getOrDefault(modId, Collections.emptyMap()).getOrDefault(type, null))
+            .map(ModConfig::getFullPath)
+            .map(Object::toString)
+            .orElse(null);
+    }
+
     @Override
     public Map<ModConfig.Type, Set<ModConfig>> configSets() {
         return configSets;

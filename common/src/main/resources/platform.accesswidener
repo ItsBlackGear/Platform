@@ -4,6 +4,7 @@ accessWidener   v2  named
 accessible method net/minecraft/world/level/block/state/properties/WoodType <init> (Ljava/lang/String;)V
 accessible method net/minecraft/world/level/block/state/properties/WoodType register (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
 accessible method net/minecraft/client/renderer/Sheets createSignMaterial (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/Material;
+accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
 
 # Fog Registry
 accessible class net/minecraft/client/renderer/FogRenderer$FogData

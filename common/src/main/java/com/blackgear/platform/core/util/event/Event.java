@@ -27,7 +27,7 @@ public abstract class Event<T> {
             return null;
         }));
     }
-    
+
     public static <T> Event<T> cancellable(Class<? super T> type) {
         return create(type, callbacks -> (T) Proxy.newProxyInstance(Event.class.getClassLoader(), new Class[] { type }, (proxy, method, args) -> {
             for (Object callback : callbacks) {
@@ -36,11 +36,11 @@ public abstract class Event<T> {
                     return false;
                 }
             }
-            
+
             return true;
         }));
     }
-    
+
     private static <T, S> S invokeFast(T callback, Method method, Object[] args) throws Throwable {
         return (S) MethodHandles.lookup().unreflect(method).bindTo(callback).invokeWithArguments(args);
     }

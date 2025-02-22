@@ -1,7 +1,7 @@
 package com.blackgear.platform.client.event;
 
-import com.blackgear.platform.core.mixin.client.forge.access.CameraAccessor;
-import com.blackgear.platform.core.mixin.client.forge.access.NearPlaneAccessor;
+import com.blackgear.platform.core.mixin.client.access.CameraAccessor;
+import com.blackgear.platform.core.mixin.client.access.NearPlaneAccessor;
 import com.blackgear.platform.core.util.event.Event;
 import com.mojang.blaze3d.shaders.FogShape;
 import net.minecraft.client.Camera;

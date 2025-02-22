@@ -1,5 +1,7 @@
 package com.blackgear.platform.client.fabric;
 
+import com.blackgear.platform.client.RendererRegistry;
+import com.mojang.datafixers.util.Pair;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -7,28 +9,28 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.impl.client.rendering.BlockEntityRendererRegistryImpl;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RendererRegistryImpl {
-    public static final Set<ModelResourceLocation> SPECIAL_MODELS = ConcurrentHashMap.newKeySet();
-
     public static void addBlockRenderType(RenderType type, Block... blocks) {
         BlockRenderLayerMap.INSTANCE.putBlocks(type, blocks);
     }
@@ -52,7 +54,7 @@ public class RendererRegistryImpl {
     }
     
     @SuppressWarnings("UnstableApiUsage")
-    public static <T extends BlockEntity> void addBlockEntityRenderer(Supplier<BlockEntityType<T>> type, BlockEntityRendererProvider<? super T> renderer) {
+    public static <T extends BlockEntity> void addBlockEntityRenderer(Supplier<? extends BlockEntityType<? extends T>> type, BlockEntityRendererProvider<T> renderer) {
         BlockEntityRendererRegistryImpl.register(type.get(), renderer);
     }
     
@@ -60,6 +62,11 @@ public class RendererRegistryImpl {
         EntityModelLayerRegistry.registerModelLayer(layer, definition::get);
     }
 
-    public static void registerSpecialModel(ModelResourceLocation model) {
+    public static void registerSkullModel(SkullBlock.Type type, Function<ModelPart, SkullModelBase> factory, ModelLayerLocation layerLocation) {
+        RendererRegistry.MODEL_BY_SKULL.put(type, new Pair<>(factory, layerLocation));
+    }
+
+    public static void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture) {
+        RendererRegistry.TEXTURE_BY_SKULL.put(type, texture);
     }
 }

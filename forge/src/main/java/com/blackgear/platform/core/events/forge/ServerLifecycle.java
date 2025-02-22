@@ -13,21 +13,21 @@ import net.minecraftforge.fml.common.Mod;
 public class ServerLifecycle {
     @SubscribeEvent
     public static void onServerStartup(ServerStartingEvent event) {
-        ServerLifecycleEvents.STARTING.invoker().starting(event.getServer());
+        ServerLifecycleEvents.STARTING.invoker().onLifecycle(event.getServer());
     }
     
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        ServerLifecycleEvents.STARTED.invoker().started(event.getServer());
+        ServerLifecycleEvents.STARTED.invoker().onLifecycle(event.getServer());
     }
     
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
-        ServerLifecycleEvents.STOPPING.invoker().stopping(event.getServer());
+        ServerLifecycleEvents.STOPPING.invoker().onLifecycle(event.getServer());
     }
     
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
-        ServerLifecycleEvents.STOPPED.invoker().stopped(event.getServer());
+        ServerLifecycleEvents.STOPPED.invoker().onLifecycle(event.getServer());
     }
 }

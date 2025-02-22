@@ -4,19 +4,9 @@
   "package": "com.blackgear.platform.core.mixin.forge",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "core.networking.ConnectionMixin",
-    "core.networking.PlayerListMixin",
-    "core.networking.ServerEntityMixin",
-    "core.networking.ServerGamePacketListenerImplMixin",
-    "core.networking.ServerLoginPacketListenerImplMixin",
-    "core.networking.access.ChunkMapAccessor",
-    "core.networking.access.ServerLoginPacketListenerImplAccessor",
-    "core.networking.access.TrackedEntityAccessor"
   ],
   "client": [
-    "client.AbstractClientPlayerMixin",
-    "core.networking.access.ConnectScreenAccessor",
-    "core.networking.access.MinecraftAccessor"
+    "core.networking.MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

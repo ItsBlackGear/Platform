@@ -9,7 +9,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
 public class HudRenderEvent {
     public static final Event<RenderHud> RENDER_HUD = Event.create(RenderHud.class);

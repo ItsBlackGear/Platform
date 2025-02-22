@@ -21,19 +21,23 @@ public class EnvironmentImpl {
     public static boolean isClientSide() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
-    
+
     public static boolean isProduction() {
         return !FabricLoader.getInstance().isDevelopmentEnvironment();
     }
-    
+
     public static boolean hasModLoaded(String modId) {
         return FabricLoader.getInstance().isModLoaded(modId);
     }
-    
+
+    public static String getModVersion(String modId) {
+        return FabricLoader.getInstance().getModContainer(modId).map(container -> container.getMetadata().getVersion().toString()).orElse(null);
+    }
+
     public static Optional<MinecraftServer> getCurrentServer() {
         return Optional.ofNullable(PlatformFabric.getServer());
     }
-    
+
     public static BlockableEventLoop<?> getGameExecutor() {
         if (Environment.isClientSide()) {
             return CLIENT_EXECUTOR.get().get();
@@ -41,21 +45,21 @@ public class EnvironmentImpl {
             return Environment.getCurrentServer().orElseThrow(() -> new IllegalStateException("No server available"));
         }
     }
-    
+
     public static Path getGameDir() {
         return FabricLoader.getInstance().getGameDir();
     }
-    
+
     public static Path getConfigDir() {
         return FabricLoader.getInstance().getConfigDir();
     }
-    
+
     public static <T> T registerSafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
         Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
         new ModConfig(type, pair.getRight(), modId);
         return pair.getLeft();
     }
-    
+
     public static <T> T registerSafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
         Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
         new ModConfig(type, pair.getRight(), modId, fileName);

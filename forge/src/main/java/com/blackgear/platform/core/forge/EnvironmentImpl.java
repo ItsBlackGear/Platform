@@ -28,52 +28,56 @@ public class EnvironmentImpl {
     public static boolean isClientSide() {
         return FMLLoader.getDist() == Dist.CLIENT;
     }
-    
+
     public static boolean isProduction() {
         return !FMLLoader.isProduction();
     }
-    
+
     public static boolean hasModLoaded(String modId) {
         return ModList.get().isLoaded(modId);
     }
-    
+
+    public static String getModVersion(String modId) {
+        return ModList.get().getModContainerById(modId).map(container -> container.getModInfo().getVersion().toString()).orElse(null);
+    }
+
     public static Optional<MinecraftServer> getCurrentServer() {
         return Optional.ofNullable(ServerLifecycleHooks.getCurrentServer());
     }
-    
+
     public static BlockableEventLoop<?> getGameExecutor() {
         return LogicalSidedProvider.WORKQUEUE.get(EffectiveSide.get());
     }
-    
+
     public static Path getGameDir() {
         return FMLPaths.GAMEDIR.get();
     }
-    
+
     public static Path getConfigDir() {
         return FMLPaths.CONFIGDIR.get();
     }
-    
+
     public static <T> T registerSafeConfig(String modId, Type type, Function<ConfigBuilder, T> spec) {
         ModLoadingContext context = ModLoadingContext.get();
         String fileName = String.format("%s-%s.toml", modId, type.name().toLowerCase(Locale.ROOT));
-        
+
         Pair<T, ForgeConfigSpec> pair = new ForgeConfigBuilder(new ForgeConfigSpec.Builder()).configure(spec);
         ModConfig config = new ModConfig(forge(type), pair.getRight(), context.getActiveContainer(), fileName);
         context.getActiveContainer().addConfig(config);
-        
+
         return pair.getLeft();
     }
-    
+
     public static <T> T registerSafeConfig(String modId, Type type, String fileName, Function<ConfigBuilder, T> spec) {
         ModLoadingContext context = ModLoadingContext.get();
-        
+
         Pair<T, ForgeConfigSpec> pair = new ForgeConfigBuilder(new ForgeConfigSpec.Builder()).configure(spec);
         ModConfig config = new ModConfig(forge(type), pair.getRight(), context.getActiveContainer(), fileName);
         context.getActiveContainer().addConfig(config);
-        
+
         return pair.getLeft();
     }
-    
+
     private static ModConfig.Type forge(Type type) {
         return switch (type) {
             case COMMON -> ModConfig.Type.COMMON;

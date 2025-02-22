@@ -5,6 +5,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.thread.BlockableEventLoop;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -25,7 +26,12 @@ public class Environment {
     public static boolean hasModLoaded(String modId) {
         throw new AssertionError();
     }
-    
+
+    @ExpectPlatform
+    public static String getModVersion(String modId) {
+        throw new AssertionError();
+    }
+
     @ExpectPlatform
     public static Optional<MinecraftServer> getCurrentServer() {
         throw new AssertionError();

@@ -165,7 +165,7 @@ public class ConfigFileTypeHandler {
                 );
                 
                 this.modConfig.getSpec().afterReload();
-                ConfigEvents.RELOADING.invoker().onModConfigReloading(this.modConfig);
+                ConfigEvents.RELOADING.invoker().onModConfig(this.modConfig);
             }
         }
     }
