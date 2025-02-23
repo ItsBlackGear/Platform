@@ -1,6 +1,5 @@
 package com.blackgear.platform.common.entity.spawn;
 
-import com.blackgear.platform.core.mixin.access.SpawnPlacementsAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -92,10 +91,10 @@ public final class SpawnPlacement {
     }
     
     private static <T extends Mob> void registerOrReplaceEntityData(Supplier<EntityType<T>> entity, SpawnPlacements.Data data) {
-        SpawnPlacements.Data entry = SpawnPlacementsAccessor.getDATA_BY_TYPE().put(entity.get(), data);
-        
+        SpawnPlacements.Data entry = SpawnPlacements.DATA_BY_TYPE.put(entity.get(), data);
+
         if (entry != null) {
-            SpawnPlacementsAccessor.getDATA_BY_TYPE().replace(entity.get(), data);
+            SpawnPlacements.DATA_BY_TYPE.replace(entity.get(), data);
         }
     }
     

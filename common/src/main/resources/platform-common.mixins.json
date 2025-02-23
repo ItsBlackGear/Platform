@@ -15,7 +15,6 @@
     "access.OverworldBiomeSourceAccessor",
     "access.SensorTypeAccessor",
     "access.SimpleParticleTypeAccessor",
-    "access.SpawnPlacementsAccessor",
     "common.BiomeEdgeLayerMixin",
     "common.BlockEntityTypeMixin",
     "common.BlockMixin",

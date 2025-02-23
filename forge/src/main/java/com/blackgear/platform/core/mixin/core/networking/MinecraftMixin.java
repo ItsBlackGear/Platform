@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MinecraftMixin {
     @Inject(
         method = "<init>",
-        at = @At(value = "TAIL")
+        at = @At("TAIL")
     )
     public void platform$loadConfigs(GameConfig arg, CallbackInfo ci) {
         ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, Environment.getConfigDir());

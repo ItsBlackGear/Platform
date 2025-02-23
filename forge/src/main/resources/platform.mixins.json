@@ -4,7 +4,6 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "access.SpawnPlacementsAccessor",
     "core.LootTableMixin",
     "core.LootTablesMixin",
     "core.access.RegionHillsLayerAccessor",
