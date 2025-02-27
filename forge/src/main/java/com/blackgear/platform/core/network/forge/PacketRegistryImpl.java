@@ -27,20 +27,20 @@ public class PacketRegistryImpl {
     }
 
     public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
-        registerPacket(channel, id, handler, packet, NetworkDirection.S2C);
+        registerPacket(channel, handler, packet, NetworkDirection.S2C);
     }
 
     public static <T extends Packet<T>> void registerC2SPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
-        registerPacket(channel, id, handler, packet, NetworkDirection.C2S);
+        registerPacket(channel, handler, packet, NetworkDirection.C2S);
     }
 
-    private static <T extends Packet<T>> void registerPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet, NetworkDirection direction) {
+    private static <T extends Packet<T>> void registerPacket(ResourceLocation channel, PacketHandler<T> handler, Class<T> packet, NetworkDirection direction) {
         ChannelHolder holder = getChannelHolder(channel);
         holder.value().registerMessage(holder.incrementPackets(), packet, handler::encode, handler::decode, (msg, ctx) -> {
             ctx.get().enqueueWork(() -> {
                 Player player = switch (direction) {
                     case S2C -> ctx.get().getSender() == null ? getLocalPlayer() : null;
-                    case C2S -> getLocalPlayer();
+                    case C2S -> ctx.get().getSender();
                 };
 
                 if (player != null) {
