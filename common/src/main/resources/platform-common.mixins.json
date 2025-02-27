@@ -9,7 +9,6 @@
     "access.MemoryModuleTypeAccessor",
     "access.SensorTypeAccessor",
     "access.SimpleParticleTypeAccessor",
-    "access.SpawnPlacementsAccessor",
     "common.BlockEntityTypeMixin",
     "common.CreativeModeTabMixin",
     "common.OverworldBiomeBuilderMixin",

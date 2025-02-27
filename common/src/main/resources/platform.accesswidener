@@ -23,3 +23,4 @@ accessible class net/minecraft/core/Registry$RegistryBootstrap
 # Entity Handler
 accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacements$Type;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V
 accessible class net/minecraft/world/entity/SpawnPlacements$Data
+accessible field net/minecraft/world/entity/SpawnPlacements DATA_BY_TYPE Ljava/util/Map;

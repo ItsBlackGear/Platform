@@ -2,7 +2,7 @@ package com.blackgear.platform.core.util.network;
 
 import com.blackgear.platform.core.network.PacketRegistry;
 import com.blackgear.platform.core.network.listener.PacketSender;
-import com.blackgear.platform.core.network.packet.PacketWrapper;
+import com.blackgear.platform.core.network.packet.NetworkPacketWrapper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -20,10 +20,10 @@ public class ServerPlayNetworking {
     }
 
     public static void send(ServerPlayer player, ResourceLocation id, FriendlyByteBuf buf) {
-        PacketRegistry.sendToPlayer(id, new PacketWrapper(id, new FriendlyByteBuf(buf.copy())), player);
+        PacketRegistry.sendToPlayer(id, new NetworkPacketWrapper(id, new FriendlyByteBuf(buf.copy())), player);
     }
 
-    public static void handle(PacketWrapper message, ServerPlayer sender) {
+    public static void handle(NetworkPacketWrapper message, ServerPlayer sender) {
         HANDLERS.get(message.packet()).receive(sender.server, sender, sender.connection, new FriendlyByteBuf(message.data()), null);
     }
 

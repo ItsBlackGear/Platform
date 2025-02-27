@@ -1,4 +1,4 @@
-package com.blackgear.platform.client;
+package com.blackgear.platform.client.animator;
 
 import com.mojang.math.Vector3f;
 import net.fabricmc.api.EnvType;
@@ -19,7 +19,7 @@ import java.util.Optional;
  * Backport the updated animation system from 1.20+
  */
 @Environment(EnvType.CLIENT)
-public class AnimationHelper {
+public class KeyframeAnimator {
     private static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
     
     public static void animate(HierarchicalModel<?> model, AnimationState state, AnimationDefinition definition, float time) {
@@ -55,8 +55,8 @@ public class AnimationHelper {
                 Keyframe nextFrame = frames[nextFrameIndex];
                 float remaining = elapsed - frame.timestamp();
                 float delta = nextFrameIndex != frameIndex ? Mth.clamp(remaining / (nextFrame.timestamp() - frame.timestamp()), 0.0f, 1.0f) : 0.0f;
-                nextFrame.interpolation().apply(AnimationHelper.ANIMATION_VECTOR_CACHE, delta, frames, frameIndex, nextFrameIndex, scale);
-                animationChannel.target().apply(modelPart, AnimationHelper.ANIMATION_VECTOR_CACHE);
+                nextFrame.interpolation().apply(KeyframeAnimator.ANIMATION_VECTOR_CACHE, delta, frames, frameIndex, nextFrameIndex, scale);
+                animationChannel.target().apply(modelPart, KeyframeAnimator.ANIMATION_VECTOR_CACHE);
             }));
         }
     }

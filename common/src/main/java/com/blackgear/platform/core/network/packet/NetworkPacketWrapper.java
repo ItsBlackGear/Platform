@@ -10,7 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
-public record PacketWrapper(ResourceLocation packet, ByteBuf data) implements Packet<PacketWrapper> {
+public record NetworkPacketWrapper(ResourceLocation packet, ByteBuf data) implements Packet<NetworkPacketWrapper> {
     public static final ResourceLocation ID = Platform.resource("packet_wrapper");
     public static final Handler HANDLER = new Handler();
 
@@ -20,24 +20,24 @@ public record PacketWrapper(ResourceLocation packet, ByteBuf data) implements Pa
     }
 
     @Override
-    public PacketHandler<PacketWrapper> getHandler() {
+    public PacketHandler<NetworkPacketWrapper> getHandler() {
         return HANDLER;
     }
 
-    public static final class Handler implements PacketHandler<PacketWrapper> {
+    public static final class Handler implements PacketHandler<NetworkPacketWrapper> {
         @Override
-        public void encode(PacketWrapper message, FriendlyByteBuf buf) {
+        public void encode(NetworkPacketWrapper message, FriendlyByteBuf buf) {
             buf.writeResourceLocation(message.packet);
             buf.writeBytes(message.data);
         }
 
         @Override
-        public PacketWrapper decode(FriendlyByteBuf buf) {
-            return new PacketWrapper(buf.readResourceLocation(), buf.readBytes(buf.readableBytes()));
+        public NetworkPacketWrapper decode(FriendlyByteBuf buf) {
+            return new NetworkPacketWrapper(buf.readResourceLocation(), buf.readBytes(buf.readableBytes()));
         }
 
         @Override
-        public PacketContext handle(PacketWrapper message) {
+        public PacketContext handle(NetworkPacketWrapper message) {
             return (player, level) -> ServerPlayNetworking.handle(message, (ServerPlayer) player);
         }
     }

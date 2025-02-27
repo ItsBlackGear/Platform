@@ -16,16 +16,16 @@ import java.util.Collection;
 public class NetworkChannel {
     private final ResourceLocation channel;
 
-    public NetworkChannel(String modId, String channel) {
+    public NetworkChannel(String modId, int version, String channel) {
         this.channel = new ResourceLocation(modId, channel);
-        PacketRegistry.registerChannel(this.channel);
+        PacketRegistry.registerChannel(this.channel, version);
     }
 
-    public <T extends Packet<T>> void registerPacket(NetworkDirection direction, ResourceLocation id, PacketHandler<T> handler, Class<T> clazz) {
+    public <T extends Packet<T>> void registerPacket(NetworkDirection direction, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
         if (direction == NetworkDirection.C2S) {
-            PacketRegistry.registerC2SPacket(this.channel, id, handler, clazz);
+            PacketRegistry.registerC2SPacket(this.channel, id, handler, packet);
         } else {
-            PacketRegistry.registerS2CPacket(this.channel, id, handler, clazz);
+            PacketRegistry.registerS2CPacket(this.channel, id, handler, packet);
         }
     }
 
@@ -38,7 +38,7 @@ public class NetworkChannel {
     }
 
     public <T extends Packet<T>> void sendToPlayers(T packet, Collection<? extends Player> players) {
-        players.forEach(player -> PacketRegistry.sendToPlayer(this.channel, packet, player));
+        players.forEach(player -> sendToPlayer(packet, player));
     }
 
     public <T extends Packet<T>> void sendToAllPlayers(T packet, MinecraftServer server) {

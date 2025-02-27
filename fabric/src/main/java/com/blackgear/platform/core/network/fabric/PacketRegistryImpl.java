@@ -13,10 +13,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class PacketRegistryImpl {
-    public static void registerChannel(ResourceLocation channel) { }
+    public static void registerChannel(ResourceLocation channel, int version) { }
 
     @net.fabricmc.api.Environment(EnvType.CLIENT)
-    public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> clazz) {
+    public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
         if (Environment.isClientSide()) {
             ClientPlayNetworking.registerGlobalReceiver(channelPath(channel, id), (client, handler1, buf, responseSender) -> {
                 T decode = handler.decode(buf);
@@ -25,7 +25,7 @@ public class PacketRegistryImpl {
         }
     }
 
-    public static <T extends Packet<T>> void registerC2SPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> clazz) {
+    public static <T extends Packet<T>> void registerC2SPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
         ServerPlayNetworking.registerGlobalReceiver(channelPath(channel, id), (server, player, handler1, buf, responseSender) -> {
             T decode = handler.decode(buf);
             server.execute(() -> handler.handle(decode).apply(player, player.getLevel()));
