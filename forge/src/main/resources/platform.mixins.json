@@ -13,7 +13,7 @@
     "core.biome.ShoreLayerMixin"
   ],
   "client": [
-    "core.networking.MinecraftMixin"
+    "client.MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

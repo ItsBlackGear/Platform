@@ -6,7 +6,7 @@ import com.blackgear.platform.core.network.packet.ConfigSyncPacket;
 import com.blackgear.platform.core.network.packet.NetworkPacketWrapper;
 
 public class MessageHandler {
-    public static final NetworkChannel DEFAULT_CHANNEL = new NetworkChannel(Platform.MOD_ID, "networking");
+    public static final NetworkChannel DEFAULT_CHANNEL = new NetworkChannel(Platform.MOD_ID, 1, "networking");
 
     public static void bootstrap() {
         DEFAULT_CHANNEL.registerPacket(NetworkDirection.C2S, ConfigSyncPacket.ID, ConfigSyncPacket.HANDLER, ConfigSyncPacket.class);

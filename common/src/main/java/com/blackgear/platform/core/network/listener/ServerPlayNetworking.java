@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.network.listener;
 
-import com.blackgear.platform.core.network.PacketRegistry;
+import com.blackgear.platform.core.network.MessageHandler;
 import com.blackgear.platform.core.network.packet.NetworkPacketWrapper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +19,7 @@ public class ServerPlayNetworking {
     }
 
     public static void send(ServerPlayer player, ResourceLocation id, FriendlyByteBuf buf) {
-        PacketRegistry.sendToPlayer(id, new NetworkPacketWrapper(id, new FriendlyByteBuf(buf.copy())), player);
+        MessageHandler.DEFAULT_CHANNEL.sendToPlayer(new NetworkPacketWrapper(id, buf), player);
     }
 
     public static void handle(NetworkPacketWrapper message, ServerPlayer sender) {

@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.network.forge;
 
-import com.blackgear.platform.core.Environment;
+import com.blackgear.platform.core.network.base.NetworkDirection;
 import com.blackgear.platform.core.network.base.Packet;
 import com.blackgear.platform.core.network.base.PacketHandler;
 import net.minecraft.client.Minecraft;
@@ -19,62 +19,66 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PacketRegistryImpl {
-    public static final Map<ResourceLocation, Channel> CHANNELS = new ConcurrentHashMap<>();
+    public static final Map<ResourceLocation, ChannelHolder> CHANNELS = new ConcurrentHashMap<>();
 
-    public static void registerChannel(ResourceLocation name) {
-        String protocol = Environment.getModVersion(name.getNamespace());
-        Channel channel = new Channel(0, NetworkRegistry.newSimpleChannel(name, () -> protocol, protocol::equals, protocol::equals));
-        CHANNELS.put(name, channel);
+    public static void registerChannel(ResourceLocation name, int version) {
+        String protocol = Integer.toString(version);
+        ChannelHolder holder = new ChannelHolder(0, NetworkRegistry.newSimpleChannel(name, () -> protocol, protocol::equals, protocol::equals));
+        CHANNELS.put(name, holder);
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> clazz) {
-        registerPacket(channel, handler, clazz, true);
+    public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
+        registerPacket(channel, handler, packet, NetworkDirection.S2C);
     }
 
-    public static <T extends Packet<T>> void registerC2SPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> clazz) {
-        registerPacket(channel, handler, clazz, false);
+    public static <T extends Packet<T>> void registerC2SPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
+        registerPacket(channel, handler, packet, NetworkDirection.C2S);
     }
 
-    private static <T extends Packet<T>> void registerPacket(ResourceLocation id, PacketHandler<T> handler, Class<T> clazz, boolean isS2C) {
-        Channel channel = channel(id);
-        channel.value().registerMessage(channel.incrementPackets(), clazz, handler::encode, handler::decode, (msg, ctx) -> {
-            NetworkEvent.Context context = ctx.get();
-            context.enqueueWork(() -> {
-                Player player = isS2C
-                    ? (context.getSender() == null ? Minecraft.getInstance().player : null)
-                    : context.getSender();
+    private static <T extends Packet<T>> void registerPacket(ResourceLocation channel, PacketHandler<T> handler, Class<T> packet, NetworkDirection direction) {
+        ChannelHolder holder = getChannelHolder(channel);
+        holder.value().registerMessage(holder.incrementPackets(), packet, handler::encode, handler::decode, (msg, ctx) -> {
+            ctx.get().enqueueWork(() -> {
+                Player player = direction == NetworkDirection.S2C
+                    ? (ctx.get().getSender() == null ? getLocalPlayer() : null)
+                    : ctx.get().getSender();
 
                 if (player != null) {
                     handler.handle(msg).apply(player, player.level);
                 }
             });
 
-            context.setPacketHandled(true);
+            ctx.get().setPacketHandled(true);
         });
     }
 
     @OnlyIn(Dist.CLIENT)
     public static <T extends Packet<T>> void sendToServer(ResourceLocation id, T packet) {
-        channel(id).value().sendToServer(packet);
+        getChannelHolder(id).value().sendToServer(packet);
     }
 
     public static <T extends Packet<T>> void sendToPlayer(ResourceLocation id, T packet, Player player) {
-        Channel channel = channel(id);
+        ChannelHolder channel = getChannelHolder(id);
         if (player instanceof ServerPlayer) {
             channel.value().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), packet);
         }
     }
 
-    private static Channel channel(ResourceLocation name) {
+    @OnlyIn(Dist.CLIENT)
+    private static Player getLocalPlayer() {
+        return Minecraft.getInstance().player;
+    }
+
+    private static ChannelHolder getChannelHolder(ResourceLocation name) {
         return Optional.ofNullable(CHANNELS.get(name)).orElseThrow(() -> new IllegalStateException("Channel not registered: " + name));
     }
 
-    public static class Channel {
+    public static class ChannelHolder {
         private int packets;
         private final SimpleChannel channel;
 
-        public Channel(int packets, SimpleChannel channel) {
+        public ChannelHolder(int packets, SimpleChannel channel) {
             this.packets = packets;
             this.channel = channel;
         }
