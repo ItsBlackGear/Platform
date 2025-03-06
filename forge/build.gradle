@@ -59,7 +59,6 @@ shadowJar {
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowBundle]
-//    relocate "io.llamalad7.mixinextras", "com.blackgear.platform.mixinextras"
     archiveClassifier = "dev-shadow"
 }
 

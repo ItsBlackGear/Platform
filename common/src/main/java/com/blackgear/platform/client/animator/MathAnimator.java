@@ -1,6 +1,7 @@
 package com.blackgear.platform.client.animator;
 
 import com.blackgear.platform.client.animator.base.AnimatedChannel;
+import com.blackgear.platform.client.animator.base.AnimatedModel;
 import com.google.common.collect.Maps;
 import com.mojang.math.Vector3f;
 import net.fabricmc.api.EnvType;
@@ -17,6 +18,20 @@ import java.util.Optional;
 @Environment(EnvType.CLIENT)
 public record MathAnimator(Map<String, List<AnimatedChannel>> animationsByBone) {
     public static void animate(HierarchicalModel<?> model, float animationProgress, MathAnimator builder) {
+        float animTime = animationProgress / 20F;
+
+        for (Map.Entry<String, List<AnimatedChannel>> animation : builder.animationsByBone().entrySet()) {
+            Optional<ModelPart> entry = model.getAnyDescendantWithName(animation.getKey());
+            List<AnimatedChannel> channels = animation.getValue();
+            entry.ifPresent(part -> channels.forEach(channel -> Arrays.stream(channel.targets())
+                .forEach(point -> {
+                    Vector3f vector = new Vector3f(point.getX(animTime), point.getY(animTime), point.getZ(animTime));
+                    point.target().apply(part, vector);
+                })));
+        }
+    }
+
+    public static void animate(AnimatedModel model, float animationProgress, MathAnimator builder) {
         float animTime = animationProgress / 20F;
 
         for (Map.Entry<String, List<AnimatedChannel>> animation : builder.animationsByBone().entrySet()) {
