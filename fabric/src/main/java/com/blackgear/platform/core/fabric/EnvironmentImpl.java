@@ -11,12 +11,19 @@ import net.minecraft.util.thread.BlockableEventLoop;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class EnvironmentImpl {
-    private static final Supplier<Supplier<BlockableEventLoop<?>>> CLIENT_EXECUTOR = () -> Minecraft::getInstance;
+    private static final Supplier<Supplier<BlockableEventLoop<?>>> CLIENT_EXECUTOR = () -> () -> {
+        try {
+            return Minecraft.getInstance();
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to access Minecraft client instance", exception);
+        }
+    };
 
     public static boolean isClientSide() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
@@ -27,11 +34,16 @@ public class EnvironmentImpl {
     }
 
     public static boolean hasModLoaded(String modId) {
+        Objects.requireNonNull(modId, "Mod ID cannot be null");
         return FabricLoader.getInstance().isModLoaded(modId);
     }
 
     public static String getModVersion(String modId) {
-        return FabricLoader.getInstance().getModContainer(modId).map(container -> container.getMetadata().getVersion().toString()).orElse(null);
+        Objects.requireNonNull(modId, "Mod ID cannot be null");
+        return FabricLoader.getInstance()
+            .getModContainer(modId)
+            .map(container -> container.getMetadata().getVersion().toString())
+            .orElse(null);
     }
 
     public static Optional<MinecraftServer> getCurrentServer() {
@@ -40,9 +52,14 @@ public class EnvironmentImpl {
 
     public static BlockableEventLoop<?> getGameExecutor() {
         if (Environment.isClientSide()) {
-            return CLIENT_EXECUTOR.get().get();
+            try {
+                return CLIENT_EXECUTOR.get().get();
+            } catch (Exception exception) {
+                throw new IllegalStateException("Failed to get client executor", exception);
+            }
         } else {
-            return Environment.getCurrentServer().orElseThrow(() -> new IllegalStateException("No server available"));
+            return Environment.getCurrentServer()
+                .orElseThrow(() -> new IllegalStateException("No server executor available"));
         }
     }
 

@@ -38,9 +38,8 @@ public class ItemRegistry {
         return register(name, function, new Item.Properties());
     }
 
-    public Supplier<Item> register(String name, Function<Item.Properties, Item> function, Item.Properties properties) {
-        Item item = function.apply(properties);
-        return this.items.register(name, () -> item);
+    public Supplier<Item> register(String name, Function<Item.Properties, Item> factory, Item.Properties properties) {
+        return this.items.register(name, () -> factory.apply(properties));
     }
 
     public <T extends Mob> Supplier<Item> spawnEgg(String name, Supplier<EntityType<T>> entity, int primaryColor, int secondaryColor, Item.Properties properties) {

@@ -1,19 +1,15 @@
 package com.blackgear.platform.forge;
 
 import com.blackgear.platform.Platform;
-import com.blackgear.platform.client.RendererRegistry;
 import com.blackgear.platform.client.event.FogRenderEvents;
 import com.blackgear.platform.client.event.HudRenderEvent;
-import com.blackgear.platform.client.event.SkullRegistry;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.world.level.material.FogType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -177,11 +173,5 @@ public class ForgeClientEvents {
             event.setFogShape(context.fogShape());
             event.setCanceled(true);
         }
-    }
-
-    @SubscribeEvent
-    public static void registerSkulls(EntityRenderersEvent.CreateSkullModels event) {
-        SkullRegistry.MODEL_BY_SKULL.forEach((type, pair) -> event.registerSkullModel(type, pair.getFirst().apply(event.getEntityModelSet().bakeLayer(pair.getSecond()))));
-        SkullBlockRenderer.SKIN_BY_TYPE.putAll(SkullRegistry.TEXTURE_BY_SKULL);
     }
 }

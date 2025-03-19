@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public record BlockEntityTypeBuilder<T extends BlockEntity>(BlockEntityTypeBuilder.Factory<? extends T> factory, List<Supplier<Block>> blocks) {
+public record BlockEntityTypeBuilder<T extends BlockEntity>(Factory<? extends T> factory, List<Supplier<Block>> blocks) {
     public static <T extends BlockEntity> BlockEntityTypeBuilder<T> create(Factory<? extends T> factory, List<Supplier<Block>> blocks) {
         return new BlockEntityTypeBuilder<>(factory, blocks);
     }

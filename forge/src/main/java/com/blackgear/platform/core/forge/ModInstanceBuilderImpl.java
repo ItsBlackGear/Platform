@@ -10,7 +10,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class ModInstanceBuilderImpl {
     public static ModInstance builder(
@@ -21,18 +20,32 @@ public class ModInstanceBuilderImpl {
         Consumer<ParallelDispatch> postClient
     ) {
         return new ModInstance(modId, common, postCommon, client, postClient) {
-            @Override public void bootstrap() {
-                IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-                
-                bus.<FMLCommonSetupEvent>addListener(event -> {
-                    this.onPostCommon.accept(new ForgeParallelDispatch(event));
-                });
-                bus.<FMLClientSetupEvent>addListener(event -> {
-                    this.onPostClient.accept(new ForgeParallelDispatch(event));
-                });
-                
-                this.onCommon.run();
-                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> this.onClient.run());
+            @Override
+            public void bootstrap() {
+                try {
+                    IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+                    if (bus == null) {
+                        throw new IllegalStateException("Failed to get Forge mod event bus");
+                    }
+
+                    // Register common post-setup
+                    bus.<FMLCommonSetupEvent>addListener(event -> {
+                        this.onPostCommon.accept(new ForgeParallelDispatch(event));
+                    });
+
+                    // Register client post-setup (will only be called on client)
+                    bus.<FMLClientSetupEvent>addListener(event -> {
+                        this.onPostClient.accept(new ForgeParallelDispatch(event));
+                    });
+
+                    // Run common setup immediately
+                    this.onCommon.run();
+
+                    // Run client setup immediately if on client side
+                    DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> this.onClient.run());
+                } catch (Exception exception) {
+                    throw new RuntimeException("Failed to bootstrap mod: " + this.modId, exception);
+                }
             }
         };
     }

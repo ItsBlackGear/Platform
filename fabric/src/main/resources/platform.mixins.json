@@ -11,6 +11,7 @@
   ],
   "client": [
     "client.ClientLevelMixin",
+    "client.ClientPlayerAttackMixin",
     "client.FogRendererMixin",
     "client.GuiMixin",
     "client.MinecraftMixin",

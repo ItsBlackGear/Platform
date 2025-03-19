@@ -1,27 +1,39 @@
-package com.blackgear.platform.common.entity.forge;
+package com.blackgear.platform.common.item;
 
-import com.blackgear.platform.core.mixin.client.access.ItemPropertiesAccessor;
+import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemPropertyRegistryImpl {
+@Environment(EnvType.CLIENT)
+public class ItemPropertyRegistry {
+    @ExpectPlatform
     public static ClampedItemPropertyFunction registerGeneric(ResourceLocation name, ClampedItemPropertyFunction property) {
-        ItemPropertiesAccessor.getGENERIC_PROPERTIES().put(name, property);
-        return property;
+        throw new AssertionError();
     }
     
+    @ExpectPlatform
     public static ItemPropertyFunction registerGeneric(ResourceLocation name, ItemPropertyFunction property) {
-        return ItemProperties.registerGeneric(name, property);
+        throw new AssertionError();
     }
     
+    @ExpectPlatform
     public static void registerCustomModelData(ItemPropertyFunction property) {
-        ItemPropertiesAccessor.callRegisterCustomModelData(property);
+        throw new AssertionError();
     }
     
+    @ExpectPlatform
     public static void register(Item item, ResourceLocation name, ClampedItemPropertyFunction property) {
-        ItemProperties.register(item, name, property);
+        throw new AssertionError();
+    }
+    
+    @Nullable
+    public static ItemPropertyFunction getProperty(Item item, ResourceLocation name) {
+        return ItemProperties.getProperty(item, name);
     }
 }

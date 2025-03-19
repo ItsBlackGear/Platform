@@ -13,16 +13,18 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketRegistryImpl {
     public static final Map<ResourceLocation, ChannelHolder> CHANNELS = new ConcurrentHashMap<>();
 
     public static void registerChannel(ResourceLocation name, int version) {
         String protocol = Integer.toString(version);
-        ChannelHolder channel = new ChannelHolder(0, NetworkRegistry.newSimpleChannel(name, () -> protocol, protocol::equals, protocol::equals));
+        ChannelHolder channel = new ChannelHolder(NetworkRegistry.newSimpleChannel(name, () -> protocol, protocol::equals, protocol::equals));
         CHANNELS.put(name, channel);
     }
 
@@ -74,16 +76,15 @@ public class PacketRegistryImpl {
     }
 
     public static class ChannelHolder {
-        private int packets;
+        private final AtomicInteger packets = new AtomicInteger();
         private final SimpleChannel channel;
 
-        public ChannelHolder(int packets, SimpleChannel channel) {
-            this.packets = packets;
-            this.channel = channel;
+        public ChannelHolder(SimpleChannel channel) {
+            this.channel = Objects.requireNonNull(channel, "Channel cannot be null");
         }
 
         public int incrementPackets() {
-            return this.packets++;
+            return this.packets.getAndIncrement();
         }
 
         public SimpleChannel value() {

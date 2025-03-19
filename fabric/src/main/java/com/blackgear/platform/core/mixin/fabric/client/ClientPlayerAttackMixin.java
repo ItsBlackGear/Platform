@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin.fabric;
+package com.blackgear.platform.core.mixin.fabric.client;
 
 import com.blackgear.platform.common.events.EntityEvents;
 import net.minecraft.client.player.LocalPlayer;
@@ -10,8 +10,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Player.class)
-public class PlayerAttackMixin {
+@Mixin(
+    value = {
+        LocalPlayer.class,
+        RemotePlayer.class
+    }
+)
+public class ClientPlayerAttackMixin {
     @Inject(
         method = "hurt",
         at = @At("HEAD"),

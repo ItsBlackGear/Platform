@@ -21,6 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -34,11 +35,15 @@ public class EnvironmentImpl {
     }
 
     public static boolean hasModLoaded(String modId) {
+        Objects.requireNonNull(modId, "Mod ID cannot be null");
         return ModList.get().isLoaded(modId);
     }
 
     public static String getModVersion(String modId) {
-        return ModList.get().getModContainerById(modId).map(container -> container.getModInfo().getVersion().toString()).orElse(null);
+        Objects.requireNonNull(modId, "Mod ID cannot be null");
+        return ModList.get().getModContainerById(modId)
+            .map(container -> container.getModInfo().getVersion().toString())
+            .orElse(null);
     }
 
     public static Optional<MinecraftServer> getCurrentServer() {
@@ -46,7 +51,11 @@ public class EnvironmentImpl {
     }
 
     public static BlockableEventLoop<?> getGameExecutor() {
-        return LogicalSidedProvider.WORKQUEUE.get(EffectiveSide.get());
+        try {
+            return LogicalSidedProvider.WORKQUEUE.get(EffectiveSide.get());
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to get game executor", exception);
+        }
     }
 
     public static Path getGameDir() {
@@ -59,6 +68,10 @@ public class EnvironmentImpl {
 
     public static <T> T registerSafeConfig(String modId, Type type, Function<ConfigBuilder, T> spec) {
         ModLoadingContext context = ModLoadingContext.get();
+        if (context == null || context.getActiveContainer() == null) {
+            throw new IllegalStateException("Cannot register config outside of mod loading context");
+        }
+
         String fileName = String.format("%s-%s.toml", modId, type.name().toLowerCase(Locale.ROOT));
 
         Pair<T, ForgeConfigSpec> pair = new ForgeConfigBuilder(new ForgeConfigSpec.Builder()).configure(spec);
@@ -70,6 +83,9 @@ public class EnvironmentImpl {
 
     public static <T> T registerSafeConfig(String modId, Type type, String fileName, Function<ConfigBuilder, T> spec) {
         ModLoadingContext context = ModLoadingContext.get();
+        if (context == null || context.getActiveContainer() == null) {
+            throw new IllegalStateException("Cannot register config outside of mod loading context");
+        }
 
         Pair<T, ForgeConfigSpec> pair = new ForgeConfigBuilder(new ForgeConfigSpec.Builder()).configure(spec);
         ModConfig config = new ModConfig(forge(type), pair.getRight(), context.getActiveContainer(), fileName);

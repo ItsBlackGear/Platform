@@ -75,6 +75,7 @@ public class BlockRegistry {
     public Supplier<Block> register(String name, Function<BlockBehaviour.Properties, Block> factory, BlockBehaviour.Properties properties) {
         return this.register(name, () -> factory.apply(properties));
     }
+
     public Supplier<Block> register(String name, Supplier<Block> block) {
         return this.register(name, block, entry -> new BlockItem(entry.get(), new Item.Properties()));
     }

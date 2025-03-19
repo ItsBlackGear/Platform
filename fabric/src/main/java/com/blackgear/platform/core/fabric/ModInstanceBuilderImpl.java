@@ -16,13 +16,22 @@ public class ModInstanceBuilderImpl {
     ) {
         return new ModInstance(modId, common, postCommon, client, postClient) {
             @Override public void bootstrap() {
-                ParallelDispatch dispatch = new FabricParallelDispatch();
-                
-                this.onCommon.run();
-                this.onPostCommon.accept(dispatch);
-                if (Environment.isClientSide()) {
-                    this.onClient.run();
-                    this.onPostClient.accept(dispatch);
+                try {
+                    ParallelDispatch dispatch = new FabricParallelDispatch();
+
+                    // Run common setup
+                    this.onCommon.run();
+
+                    // Run common post-setup
+                    this.onPostCommon.accept(dispatch);
+
+                    // Run client setup and post-setup if on client side
+                    if (Environment.isClientSide()) {
+                        this.onClient.run();
+                        this.onPostClient.accept(dispatch);
+                    }
+                } catch (Exception exception) {
+                    throw new RuntimeException("Failed to bootstrap mod: " + this.modId, exception);
                 }
             }
         };

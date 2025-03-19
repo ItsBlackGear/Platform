@@ -4,8 +4,6 @@ import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.network.base.Packet;
 import com.blackgear.platform.core.network.base.PacketHandler;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -15,13 +13,9 @@ import net.minecraft.world.entity.player.Player;
 public class PacketRegistryImpl {
     public static void registerChannel(ResourceLocation channel, int version) { }
 
-    @net.fabricmc.api.Environment(EnvType.CLIENT)
     public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
         if (Environment.isClientSide()) {
-            ClientPlayNetworking.registerGlobalReceiver(channelPath(channel, id), (client, handler1, buf, responseSender) -> {
-                T decode = handler.decode(buf);
-                client.execute(() -> handler.handle(decode).apply(client.player, client.level));
-            });
+            ClientPacketRegistry.registerS2CPacket(channelPath(channel, id), handler);
         }
     }
 
@@ -32,12 +26,9 @@ public class PacketRegistryImpl {
         });
     }
 
-    @net.fabricmc.api.Environment(EnvType.CLIENT)
     public static <T extends Packet<T>> void sendToServer(ResourceLocation channel, T packet) {
         if (Environment.isClientSide()) {
-            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-            packet.getHandler().encode(packet, buf);
-            ClientPlayNetworking.send(channelPath(channel, packet.getId()), buf);
+            ClientPacketRegistry.sendToServer(channelPath(channel, packet.getId()), packet);
         }
     }
 
