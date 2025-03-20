@@ -8,6 +8,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSourceParameterList;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 public interface BiomeContext {
     Predicate<BiomeContext> OVERWORLD_BIOME = context -> MultiNoiseBiomeSourceParameterList.Preset.OVERWORLD.usedBiomes().anyMatch(context::is);
     
-    ResourceKey<Biome> key();
+    ResourceKey<Biome> resource();
     
     Biome biome();
     
@@ -31,8 +32,10 @@ public interface BiomeContext {
     
     boolean is(Predicate<BiomeContext> context);
 
-    default boolean hasEntity(Supplier<EntityType<?>>... entities) {
-        return hasEntity(ImmutableSet.copyOf(entities));
+    boolean hasFeature(ResourceKey<PlacedFeature> feature);
+
+    default boolean hasEntity(Supplier<EntityType<?>> entities) {
+        return hasEntity(ImmutableSet.of(entities));
     }
     
     default boolean hasEntity(Set<Supplier<EntityType<?>>> entitySet) {

@@ -9,26 +9,26 @@ import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
 public class PlatformFabric implements ModInitializer {
-    static MinecraftServer server;
-    
+    private static MinecraftServer server;
+
     @Override
     public void onInitialize() {
         Platform.bootstrap();
-        
-        ServerLifecycleEvents.SERVER_STARTING.register(server -> {
-            PlatformFabric.server = server;
-        });
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-            PlatformFabric.server = null;
-        });
-        
+        registerServerLifecycleEvents();
+
         if (Environment.isClientSide()) {
             FabricClientEvents.bootstrap();
         }
-        
+
+        FabricCommonEvents.bootstrap();
         ServerLifecycle.bootstrap();
     }
-    
+
+    private void registerServerLifecycleEvents() {
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> PlatformFabric.server = server);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> PlatformFabric.server = null);
+    }
+
     @Nullable
     public static MinecraftServer getServer() {
         return server;

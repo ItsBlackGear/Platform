@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class SimpleConfigBuilder implements ConfigBuilder {
     private final Config storage = Config.of(LinkedHashMap::new, InMemoryFormat.withUniversalSupport()); // Use LinkedHashMap for consistent ordering
     private final Map<List<String>, String> levelComments = new HashMap<>();
+    private final Map<List<String>, String> levelTranslationKeys = new HashMap<>();
     private final List<String> currentPath = new ArrayList<>();
     List<SimpleConfigSpec.FabricConfigValue<?>> values = new ArrayList<>();
     private SimpleConfigSpec.BuilderContext context = new SimpleConfigSpec.BuilderContext();
@@ -173,7 +174,12 @@ public class SimpleConfigBuilder implements ConfigBuilder {
             this.levelComments.put(new ArrayList<>(currentPath), this.context.buildComment());
             this.context.setComment(); // Set to empty
         }
-        
+
+        if (this.context.getTranslationKey() != null) {
+            this.levelTranslationKeys.put(new ArrayList<>(currentPath), this.context.getTranslationKey());
+            this.context.setTranslationKey(null);
+        }
+
         this.context.ensureEmpty();
         return this;
     }
@@ -201,7 +207,7 @@ public class SimpleConfigBuilder implements ConfigBuilder {
         Config valueCfg = Config.of(Config.getDefaultMapCreator(true, true), InMemoryFormat.withSupport(ConfigValue.class::isAssignableFrom));
         this.values.forEach(v -> valueCfg.set(v.getPath(), v));
         
-        SimpleConfigSpec ret = new SimpleConfigSpec(this.storage, valueCfg, this.levelComments);
+        SimpleConfigSpec ret = new SimpleConfigSpec(this.storage, valueCfg, this.levelComments, this.levelTranslationKeys);
         this.values.forEach(v -> v.spec = ret);
         return ret;
     }

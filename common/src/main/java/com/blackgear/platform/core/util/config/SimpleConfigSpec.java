@@ -8,6 +8,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,69 +16,53 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static com.blackgear.platform.core.util.config.ConfigTracker.CORE;
 import static com.electronwill.nightconfig.core.ConfigSpec.CorrectionAction.*;
 
 public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements IConfigSpec<SimpleConfigSpec> {
     private final Map<List<String>, String> levelComments;
-    
+    private final Map<List<String>, String> levelTranslationKeys;
+
     private final UnmodifiableConfig values;
     private Config childConfig;
     
     private boolean isCorrecting = false;
-    
-    SimpleConfigSpec(UnmodifiableConfig storage, UnmodifiableConfig values, Map<List<String>, String> levelComments) {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    SimpleConfigSpec(UnmodifiableConfig storage, UnmodifiableConfig values, Map<List<String>, String> levelComments, Map<List<String>, String> levelTranslationKeys) {
         super(storage);
         this.values = values;
         this.levelComments = levelComments;
+        this.levelTranslationKeys = levelTranslationKeys;
     }
-    
+
+    public String getLevelComment(List<String> path) {
+        return this.levelComments.get(path);
+    }
+
+    public String getLevelTranslationKey(List<String> path) {
+        return this.levelTranslationKeys.get(path);
+    }
+
+    @Override
     public void setConfig(CommentedConfig config) {
         this.childConfig = config;
         if (config != null && !this.isCorrect(config)) {
             String configName = config instanceof FileConfig ? ((FileConfig) config).getNioPath().toString() : config.toString();
-            LogManager.getLogger()
-                .warn(CORE,
-                    "Configuration file {} is not correct. Correcting",
-                    configName
-                );
-            
-            this.correct(
-                config,
-                (action, path, incorrectValue, correctedValue) -> {
-                    LogManager.getLogger()
-                        .warn(CORE,
-                            "Incorrect key {} was corrected from {} to its default, {}. {}",
-                            DOT_JOINER.join(path),
-                            incorrectValue,
-                            correctedValue,
-                            incorrectValue == correctedValue
-                                ? "This seems to be an error."
-                                : ""
-                        );
-                },
-                (action, path, incorrectValue, correctedValue) -> {
-                    LogManager.getLogger()
-                        .debug(CORE,
-                            "The comment on key {} does not match the spec. This may create a backup.",
-                            DOT_JOINER.join(path)
-                        );
-                }
-            );
+            LOGGER.warn("Configuration file {} is not correct. Correcting", configName);
+            this.correct(config,
+                (action, path, incorrectValue, correctedValue) ->
+                    LOGGER.warn("Incorrect key {} was corrected from {} to its default, {}. {}", DOT_JOINER.join(path), incorrectValue, correctedValue, incorrectValue == correctedValue ? "This seems to be an error." : ""),
+                (action, path, incorrectValue, correctedValue) ->
+                    LOGGER.debug("The comment on key {} does not match the spec. This may create a backup.", DOT_JOINER.join(path)));
             
             if (config instanceof FileConfig) {
                 ((FileConfig) config).save();
             }
         }
-        
         this.afterReload();
     }
-    
-    @Override
-    public void acceptConfig(CommentedConfig config) {
-        this.setConfig(config);
-    }
-    
+
     @Override
     public boolean isCorrecting() {
         return this.isCorrecting;
@@ -102,22 +87,16 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     
     private void resetCaches(final Iterable<Object> values) {
         values.forEach(value -> {
-            if (value instanceof FabricConfigValue<?>) {
-                final FabricConfigValue<?> configValue = (FabricConfigValue<?>) value;
+            if (value instanceof FabricConfigValue<?> configValue) {
                 configValue.clearCache();
-            } else if (value instanceof Config) {
-                final Config config = (Config) value;
+            } else if (value instanceof Config config) {
                 this.resetCaches(config.valueMap().values());
             }
         });
     }
     
     public void save() {
-        Preconditions.checkNotNull(
-            this.childConfig,
-            "Cannot save config value without assigned Config object present"
-        );
-        
+        Preconditions.checkNotNull(this.childConfig, "Cannot save config value without assigned Config object present");
         if (this.childConfig instanceof FileConfig) {
             ((FileConfig) this.childConfig).save();
         }
@@ -126,24 +105,12 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     @Override
     public synchronized boolean isCorrect(CommentedConfig config) {
         LinkedList<String> parent = new LinkedList<>();
-        return this.correct(
-            this.config,
-            config,
-            parent,
-            Collections.unmodifiableList(parent),
-            (action, path, incorrectValue, correctedValue) -> {},
-            null,
-            true
-        ) == 0;
+        return this.correct(this.config, config, parent, Collections.unmodifiableList(parent), (action, path, incorrectValue, correctedValue) -> {}, null, true) == 0;
     }
     
     @Override
     public int correct(CommentedConfig config) {
-        return this.correct(
-            config,
-            (action, path, incorrectValue, correctedValue) -> {},
-            null
-        );
+        return this.correct(config, (action, path, incorrectValue, correctedValue) -> {}, null);
     }
     
     public synchronized int correct(CommentedConfig config, CorrectionListener listener) {
@@ -152,32 +119,19 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     
     public synchronized int correct(CommentedConfig config, CorrectionListener listener, CorrectionListener commentListener) {
         LinkedList<String> parent = new LinkedList<>();
-        
+        int ret = -1;
+
         try {
             this.isCorrecting = true;
-            return this.correct(
-                this.config,
-                config,
-                parent,
-                Collections.unmodifiableList(parent),
-                listener,
-                commentListener,
-                false
-            );
+            ret = this.correct(this.config, config, parent, Collections.unmodifiableList(parent), listener, commentListener, false);
         } finally {
             this.isCorrecting = false;
         }
+
+        return ret;
     }
     
-    private int correct(
-        UnmodifiableConfig spec,
-        CommentedConfig config,
-        LinkedList<String> parentPath,
-        List<String> parentPathUnmodifiable,
-        CorrectionListener listener,
-        CorrectionListener commentListener,
-        boolean dryRun
-    ) {
+    private int correct(UnmodifiableConfig spec, CommentedConfig config, LinkedList<String> parentPath, List<String> parentPathUnmodifiable, CorrectionListener listener, CorrectionListener commentListener, boolean dryRun) {
         int count = 0;
         
         Map<String, Object> specMap = spec.valueMap();
@@ -193,15 +147,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
             
             if (specValue instanceof Config) {
                 if (configValue instanceof CommentedConfig) {
-                    count += this.correct((
-                        Config) specValue,
-                        (CommentedConfig) configValue,
-                        parentPath,
-                        parentPathUnmodifiable,
-                        listener,
-                        commentListener,
-                        dryRun
-                    );
+                    count += this.correct((Config) specValue, (CommentedConfig) configValue, parentPath, parentPathUnmodifiable, listener, commentListener, dryRun);
                     
                     if (count > 0 && dryRun) {
                         return count;
@@ -213,15 +159,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
                     configMap.put(key, newValue);
                     listener.onCorrect(action, parentPathUnmodifiable, configValue, newValue);
                     count++;
-                    count += this.correct(
-                        (Config) specValue,
-                        newValue,
-                        parentPath,
-                        parentPathUnmodifiable,
-                        listener,
-                        commentListener,
-                        dryRun
-                    );
+                    count += this.correct((Config) specValue, newValue, parentPath, parentPathUnmodifiable, listener, commentListener, dryRun);
                 }
                 
                 String newComment = levelComments.get(parentPath);
@@ -269,7 +207,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         }
         
         // Second step: removes the unspecified values
-        for (Iterator<Map.Entry<String, Object>> ittr = configMap.entrySet().iterator(); ittr.hasNext(); ) {
+        for (Iterator<Map.Entry<String, Object>> ittr = configMap.entrySet().iterator(); ittr.hasNext();) {
             Map.Entry<String, Object> entry = ittr.next();
             if (!specMap.containsKey(entry.getKey())) {
                 if (dryRun) {
@@ -288,11 +226,8 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     }
     
     private boolean stringsMatchIgnoringNewlines(@Nullable Object obj1, @Nullable Object obj2) {
-        if (obj1 instanceof String && obj2 instanceof String) {
-            String string1 = (String) obj1;
-            String string2 = (String) obj2;
-            
-            if (string1.length() > 0 && string2.length() > 0) {
+        if (obj1 instanceof String string1 && obj2 instanceof String string2) {
+            if (!string1.isEmpty() && !string2.isEmpty()) {
                 return string1.replaceAll("\r\n", "\n")
                     .equals(string2.replaceAll("\r\n", "\n"));
             }
@@ -414,13 +349,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
                 boolean result = ((Number) this.min).doubleValue() <= n.doubleValue() && n.doubleValue() <= ((Number) this.max).doubleValue();
                 
                 if (!result) {
-                    LogManager.getLogger()
-                        .debug(CORE,
-                            "Range value {} is not within its bounds {}-{}",
-                            n.doubleValue(),
-                            ((Number) this.min).doubleValue(),
-                            ((Number) this.max).doubleValue()
-                        );
+                    LOGGER.debug("Range value {} is not within its bounds {}-{}", n.doubleValue(), ((Number) this.min).doubleValue(), ((Number) this.max).doubleValue());
                 }
                 
                 return result;
@@ -434,13 +363,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
             
             boolean result = c.compareTo(this.min) >= 0 && c.compareTo(this.max) <= 0;
             if (!result) {
-                LogManager.getLogger()
-                    .debug(CORE,
-                        "Range value {} is not within its bounds {}-{}",
-                        c,
-                        this.min,
-                        this.max
-                    );
+                LOGGER.debug("Range value {} is not within its bounds {}-{}", c, this.min, this.max);
             }
             
             return result;

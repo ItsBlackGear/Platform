@@ -4,15 +4,24 @@
   "package": "com.blackgear.platform.core.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "client.access.ItemPropertiesAccessor",
-    "client.access.NearPlaneAccessor",
+    "access.ActivityAccessor",
+    "access.LevelResourceAccessor",
+    "access.SensorTypeAccessor",
+    "access.SimpleParticleTypeAccessor",
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",
-    "core.access.LevelResourceAccessor"
+    "common.ShearsItemMixin",
+    "common.SwordItemMixin",
+    "config.ServerMainMixin"
   ],
   "client": [
-    "client.access.CameraAccessor",
-    "core.config.ClientHandshakePacketListenerImplMixin"
+    "access.CameraAccessor",
+    "access.ItemPropertiesAccessor",
+    "access.NearPlaneAccessor",
+    "client.AbstractClientPlayerMixin",
+    "client.GuiGraphicsMixin",
+    "client.ItemRendererMixin",
+    "client.MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

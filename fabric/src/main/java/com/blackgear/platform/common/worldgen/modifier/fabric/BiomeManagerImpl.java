@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -48,28 +49,33 @@ public class BiomeManagerImpl {
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
-                public ResourceKey<Biome> key() {
-                    return FabricBiomeWriter.this.selector.getBiomeKey();
+                public ResourceKey<Biome> resource() {
+                    return selector.getBiomeKey();
                 }
                 
                 @Override
                 public Biome biome() {
-                    return FabricBiomeWriter.this.selector.getBiome();
+                    return selector.getBiome();
                 }
                 
                 @Override
                 public boolean is(TagKey<Biome> tag) {
-                    return FabricBiomeWriter.this.selector.hasTag(tag);
+                    return selector.hasTag(tag);
                 }
                 
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    return this.key() == biome;
+                    return this.resource() == biome;
                 }
                 
                 @Override
                 public boolean is(Predicate<BiomeContext> context) {
                     return context.test(this);
+                }
+
+                @Override
+                public boolean hasFeature(ResourceKey<PlacedFeature> feature) {
+                    return selector.hasPlacedFeature(feature);
                 }
             };
         }
@@ -78,15 +84,30 @@ public class BiomeManagerImpl {
         public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
             this.modifier.getGenerationSettings().addFeature(decoration, feature);
         }
+
+        @Override
+        public void removeFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            this.modifier.getGenerationSettings().removeFeature(decoration, feature);
+        }
         
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.modifier.getSpawnSettings().addSpawn(category, data);
         }
+
+        @Override
+        public void removeSpawn(EntityType<?> entity) {
+            this.modifier.getSpawnSettings().removeSpawnsOfEntityType(entity);
+        }
         
         @Override
         public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
             this.modifier.getGenerationSettings().addCarver(carving, carver);
+        }
+
+        @Override
+        public void removeCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            this.modifier.getGenerationSettings().removeCarver(carving, carver);
         }
     }
 }

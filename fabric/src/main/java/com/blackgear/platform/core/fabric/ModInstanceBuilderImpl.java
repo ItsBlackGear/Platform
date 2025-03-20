@@ -5,7 +5,6 @@ import com.blackgear.platform.core.ModInstance;
 import com.blackgear.platform.core.ParallelDispatch;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class ModInstanceBuilderImpl {
     public static ModInstance builder(
@@ -18,9 +17,14 @@ public class ModInstanceBuilderImpl {
         return new ModInstance(modId, common, postCommon, client, postClient) {
             @Override public void bootstrap() {
                 ParallelDispatch dispatch = new FabricParallelDispatch();
-                
+
+                // Run common setup
                 this.onCommon.run();
+
+                // Run common post-setup
                 this.onPostCommon.accept(dispatch);
+
+                // Run client setup and post-setup if on client side
                 if (Environment.isClientSide()) {
                     this.onClient.run();
                     this.onPostClient.accept(dispatch);

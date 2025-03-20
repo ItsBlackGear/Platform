@@ -10,7 +10,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class ModInstanceBuilderImpl {
     public static ModInstance builder(
@@ -23,15 +22,24 @@ public class ModInstanceBuilderImpl {
         return new ModInstance(modId, common, postCommon, client, postClient) {
             @Override public void bootstrap() {
                 IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-                
+                if (bus == null) {
+                    throw new IllegalStateException("Failed to get Forge mod event bus");
+                }
+
+                // Register common post-setup
                 bus.<FMLCommonSetupEvent>addListener(event -> {
                     this.onPostCommon.accept(new ForgeParallelDispatch(event));
                 });
+
+                // Register client post-setup (will only be called on client)
                 bus.<FMLClientSetupEvent>addListener(event -> {
                     this.onPostClient.accept(new ForgeParallelDispatch(event));
                 });
-                
+
+                // Run common setup immediately
                 this.onCommon.run();
+
+                // Run client setup immediately if on client side
                 DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> this.onClient.run());
             }
         };

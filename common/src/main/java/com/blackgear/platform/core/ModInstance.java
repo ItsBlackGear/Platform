@@ -1,66 +1,30 @@
 package com.blackgear.platform.core;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
  * Utility class represents a mod instance, which includes both the common and client side of a mod.
  * It provides methods to set up and post-initialize the common and client side of the mod.
- *
- * <p>Example of a mod instance creation:</p>
- *
- * <pre>{@code
- *
- * ModInstance INSTANCE = ModInstance.create(MOD_ID)
- *  // custom class holding all the common setup methods
- * 	.common(CommonSetup::onStartup)
- * 	.postCommon(CommonSetup::postStartup)
- * 	// custom class holding all the client setup methods
- * 	.client(ClientSetup::onStartup)
- * 	.postClient(ClientSetup::postStartup)
- * 	// build the mod instance
- * 	.build();
- *
- * // For CommonSetup and ClientSetup, we just create two public static void methods.
- * // Alternatively, you can also use lambda expressions like this:
- *
- * ModInstance INSTANCE = ModInstance.create(MOD_ID)
- * 	.common(() -> {})
- * 	.postCommon(() -> {})
- * 	.client(() -> {})
- * 	.postClient(() -> {})
- * 	.build();
- *
- * // It is not mandatory to initialize all the methods, just the ones that you need.
- * // Here's an example of an instance for a client-side only mod:
- *
- * ModInstance INSTANCE = ModInstance.create(MOD_ID)
- * 	.client(() -> {})
- * 	.postClient(() -> {})
- * 	.build();
- *
- * // Alternatively, you can do the same for a server-side only mod:
- *
- * }</pre>
- *
- * @author ItsBlackGear
  */
 public abstract class ModInstance {
     public final String modId;
-    public Runnable onCommon;
-    public Consumer<ParallelDispatch> onPostCommon;
-    public Runnable onClient;
-    public Consumer<ParallelDispatch> onPostClient;
+    protected Runnable onCommon;
+    protected Consumer<ParallelDispatch> onPostCommon;
+    protected Runnable onClient;
+    protected Consumer<ParallelDispatch> onPostClient;
 
-    public ModInstance(
+    protected ModInstance(
         String modId,
         Runnable onCommon,
         Consumer<ParallelDispatch> onPostCommon,
         Runnable onClient,
         Consumer<ParallelDispatch> onPostClient
     ) {
-        this.modId = modId;
+        this.modId = Objects.requireNonNull(modId, "Mod ID cannot be null");
         this.onCommon = onCommon;
         this.onPostCommon = onPostCommon;
         this.onClient = onClient;
@@ -68,61 +32,43 @@ public abstract class ModInstance {
         this.populateIfEmpty();
     }
 
-    public static Builder create(String modId) {
+    /**
+     * Creates a new builder for a mod instance with the specified ID.
+     *
+     * @param modId the mod ID
+     * @return a new builder
+     * @throws NullPointerException if modId is null
+     */
+    public static Builder create(@NotNull String modId) {
         return new Builder(modId);
     }
 
     /**
-     * method used to initialize the ModInstance.
-     **/
+     * Initializes the ModInstance, registering necessary events for the appropriate platform.
+     */
     public abstract void bootstrap();
 
     /**
-     * call the common setup instances for the mod initialization.
-     **/
-    private void commonSetup(Runnable common) {
-        this.onCommon = common;
-    }
-
-    /**
-     * call the common setup instances for the mod post-initialization.
-     **/
-    private void postCommonSetup(Consumer<ParallelDispatch> common) {
-        this.onPostCommon = common;
-    }
-
-    /**
-     * call the client setup instances for the mod initialization.
-     **/
-    private void clientSetup(Runnable client) {
-        this.onClient = client;
-    }
-
-    /**
-     * call the client setup instances for the mod post-initialization.
-     **/
-    private void postClientSetup(Consumer<ParallelDispatch> client) {
-        this.onPostClient = client;
-    }
-
-    /**
-     * prevents null pointer exceptions by populating the fields with empty methods.
-     **/
+     * Prevents null pointer exceptions by populating the fields with empty methods.
+     */
     private void populateIfEmpty() {
         if (this.onCommon == null) {
-            this.commonSetup(() -> {});
+            this.onCommon = () -> {};
         }
         if (this.onPostCommon == null) {
-            this.postCommonSetup(dispatch -> {});
+            this.onPostCommon = dispatch -> {};
         }
         if (this.onClient == null) {
-            this.clientSetup(() -> {});
+            this.onClient = () -> {};
         }
         if (this.onPostClient == null) {
-            this.postClientSetup(dispatch -> {});
+            this.onPostClient = dispatch -> {};
         }
     }
 
+    /**
+     * Builder class for creating ModInstance objects in a fluent manner.
+     */
     public static class Builder {
         private final String modId;
         private Runnable onCommon;
@@ -131,29 +77,58 @@ public abstract class ModInstance {
         private Consumer<ParallelDispatch> onPostClient;
 
         protected Builder(String modId) {
-            this.modId = modId;
+            this.modId = Objects.requireNonNull(modId, "Mod ID cannot be null");
         }
 
+        /**
+         * Sets the common setup code to run during mod initialization.
+         *
+         * @param common the common setup code
+         * @return this builder
+         */
         public Builder common(Runnable common) {
             this.onCommon = common;
             return this;
         }
 
+        /**
+         * Sets the common post-setup code to run after mod initialization.
+         *
+         * @param common the common post-setup code
+         * @return this builder
+         */
         public Builder postCommon(Consumer<ParallelDispatch> common) {
             this.onPostCommon = common;
             return this;
         }
 
+        /**
+         * Sets the client-side setup code to run during mod initialization.
+         *
+         * @param client the client-side setup code
+         * @return this builder
+         */
         public Builder client(Runnable client) {
             this.onClient = client;
             return this;
         }
 
+        /**
+         * Sets the client-side post-setup code to run after mod initialization.
+         *
+         * @param client the client-side post-setup code
+         * @return this builder
+         */
         public Builder postClient(Consumer<ParallelDispatch> client) {
             this.onPostClient = client;
             return this;
         }
 
+        /**
+         * Builds a ModInstance with the configured setup methods.
+         *
+         * @return a new ModInstance
+         */
         public ModInstance build() {
             return builder(this.modId, this.onCommon, this.onPostCommon, this.onClient, this.onPostClient);
         }

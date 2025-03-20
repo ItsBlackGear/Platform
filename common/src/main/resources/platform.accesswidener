@@ -22,3 +22,7 @@ accessible method net/minecraft/world/entity/SpawnPlacements register (Lnet/mine
 
 # Creative Tab
 accessible class net/minecraft/world/item/CreativeModeTab$TabVisibility
+accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+accessible field net/minecraft/world/entity/SpawnPlacements DATA_BY_TYPE Ljava/util/Map;
+accessible class net/minecraft/world/entity/SpawnPlacements$Data
+accessible field net/minecraft/world/item/ShovelItem FLATTENABLES Ljava/util/Map;

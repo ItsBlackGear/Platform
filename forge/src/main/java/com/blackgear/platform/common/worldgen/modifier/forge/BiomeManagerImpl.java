@@ -4,13 +4,16 @@ import com.blackgear.platform.common.worldgen.modifier.BiomeContext;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.common.worldgen.modifier.BiomeWriter;
 import com.blackgear.platform.Platform;
+import com.blackgear.platform.core.util.WorldGenSerialization;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -25,6 +28,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -34,9 +38,8 @@ public class BiomeManagerImpl {
     
     public static void bootstrap() {
         FMLJavaModLoadingContext.get().getModEventBus().<RegisterEvent>addListener(event -> {
-            event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, entry -> {
-                entry.register(new ResourceLocation(Platform.MOD_ID, "biome_modifier_codec"), codec = Codec.unit(PlatformBiomeModifier.INSTANCE));
-            });
+            event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, entry -> entry.register(Platform.resource("biome_modifier_codec"), codec = Codec.unit(PlatformBiomeModifier.INSTANCE)));
+            event.register(ForgeRegistries.Keys.BIOME_MODIFIERS, entry -> entry.register(Platform.resource("biome_modifier"), PlatformBiomeModifier.INSTANCE));
         });
     }
     
@@ -46,7 +49,7 @@ public class BiomeManagerImpl {
         @Override
         public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             if (phase == Phase.ADD) {
-                BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome.unwrapKey(), builder));
+                BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome, builder));
             }
         }
         
@@ -57,94 +60,117 @@ public class BiomeManagerImpl {
     }
     
     static class ForgeBiomeWriter extends BiomeWriter {
-        private final Optional<ResourceKey<Biome>> biome;
+        private final Holder<Biome> biome;
         private final ModifiableBiomeInfo.BiomeInfo.Builder builder;
       
-        ForgeBiomeWriter(Optional<ResourceKey<Biome>> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+        ForgeBiomeWriter(Holder<Biome> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             this.biome = biome;
             this.builder = builder;
         }
         
         @Override
         public ResourceLocation name() {
-            return ForgeBiomeWriter.this.biome.get().location();
+            return biome.unwrapKey().orElseThrow().location();
         }
 
         @Override
         public BiomeContext context() {
             return new BiomeContext() {
                 @Override
-                public ResourceKey<Biome> key() {
-                    return ForgeBiomeWriter.this.biome.get();
+                public ResourceKey<Biome> resource() {
+                    return biome.unwrapKey().orElseThrow();
                 }
                 
                 @Override
                 public Biome biome() {
-                    return ForgeRegistries.BIOMES.getValue(ForgeBiomeWriter.this.name());
+                    return biome.value();
                 }
                 
                 @Override
                 public boolean is(TagKey<Biome> tag) {
-                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                    if (server != null) {
-                        server.registryAccess()
-                            .registry(Registries.BIOME)
-                            .flatMap(biomes -> biomes.getHolder(ForgeBiomeWriter.this.biome.get()))
-                            .ifPresent(holder -> holder.is(tag));
-                    }
-                    
-                    return false;
+                    return biome.is(tag);
                 }
                 
                 @Override
                 public boolean is(ResourceKey<Biome> biome) {
-                    MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                    if (server != null) {
-                        server.registryAccess()
-                            .registry(Registries.BIOME)
-                            .flatMap(biomes -> biomes.getHolder(ForgeBiomeWriter.this.biome.get()))
-                            .ifPresent(holder -> holder.is(biome));
-                    }
-                    
-                    return false;
+                    return this.resource() == biome;
                 }
                 
                 @Override
                 public boolean is(Predicate<BiomeContext> context) {
                     return context.test(this);
                 }
+
+                @Override
+                public boolean hasFeature(ResourceKey<PlacedFeature> feature) {
+                    var optional = getRegistryEntry(Registries.PLACED_FEATURE, feature);
+
+                    if (optional.isPresent()) {
+                        Holder.Reference<PlacedFeature> placedFeature = optional.get();
+                        return Arrays.stream(GenerationStep.Decoration.values())
+                            .anyMatch(decoration -> builder.getGenerationSettings()
+                                .getFeatures(decoration)
+                                .stream()
+                                .anyMatch(match -> WorldGenSerialization.serializeAndCompareFeature(match.get(), placedFeature.get())));
+                    }
+
+                    return false;
+                }
             };
+        }
+
+        private static <T> Optional<Holder.Reference<T>> getRegistryEntry(ResourceKey<? extends Registry<T>> registryKey, ResourceKey<T> entryKey) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server != null) {
+                return server.registryAccess()
+                    .registry(registryKey)
+                    .flatMap(registry -> registry.getHolder(entryKey));
+            }
+
+            return Optional.empty();
         }
         
         @Override
         public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (server != null) {
-                server.registryAccess()
-                    .registry(Registries.PLACED_FEATURE)
-                    .flatMap(features -> features.getHolder(feature))
-                    .ifPresent(placedFeature -> {
-                        this.builder.getGenerationSettings().addFeature(decoration, placedFeature);
-                    });
-            }
+            getRegistryEntry(Registries.PLACED_FEATURE, feature)
+                .ifPresent(placedFeature -> builder.getGenerationSettings().addFeature(decoration, placedFeature));
         }
-        
+
+        @Override
+        public void removeFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            getRegistryEntry(Registries.PLACED_FEATURE, feature)
+                .ifPresent(placedFeature ->
+                    builder.getGenerationSettings()
+                        .getFeatures(decoration)
+                        .removeIf(match -> WorldGenSerialization.serializeAndCompareFeature(match.get(), placedFeature.get())));
+        }
+
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.builder.getMobSpawnSettings().addSpawn(category, data);
         }
-        
+
+        @Override
+        public void removeSpawn(EntityType<?> entity) {
+            this.builder.getMobSpawnSettings()
+                .getSpawner(entity.getCategory())
+                .removeIf(spawner -> spawner.type == entity);
+        }
+
         @Override
         public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (server != null) {
-                server.registryAccess()
-                    .registry(Registries.CONFIGURED_CARVER)
-                    .flatMap(carvers -> carvers.getHolder(carver))
-                    .ifPresent(configuredCarver -> {
-                        this.builder.getGenerationSettings().addCarver(carving, configuredCarver);
-                    });
-            }
+            getRegistryEntry(Registries.CONFIGURED_CARVER, carver)
+                .ifPresent(configuredCarver ->
+                    builder.getGenerationSettings().addCarver(carving, configuredCarver));
+        }
+
+        @Override
+        public void removeCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            getRegistryEntry(Registries.CONFIGURED_CARVER, carver)
+                .ifPresent(configuredCarver ->
+                    builder.getGenerationSettings()
+                        .getCarvers(carving)
+                        .removeIf(match -> WorldGenSerialization.serializeAndCompareCarver(match.get(), configuredCarver.get())));
         }
     }
 }

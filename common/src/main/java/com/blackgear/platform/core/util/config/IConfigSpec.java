@@ -8,14 +8,14 @@ public interface IConfigSpec<T extends IConfigSpec<T>> extends UnmodifiableConfi
     default T self() {
         return (T) this;
     }
-    
-    void acceptConfig(CommentedConfig config);
-    
+
+    void setConfig(CommentedConfig config);
+
     boolean isCorrecting();
-    
+
     boolean isCorrect(CommentedConfig config);
-    
+
     int correct(CommentedConfig config);
-    
+
     void afterReload();
 }

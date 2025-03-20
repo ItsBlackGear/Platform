@@ -12,38 +12,29 @@ public class FabricClientEvents {
     public static void bootstrap() {
         renderHudEvent();
     }
-    
+
     private static void renderHudEvent() {
         HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            HudRenderEvent.RenderContext context = new HudRenderEvent.RenderContext() {
-                @Override
-                public Window getWindow() {
-                    return minecraft.getWindow();
-                }
-                
-                @Override
-                public int getScreenWidth() {
-                    return minecraft.getWindow().getGuiScaledWidth();
-                }
-                
-                @Override
-                public int getScreenHeight() {
-                    return minecraft.getWindow().getGuiScaledHeight();
-                }
-            };
-            
+            HudRenderEvent.RenderContext context = new HudRenderEvent.RenderContext() {};
+
             if (Minecraft.useFancyGraphics()) {
                 HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.VIGNETTE, context);
-            } else if (minecraft.gameMode.canHurtPlayer()) {
-                HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.HEALTH, context);
-            } else if (minecraft.gameMode.hasExperience()) {
-                HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.EXPERIENCE, context);
-            } else if (minecraft.options.getCameraType().isFirstPerson()) {
-                HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.FIRST_PERSON, context);
-            } else {
-                HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.DEFAULT, context);
             }
+
+            if (minecraft.gameMode.canHurtPlayer()) {
+                HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.HEALTH, context);
+            }
+
+            if (minecraft.gameMode.hasExperience()) {
+                HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.EXPERIENCE, context);
+            }
+
+            if (minecraft.options.getCameraType().isFirstPerson()) {
+                HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.FIRST_PERSON, context);
+            }
+
+            HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.DEFAULT, context);
         });
     }
 }

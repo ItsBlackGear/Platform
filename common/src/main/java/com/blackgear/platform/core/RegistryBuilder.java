@@ -5,47 +5,91 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Objects;
+
 /**
- * Utility class to help registering new registries.
+ * Utility class to help register custom registries.
+ * <p>
+ * This class simplifies the process of creating new registry types that can
+ * later be populated with entries using {@link CoreRegistry}.
  *
- * <p>Example of the registry of a registry.</p>
+ * <p><b>Example:</b> Creating a new registry type for IntProviderType</p>
  *
  * <pre>{@code
- *
- * // Create a new instance of the RegistryBuilder.
+ * // Create a new registry builder for your mod
  * RegistryBuilder BUILDER = new RegistryBuilder(MOD_ID);
  *
- * // Register your new registry entry, in this case, an IntProviderType.
- *
- * RegistryBuilder.Sample<IntProviderType<?>> INT_PROVIDER_TYPE = BUILDER.create(
- * 	"int_provider_type",
- * 	registry -> IntProviderType.CONSTANT
+ * // Register a new registry type
+ * RegistryBuilder.RegistryReference<IntProviderType<?>> INT_PROVIDER_TYPE = BUILDER.create(
+ *     "int_provider_type",
+ *     registry -> IntProviderType.CONSTANT
  * );
  *
- * }</pre>
- *
- * This type of registry can later be used to create registries using {@link CoreRegistry}.
- *
- * <pre>{@code
- *
+ * // Later use this registry with CoreRegistry
  * CoreRegistry<IntProviderType<?>> INT_PROVIDERS = CoreRegistry.create(
  *     INT_PROVIDER_TYPE.registry(),
  *     MOD_ID
  * );
- *
  * }</pre>
- *
- * By using {@link Sample} you can also call either the {@link ResourceKey} or the {@link Registry}.
- *
- * @author ItsBlackGear
  */
 public record RegistryBuilder(String modId) {
-    public <T> Sample<T> create(String key, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
-        ResourceKey<Registry<T>> resource = ResourceKey.createRegistryKey(new ResourceLocation(this.modId, key));
-        return new Sample<>(resource, BuiltInRegistries.registerSimple(resource, bootstrap));
+    /**
+     * Creates a ResourceKey for a registry with the given name.
+     *
+     * @param name the registry name
+     * @return a ResourceKey for the registry
+     */
+    public <T> ResourceKey<Registry<T>> resource(String name) {
+        return ResourceKey.createRegistryKey(new ResourceLocation(this.modId, name));
     }
-    
+
+    /**
+     * Registers a simple registry with the given key and bootstrap function.
+     *
+     * @param key the registry key
+     * @param bootstrap the bootstrap function
+     * @return the created registry
+     */
+    public <T> Registry<T> registry(ResourceKey<Registry<T>> key, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
+        return BuiltInRegistries.registerSimple(key, bootstrap);
+    }
+
+    /**
+     * Creates and registers a new registry type.
+     *
+     * @param name the registry name
+     * @param bootstrap the bootstrap function that provides the default registry value
+     * @param <T> the type of registry being created
+     * @return a RegistryReference containing the registry key and registry
+     * @throws NullPointerException if key or bootstrap is null
+     */
+    public <T> RegistryReference<T> create(String name, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
+        Objects.requireNonNull(name, "Registry name cannot be null");
+        Objects.requireNonNull(bootstrap, "Bootstrap function cannot be null");
+
+        ResourceKey<Registry<T>> resource = resource(name);
+        return new RegistryReference<>(resource, registry(resource, bootstrap));
+    }
+
+    /**
+     * Performs necessary initialization.
+     * This method is intended to be called during mod initialization.
+     */
     public static void bootstrap() {}
-    
-    public record Sample<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {}
+
+    /**
+     * A reference to a registered registry containing both its ResourceKey and Registry instance.
+     *
+     * @param <T> the type of registry
+     */
+    public record RegistryReference<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {
+        /**
+         * Gets the resource location for this registry.
+         *
+         * @return the ResourceLocation representing this registry
+         */
+        public ResourceLocation location() {
+            return this.resource.location();
+        }
+    }
 }
