@@ -17,55 +17,54 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class RendererRegistry {
-    public static final Set<ModelResourceLocation> SPECIAL_MODELS = ConcurrentHashMap.newKeySet();
-
-    @ExpectPlatform @Deprecated
+    @Deprecated(forRemoval = true)
     public static void addBlockRenderType(RenderType type, Block... blocks) {
-        throw new AssertionError();
+        GameRendering.registerBlockRenderers(event -> event.register(type, blocks));
     }
 
-    @ExpectPlatform @Deprecated
+    @Deprecated(forRemoval = true)
     public static void addFluidRenderType(RenderType type, Fluid... fluids) {
-        throw new AssertionError();
+        GameRendering.registerBlockRenderers(event -> event.register(type, fluids));
     }
 
-    @ExpectPlatform @SafeVarargs @Deprecated
+    @SafeVarargs @Deprecated(forRemoval = true)
     public static void addItemColor(ItemColor color, Supplier<? extends ItemLike>... items) {
-        throw new AssertionError();
+        Arrays.stream(items).forEach(supplier -> GameRendering.registerBlockColors(event -> event.register(color, supplier.get())));
     }
 
-    @ExpectPlatform @SafeVarargs @Deprecated
+    @SafeVarargs @Deprecated(forRemoval = true)
     public static void addBlockColor(BlockColor color, Supplier<? extends Block>... items) {
-        throw new AssertionError();
+        Arrays.stream(items).forEach(supplier -> GameRendering.registerBlockColors(event -> event.register(color, supplier.get())));
     }
 
-    @ExpectPlatform @Deprecated
+    @Deprecated(forRemoval = true)
     public static <T extends Entity> void addEntityRenderer(Supplier<? extends EntityType<? extends T>> type, EntityRendererProvider<T> renderer) {
-        throw new AssertionError();
+        GameRendering.registerEntityRenderers(event -> event.register(type.get(), renderer));
     }
 
-    @ExpectPlatform @Deprecated
+    @Deprecated(forRemoval = true)
     public static <T extends BlockEntity> void addBlockEntityRenderer(Supplier<? extends BlockEntityType<? extends T>> type, BlockEntityRendererProvider<T> renderer) {
-        throw new AssertionError();
+        GameRendering.registerBlockEntityRenderers(event -> event.register(type.get(), renderer));
     }
 
-    @ExpectPlatform @Deprecated
+    @Deprecated(forRemoval = true)
     public static void addLayerDefinition(ModelLayerLocation layer, Supplier<LayerDefinition> definition) {
-        throw new AssertionError();
+        GameRendering.registerModelLayers(event -> event.register(layer, definition));
     }
 
+    @Deprecated(forRemoval = true)
     public static void registerSpecialModel(ModelResourceLocation model) {
-        SPECIAL_MODELS.add(model);
+        GameRendering.registerSpecialModels(event -> event.register(model));
     }
 
+    @Deprecated(forRemoval = true)
     public static void registerSpecialModels(ModelResourceLocation... models) {
-        for (ModelResourceLocation model : models) {
-            registerSpecialModel(model);
-        }
+        GameRendering.registerSpecialModels(event -> event.register(models));
     }
 }

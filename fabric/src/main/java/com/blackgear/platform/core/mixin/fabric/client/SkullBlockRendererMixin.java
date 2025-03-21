@@ -39,13 +39,6 @@ public class SkullBlockRendererMixin {
         }
     }
 
-//    @Inject(method = "method_3580(Ljava/util/HashMap;)V", at = @At("TAIL"))
-//    private static void addSkullTextures(HashMap<SkullBlock.Type, ResourceLocation> map, CallbackInfo ci) {
-//        for (Map.Entry<SkullBlock.Type, ResourceLocation> entry : GameRenderingImpl.TEXTURE_BY_SKULL.entrySet()) {
-//            map.put(entry.getKey(), entry.getValue());
-//        }
-//    }
-
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)
     private static void getRenderType(SkullBlock.Type skullType, GameProfile gameProfile, CallbackInfoReturnable<RenderType> cir) {
         for (Map.Entry<SkullBlock.Type, ResourceLocation> entry : GameRenderingImpl.TEXTURE_BY_SKULL.entrySet()) {

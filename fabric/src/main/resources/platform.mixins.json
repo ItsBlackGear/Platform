@@ -15,7 +15,6 @@
     "client.FogRendererMixin",
     "client.GuiMixin",
     "client.MinecraftMixin",
-    "client.ModelBakeryMixin",
     "client.SheetsMixin",
     "client.SkullBlockRendererMixin"
   ],

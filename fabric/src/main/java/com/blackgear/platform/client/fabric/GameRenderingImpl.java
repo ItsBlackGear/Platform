@@ -72,7 +72,18 @@ public class GameRenderingImpl {
 
     @SuppressWarnings("UnstableApiUsage")
     public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
-        new ModelLoadingRegistryImpl().registerModelProvider((manager, loader) -> listener.accept(loader::accept));
+        GameRendering.SpecialModelEvent event = new GameRendering.SpecialModelEvent() {
+            @Override
+            public void register(ResourceLocation model) {
+                ModelLoadingRegistryImpl.INSTANCE.registerModelProvider((manager, loader) -> loader.accept(model));
+            }
+
+            @Override
+            public void register(ResourceLocation... models) {
+                Arrays.stream(models).forEach(this::register);
+            }
+        };
+        listener.accept(event);
     }
 
     public static void registerSkullRenderers(Consumer<GameRendering.SkullRendererEvent> listener) {

@@ -18,13 +18,11 @@
   ],
   "client": [
     "client.AbstractClientPlayerMixin",
-    "client.ItemEntityRendererMixin",
-    "client.ItemModelShaperMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
-    "client.access.CameraAccessor",
-    "client.access.ItemPropertiesAccessor",
-    "client.access.NearPlaneAccessor"
+    "access.CameraAccessor",
+    "access.ItemPropertiesAccessor",
+    "access.NearPlaneAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

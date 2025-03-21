@@ -73,7 +73,20 @@ public class GameRenderingImpl {
     }
 
     public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
-        Consumer<ModelEvent.RegisterAdditional> consumer = event -> listener.accept(event::register);
+        Consumer<ModelEvent.RegisterAdditional> consumer = event -> {
+            GameRendering.SpecialModelEvent modelEvent = new GameRendering.SpecialModelEvent() {
+                @Override
+                public void register(ResourceLocation model) {
+                    event.register(model);
+                }
+
+                @Override
+                public void register(ResourceLocation... models) {
+                    Arrays.stream(models).forEach(event::register);
+                }
+            };
+            listener.accept(modelEvent);
+        };
         FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
     }
 

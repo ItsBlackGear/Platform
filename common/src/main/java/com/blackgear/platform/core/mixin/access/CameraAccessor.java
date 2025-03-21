@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin.client.access;
+package com.blackgear.platform.core.mixin.access;
 
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Camera;

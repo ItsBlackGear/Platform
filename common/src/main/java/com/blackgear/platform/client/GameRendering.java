@@ -10,9 +10,11 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock;
@@ -20,11 +22,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class GameRendering {
+    public static final Map<Item, ModelResourceLocation> SPECIAL_ITEMS = new ConcurrentHashMap<>();
+
     @ExpectPlatform
     public static void registerBlockColors(Consumer<BlockColorEvent> listener) {
         throw new AssertionError();
@@ -53,6 +59,14 @@ public class GameRendering {
     @ExpectPlatform
     public static void registerSpecialModels(Consumer<SpecialModelEvent> listener) {
         throw new AssertionError();
+    }
+
+    public static void registerHandHeldModels(Consumer<HandHeldModelEvent> listener) {
+        HandHeldModelEvent event = (item, model) -> {
+            SPECIAL_ITEMS.put(item, model);
+            registerSpecialModels(models -> models.register(model));
+        };
+        listener.accept(event);
     }
 
     @ExpectPlatform
@@ -86,6 +100,12 @@ public class GameRendering {
 
     public interface SpecialModelEvent {
         void register(ResourceLocation model);
+
+        void register(ResourceLocation... models);
+    }
+
+    public interface HandHeldModelEvent {
+        void register(Item item, ModelResourceLocation model);
     }
 
     public interface SkullRendererEvent {
