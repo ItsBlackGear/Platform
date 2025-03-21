@@ -17,13 +17,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class EnvironmentImpl {
-    private static final Supplier<Supplier<BlockableEventLoop<?>>> CLIENT_EXECUTOR = () -> () -> {
-        try {
-            return Minecraft.getInstance();
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to access Minecraft client instance", exception);
-        }
-    };
+    private static final Supplier<Supplier<BlockableEventLoop<?>>> CLIENT_EXECUTOR = () -> Minecraft::getInstance;
 
     public static boolean isClientSide() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
@@ -52,14 +46,9 @@ public class EnvironmentImpl {
     
     public static BlockableEventLoop<?> getGameExecutor() {
         if (Environment.isClientSide()) {
-            try {
-                return CLIENT_EXECUTOR.get().get();
-            } catch (Exception exception) {
-                throw new IllegalStateException("Failed to get client executor", exception);
-            }
+            return CLIENT_EXECUTOR.get().get();
         } else {
-            return Environment.getCurrentServer()
-                .orElseThrow(() -> new IllegalStateException("No server executor available"));
+            return Environment.getCurrentServer().orElseThrow(() -> new IllegalStateException("No server available"));
         }
     }
     
