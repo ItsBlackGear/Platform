@@ -29,7 +29,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class GameRendering {
-    public static final Map<Item, ModelResourceLocation> SPECIAL_ITEMS = new ConcurrentHashMap<>();
+    public static final Map<Item, ModelResourceLocation> HAND_HELD_MODELS = new ConcurrentHashMap<>();
 
     @ExpectPlatform
     public static void registerBlockColors(Consumer<BlockColorEvent> listener) {
@@ -63,7 +63,7 @@ public class GameRendering {
 
     public static void registerHandHeldModels(Consumer<HandHeldModelEvent> listener) {
         HandHeldModelEvent event = (item, model) -> {
-            SPECIAL_ITEMS.put(item, model);
+            HAND_HELD_MODELS.put(item, model);
             registerSpecialModels(models -> models.register(model));
         };
         listener.accept(event);

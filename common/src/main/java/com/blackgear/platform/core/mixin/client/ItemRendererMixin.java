@@ -1,11 +1,6 @@
 package com.blackgear.platform.core.mixin.client;
 
 import com.blackgear.platform.client.GameRendering;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -16,65 +11,59 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
     @Shadow @Final private ItemModelShaper itemModelShaper;
 
-    @WrapOperation(
+    @Redirect(
         method = "renderGuiItem(Lnet/minecraft/world/item/ItemStack;IILnet/minecraft/client/resources/model/BakedModel;)V",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/resources/model/BakedModel;usesBlockLight()Z"
         )
     )
-    private boolean onRenderItem(BakedModel instance, Operation<Boolean> original, ItemStack stack) {
-        return !GameRendering.SPECIAL_ITEMS.containsKey(stack.getItem()) && original.call(instance);
+    private boolean onRenderItem(BakedModel instance, ItemStack stack) {
+        return !GameRendering.HAND_HELD_MODELS.containsKey(stack.getItem()) && instance.usesBlockLight();
     }
 
-    @Inject(
+    @ModifyVariable(
         method = "render",
-        at = @At("HEAD")
+        at = @At("HEAD"),
+        argsOnly = true,
+        ordinal = 0
     )
-    private void onRender(
-        ItemStack stack,
-        ItemTransforms.TransformType transformType,
-        boolean leftHand,
-        PoseStack poseStack,
-        MultiBufferSource buffer,
-        int combinedLight,
-        int combinedOverlay,
+    private BakedModel onRender(
         BakedModel model,
-        CallbackInfo ci,
-        @Local(argsOnly = true) LocalRef<BakedModel> modelRef
+        ItemStack stack,
+        ItemTransforms.TransformType transformType
     ) {
-        boolean simple = transformType == ItemTransforms.TransformType.GUI || transformType == ItemTransforms.TransformType.GROUND || transformType == ItemTransforms.TransformType.FIXED;
-        if (!simple) return;
+        boolean simple = transformType == ItemTransforms.TransformType.GUI ||
+            transformType == ItemTransforms.TransformType.GROUND ||
+            transformType == ItemTransforms.TransformType.FIXED;
 
-        if (GameRendering.SPECIAL_ITEMS.containsKey(stack.getItem())) {
-            modelRef.set(this.itemModelShaper.getItemModel(stack));
+        if (simple && GameRendering.HAND_HELD_MODELS.containsKey(stack.getItem())) {
+            return this.itemModelShaper.getItemModel(stack);
         }
+
+        return model;
     }
 
-    @WrapOperation(
+    @Redirect(
         method = "getModel",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/ItemModelShaper;getItemModel(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/client/resources/model/BakedModel;"
         )
     )
-    private BakedModel onGettingModel(
-        ItemModelShaper shaper,
-        ItemStack stack,
-        Operation<BakedModel> original
-    ) {
+    private BakedModel onGettingModel(ItemModelShaper shaper, ItemStack stack) {
         Item item = stack.getItem();
-        if (GameRendering.SPECIAL_ITEMS.containsKey(item)) {
-            return shaper.getModelManager().getModel(GameRendering.SPECIAL_ITEMS.get(item));
+        if (GameRendering.HAND_HELD_MODELS.containsKey(item)) {
+            return shaper.getModelManager().getModel(GameRendering.HAND_HELD_MODELS.get(item));
         } else {
-            return original.call(shaper, stack);
+            return shaper.getItemModel(stack);
         }
     }
 }
