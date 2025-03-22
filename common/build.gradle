@@ -15,5 +15,5 @@ dependencies {
     implementation('com.electronwill.night-config:core:3.6.0')
     implementation('com.electronwill.night-config:toml:3.6.0')
 
-    annotationProcessor(implementation("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
 }
