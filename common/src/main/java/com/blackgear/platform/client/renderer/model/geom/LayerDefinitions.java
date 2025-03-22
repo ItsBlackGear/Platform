@@ -1,6 +1,6 @@
 package com.blackgear.platform.client.renderer.model.geom;
 
-import com.blackgear.platform.client.RendererRegistry;
+import com.blackgear.platform.client.GameRendering;
 import com.blackgear.platform.client.renderer.model.geom.builder.LayerDefinition;
 import com.google.common.collect.ImmutableMap;
 import net.fabricmc.api.EnvType;
@@ -15,9 +15,7 @@ public class LayerDefinitions {
     public static Map<ModelLayerLocation, LayerDefinition> createRoots() {
         ImmutableMap.Builder<ModelLayerLocation, LayerDefinition> builder = ImmutableMap.builder();
 
-        for (Map.Entry<ModelLayerLocation, RendererRegistry.ModelLayerProvider> entry : RendererRegistry.MODEL_PROVIDERS.entrySet()) {
-            builder.put(entry.getKey(), entry.getValue().createLayerDefinition());
-        }
+        GameRendering.MODEL_LAYERS.forEach(builder::put);
         
         ImmutableMap<ModelLayerLocation, LayerDefinition> roots = builder.build();
         List<ModelLayerLocation> missingDefinitions = ModelLayers.getKnownLocations()

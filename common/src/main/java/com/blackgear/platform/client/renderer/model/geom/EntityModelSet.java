@@ -1,5 +1,6 @@
 package com.blackgear.platform.client.renderer.model.geom;
 
+import com.blackgear.platform.client.GameRendering;
 import com.blackgear.platform.client.RendererRegistry;
 import com.blackgear.platform.client.renderer.model.geom.builder.LayerDefinition;
 import com.google.common.collect.ImmutableMap;
@@ -13,11 +14,10 @@ import java.util.Map;
 @Environment(EnvType.CLIENT)
 public class EntityModelSet implements ResourceManagerReloadListener {
     public static final EntityModelSet INSTANCE = new EntityModelSet();
-    private Map<ModelLayerLocation, LayerDefinition> roots = ImmutableMap.of();
-    
+
     public NeoModelPart bakeLayer(ModelLayerLocation location) {
-        LayerDefinition layer = RendererRegistry.MODEL_PROVIDERS.get(location).createLayerDefinition();
-        
+        LayerDefinition layer = GameRendering.MODEL_LAYERS.get(location);
+
         if (layer == null) {
             throw new IllegalArgumentException("No model for layer " + location);
         } else {
@@ -27,6 +27,6 @@ public class EntityModelSet implements ResourceManagerReloadListener {
     
     @Override
     public void onResourceManagerReload(ResourceManager manager) {
-        this.roots = ImmutableMap.copyOf(LayerDefinitions.createRoots());
+        GameRendering.MODEL_LAYERS = ImmutableMap.copyOf(LayerDefinitions.createRoots());
     }
 }

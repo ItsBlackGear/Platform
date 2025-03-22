@@ -1,9 +1,7 @@
 package com.blackgear.platform.client;
 
 import com.blackgear.platform.client.renderer.model.geom.ModelLayerLocation;
-import com.blackgear.platform.client.renderer.model.geom.ModelLayers;
 import com.blackgear.platform.client.renderer.model.geom.builder.LayerDefinition;
-import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
@@ -20,64 +18,52 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class RendererRegistry {
-    public static final Map<ModelLayerLocation, ModelLayerProvider> MODEL_PROVIDERS = new ConcurrentHashMap<>();
-
-    @ExpectPlatform
+    @Deprecated
     public static void addBlockRenderType(RenderType type, Block... blocks) {
-        throw new AssertionError();
+        GameRendering.registerBlockRenderers(event -> event.register(type, blocks));
     }
 
-    @ExpectPlatform
+    @Deprecated
     public static void addFluidRenderType(RenderType type, Fluid... fluids) {
-        throw new AssertionError();
+        GameRendering.registerBlockRenderers(event -> event.register(type, fluids));
     }
 
-    @ExpectPlatform @SafeVarargs
+    @Deprecated @SafeVarargs
     public static void addItemColor(ItemColor color, Supplier<? extends ItemLike>... items) {
-        throw new AssertionError();
+        Arrays.stream(items).forEach(supplier -> GameRendering.registerBlockColors(event -> event.register(color, supplier.get())));
     }
 
-    @ExpectPlatform @SafeVarargs
+    @Deprecated @SafeVarargs
     public static void addBlockColor(BlockColor color, Supplier<? extends Block>... items) {
-        throw new AssertionError();
+        Arrays.stream(items).forEach(supplier -> GameRendering.registerBlockColors(event -> event.register(color, supplier.get())));
     }
 
-    @ExpectPlatform
+    @Deprecated
     public static <T extends Entity> void addEntityRenderer(Supplier<? extends EntityType<? extends T>> type, Function<EntityRenderDispatcher, EntityRenderer<T>> renderer) {
-        throw new AssertionError();
+        GameRendering.registerEntityRenderers(event -> event.register(type.get(), renderer));
     }
 
-    @ExpectPlatform
+    @Deprecated
     public static <T extends BlockEntity> void addBlockEntityRenderer(Supplier<BlockEntityType<T>> type, Function<BlockEntityRenderDispatcher, BlockEntityRenderer<? super T>> renderer) {
-        throw new AssertionError();
+        GameRendering.registerBlockEntityRenderers(event -> event.register(type.get(), renderer));
     }
-    
-    public static void registerModelLayer(ModelLayerLocation model, ModelLayerProvider provider) {
-        if (MODEL_PROVIDERS.putIfAbsent(model, provider) != null) {
-            throw new IllegalArgumentException(String.format("Model layer %s is already registered!", model));
-        }
-        
-        ModelLayers.ALL_MODELS.add(model);
+
+    @Deprecated
+    public static void registerModelLayer(ModelLayerLocation model, LayerDefinition provider) {
+        GameRendering.registerModelLayers(event -> event.register(model, provider));
     }
-    
-    @ExpectPlatform
+
+    @Deprecated
     public static void registerSpecialModel(ModelResourceLocation model) {
-        throw new AssertionError();
+        GameRendering.registerSpecialModels(event -> event.register(model));
     }
-    
+
     public static void registerSpecialModels(ModelResourceLocation... models) {
-        for (ModelResourceLocation model : models) {
-            registerSpecialModel(model);
-        }
-    }
-    
-    public interface ModelLayerProvider {
-        LayerDefinition createLayerDefinition();
+        GameRendering.registerSpecialModels(event -> event.register(models));
     }
 }

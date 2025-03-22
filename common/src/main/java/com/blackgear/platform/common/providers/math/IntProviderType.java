@@ -8,9 +8,9 @@ import com.mojang.serialization.Codec;
 public interface IntProviderType<P extends IntProvider> {
     CoreRegistry<IntProviderType<?>> PROVIDERS = CoreRegistry.create(PlatformRegistries.INT_PROVIDER_TYPE.getRegistry(), Platform.MOD_ID);
     
-    IntProviderType<ConstantInt> CONSTANT = PROVIDERS.registerVanilla("constant", () -> ConstantInt.CODEC);
-    IntProviderType<UniformInt> UNIFORM = PROVIDERS.registerVanilla("uniform", () -> UniformInt.CODEC);
-    IntProviderType<ClampedNormalInt> CLAMPED_NORMAL = PROVIDERS.registerVanilla("clamped_normal", () -> ClampedNormalInt.CODEC);
+    IntProviderType<ConstantInt> CONSTANT = PROVIDERS.vanilla("constant", () -> ConstantInt.CODEC);
+    IntProviderType<UniformInt> UNIFORM = PROVIDERS.vanilla("uniform", () -> UniformInt.CODEC);
+    IntProviderType<ClampedNormalInt> CLAMPED_NORMAL = PROVIDERS.vanilla("clamped_normal", () -> ClampedNormalInt.CODEC);
     
     Codec<P> codec();
 }

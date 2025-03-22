@@ -1,11 +1,9 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.blackgear.platform.core.mixin",
+  "package": "com.blackgear.platform.core.mixin.forge",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "core.LootTableMixin",
-    "core.LootTablesMixin",
     "core.access.RegionHillsLayerAccessor",
     "core.biome.BiomeInitLayerMixin",
     "core.biome.RegionHillsLayerMixin",
@@ -13,6 +11,7 @@
     "core.biome.ShoreLayerMixin"
   ],
   "client": [
+    "client.ItemRendererMixin",
     "client.MinecraftMixin"
   ],
   "injectors": {

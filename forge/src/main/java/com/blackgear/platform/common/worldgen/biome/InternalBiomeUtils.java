@@ -3,7 +3,7 @@ package com.blackgear.platform.common.worldgen.biome;
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.common.worldgen.parameters.Temperature;
 import com.blackgear.platform.core.mixin.access.BiomesAccessor;
-import com.blackgear.platform.core.mixin.core.access.RegionHillsLayerAccessor;
+import com.blackgear.platform.core.mixin.forge.core.access.RegionHillsLayerAccessor;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.data.BuiltinRegistries;

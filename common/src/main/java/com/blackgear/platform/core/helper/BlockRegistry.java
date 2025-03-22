@@ -4,7 +4,6 @@ import com.blackgear.platform.common.block.BlockProperties;
 import com.blackgear.platform.core.CoreRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -16,20 +15,14 @@ import java.util.function.Supplier;
 public class BlockRegistry {
     private final CoreRegistry<Block> blocks;
     private final CoreRegistry<Item> items;
-    private final CreativeModeTab tab;
 
-    private BlockRegistry(String modid, CreativeModeTab tab) {
-        this.blocks = CoreRegistry.create(Registry.BLOCK, modid);
-        this.items = CoreRegistry.create(Registry.ITEM, modid);
-        this.tab = tab;
-    }
-    
-    public static BlockRegistry create(String modid) {
-        return new BlockRegistry(modid, null);
+    private BlockRegistry(String modId) {
+        this.blocks = CoreRegistry.create(Registry.BLOCK, modId);
+        this.items = CoreRegistry.create(Registry.ITEM, modId);
     }
 
-    public static BlockRegistry create(String modid, CreativeModeTab tab) {
-        return new BlockRegistry(modid, tab);
+    public static BlockRegistry create(String modId) {
+        return new BlockRegistry(modId);
     }
     
     public Supplier<Block> register(
@@ -117,12 +110,7 @@ public class BlockRegistry {
     }
 
     public Supplier<Block> register(String name, Supplier<Block> block) {
-        return this.register(name, block, entry -> {
-            Item.Properties properties = (this.tab != null)
-                ? new Item.Properties().tab(this.tab)
-                : new Item.Properties();
-            return new BlockItem(entry.get(), properties);
-        });
+        return this.register(name, block, entry -> new BlockItem(entry.get(), new Item.Properties()));
     }
     
     public Supplier<Block> registerNoItem(String name, BlockProperties.Builder builder) {

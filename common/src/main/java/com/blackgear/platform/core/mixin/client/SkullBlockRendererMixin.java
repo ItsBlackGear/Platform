@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.mixin.client;
 
-import com.blackgear.platform.client.helper.SkullRegistry;
+import com.blackgear.platform.client.GameRendering;
 import net.minecraft.client.model.SkullModel;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +19,7 @@ public class SkullBlockRendererMixin {
         at = @At("TAIL")
     )
     private static void addSkullModels(HashMap<SkullBlock.Type, SkullModel> map, CallbackInfo ci) {
-        map.putAll(SkullRegistry.MODEL_BY_SKULL);
+        map.putAll(GameRendering.MODEL_BY_SKULL);
     }
 
     @Inject(
@@ -27,6 +27,6 @@ public class SkullBlockRendererMixin {
         at = @At("TAIL")
     )
     private static void addSkullTextures(HashMap<SkullBlock.Type, ResourceLocation> map, CallbackInfo ci) {
-        map.putAll(SkullRegistry.TEXTURE_BY_SKULL);
+        map.putAll(GameRendering.TEXTURE_BY_SKULL);
     }
 }

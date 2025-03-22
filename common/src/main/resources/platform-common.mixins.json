@@ -10,7 +10,6 @@
     "access.BlockBehaviourAccessor",
     "access.DecorationContextAccessor",
     "access.DirectionAccessor",
-    "access.LootTableBuilderAccessor",
     "access.MemoryModuleTypeAccessor",
     "access.OverworldBiomeSourceAccessor",
     "access.SensorTypeAccessor",
@@ -35,9 +34,6 @@
     "access.ItemPropertiesAccessor",
     "client.AbstractClientPlayerMixin",
     "client.ClientPacketListenerMixin",
-    "client.ItemEntityRendererMixin",
-    "client.ItemModelShaperMixin",
-    "client.ItemRendererMixin",
     "client.MinecraftMixin",
     "client.SkullBlockRendererMixin",
     "common.CreativeModeTabMixin"

@@ -12,8 +12,8 @@
     "client.ClientLevelMixin",
     "client.FogRendererMixin",
     "client.GuiMixin",
+    "client.ItemRendererMixin",
     "client.MinecraftMixin",
-    "client.ModelBakeryMixin",
     "client.SheetsMixin",
     "common.PlayerAttackMixin"
   ],
