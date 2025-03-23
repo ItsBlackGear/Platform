@@ -40,8 +40,8 @@ configurations {
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
-    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
-    shadowBundle(implementation(include("io.github.llamalad7:mixinextras-fabric:0.4.1")))
+    modImplementation "io.github.llamalad7:mixinextras-fabric:0.4.1"
+    annotationProcessor "io.github.llamalad7:mixinextras-common:0.4.1"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowBundle(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
@@ -59,6 +59,7 @@ shadowJar {
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowBundle]
+    relocate "com.llamalad7.mixinextras", "com.blackgear.platform.mixinextras.forge"
     archiveClassifier = "dev-shadow"
 }
 
