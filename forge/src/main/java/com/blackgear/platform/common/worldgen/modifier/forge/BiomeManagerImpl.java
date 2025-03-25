@@ -78,7 +78,7 @@ public class BiomeManagerImpl {
                 
                 @Override
                 public Biome biome() {
-                    return ForgeRegistries.BIOMES.getValue(name());
+                    return biome.value();
                 }
                 
                 @Override
