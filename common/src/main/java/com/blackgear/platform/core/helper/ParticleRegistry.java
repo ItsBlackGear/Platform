@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ParticleRegistry {
-    public final CoreRegistry<ParticleType<?>> particles;
+    private final CoreRegistry<ParticleType<?>> particles;
 
     private ParticleRegistry(String modId) {
         this.particles = CoreRegistry.create(BuiltInRegistries.PARTICLE_TYPE, modId);

@@ -7,10 +7,14 @@ import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,6 +25,7 @@ import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,6 +79,11 @@ public class GameRendering {
         throw new AssertionError();
     }
 
+    @ExpectPlatform
+    public static void registerParticleFactories(Consumer<ParticleFactoryEvent> listener) {
+        throw new AssertionError();
+    }
+
     public interface BlockColorEvent {
         void register(ItemColor color, ItemLike... items);
 
@@ -112,5 +122,16 @@ public class GameRendering {
         void registerSkullModel(SkullBlock.Type type, Function<ModelPart, SkullModelBase> model, ModelLayerLocation layer);
 
         void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture);
+    }
+
+    public interface ParticleFactoryEvent {
+        <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider);
+
+        <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory);
+
+        @FunctionalInterface
+        interface Factory<T extends ParticleOptions> {
+            @NotNull ParticleProvider<T> create(SpriteSet sprites);
+        }
     }
 }

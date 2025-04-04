@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.mixin.common;
 
-import com.blackgear.platform.common.IntegrationHandler;
+import com.blackgear.platform.common.integration.BlockIntegration;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,8 +17,8 @@ public class ShearsItemMixin {
         cancellable = true
     )
     private void platform$handleShearables(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> cir) {
-        if (IntegrationHandler.SHEARABLES.containsKey(state)) {
-            cir.setReturnValue(IntegrationHandler.SHEARABLES.getFloat(state));
+        if (BlockIntegration.SHEARABLES.containsKey(state)) {
+            cir.setReturnValue(BlockIntegration.SHEARABLES.getFloat(state));
         }
     }
 }

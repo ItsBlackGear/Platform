@@ -6,9 +6,12 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -17,12 +20,14 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class GameRenderingImpl {
     public static void registerBlockColors(Consumer<GameRendering.BlockColorEvent> listener) {
@@ -103,6 +108,24 @@ public class GameRenderingImpl {
                 }
             };
             listener.accept(skullEvent);
+        };
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+    }
+
+    public static void registerParticleFactories(Consumer<GameRendering.ParticleFactoryEvent> listener) {
+        Consumer<RegisterParticleProvidersEvent> consumer = event -> {
+            GameRendering.ParticleFactoryEvent factoryEvent = new GameRendering.ParticleFactoryEvent() {
+                @Override
+                public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider) {
+                    event.registerSpecial(type.get(), provider);
+                }
+
+                @Override
+                public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory) {
+                    event.registerSpriteSet(type.get(), factory::create);
+                }
+            };
+            listener.accept(factoryEvent);
         };
         FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
     }

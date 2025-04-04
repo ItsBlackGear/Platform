@@ -11,7 +11,6 @@
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",
     "common.ShearsItemMixin",
-    "common.SwordItemMixin",
     "config.ServerMainMixin"
   ],
   "client": [

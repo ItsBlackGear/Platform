@@ -4,6 +4,7 @@ import com.blackgear.platform.client.GameRendering;
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -13,7 +14,10 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -25,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class GameRenderingImpl {
     public static final Map<SkullBlock.Type, ResourceLocation> TEXTURE_BY_SKULL = new ConcurrentHashMap<>();
@@ -95,6 +100,21 @@ public class GameRenderingImpl {
             @Override
             public void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture) {
                 TEXTURE_BY_SKULL.put(type, texture);
+            }
+        };
+        listener.accept(event);
+    }
+
+    public static void registerParticleFactories(Consumer<GameRendering.ParticleFactoryEvent> listener) {
+        GameRendering.ParticleFactoryEvent event = new GameRendering.ParticleFactoryEvent() {
+            @Override
+            public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider) {
+                ParticleFactoryRegistry.getInstance().register(type.get(), provider);
+            }
+
+            @Override
+            public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory) {
+                ParticleFactoryRegistry.getInstance().register(type.get(), factory::create);
             }
         };
         listener.accept(event);

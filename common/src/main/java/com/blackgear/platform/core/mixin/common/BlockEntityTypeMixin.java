@@ -1,6 +1,8 @@
 package com.blackgear.platform.core.mixin.common;
 
+import net.minecraft.world.level.block.CeilingHangingSignBlock;
 import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.WallHangingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +21,10 @@ public class BlockEntityTypeMixin {
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     private void platform$isValid(BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (BlockEntityType.SIGN.equals(this) && (state.getBlock() instanceof SignBlock || state.getBlock() instanceof WallSignBlock)) {
+            cir.setReturnValue(true);
+        }
+
+        if (BlockEntityType.HANGING_SIGN.equals(this) && (state.getBlock() instanceof CeilingHangingSignBlock || state.getBlock() instanceof WallHangingSignBlock)) {
             cir.setReturnValue(true);
         }
     }

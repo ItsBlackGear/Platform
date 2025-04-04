@@ -11,6 +11,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@Deprecated(forRemoval = true)
 public class EntityFactory {
     public static void registerSpawnPlacements(Consumer<EntityPlacementEvent> listener) {
         EntityPlacementEvent event = new EntityPlacementEvent() {
