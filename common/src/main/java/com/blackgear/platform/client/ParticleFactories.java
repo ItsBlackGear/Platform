@@ -1,5 +1,7 @@
 package com.blackgear.platform.client;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.ParticleOptions;
@@ -8,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 @Deprecated(forRemoval = true)
 public class ParticleFactories {
     public static <T extends ParticleOptions, P extends ParticleType<T>> void create(Supplier<P> type, ParticleProvider<T> provider) {

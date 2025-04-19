@@ -6,6 +6,7 @@
   "mixins": [
     "access.ActivityAccessor",
     "access.LevelResourceAccessor",
+    "access.PackRepositoryAccessor",
     "access.SensorTypeAccessor",
     "access.SimpleParticleTypeAccessor",
     "common.BlockEntityTypeMixin",

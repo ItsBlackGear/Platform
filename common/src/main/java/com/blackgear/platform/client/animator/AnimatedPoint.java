@@ -1,10 +1,13 @@
 package com.blackgear.platform.client.animator;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.animation.AnimationChannel;
 import org.joml.Vector3f;
 
 import java.util.function.Function;
 
+@Environment(EnvType.CLIENT)
 public class AnimatedPoint {
     private final AnimationChannel.Target target;
     private final Function<Float, Float> x;

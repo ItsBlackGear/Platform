@@ -5,6 +5,7 @@ import com.blackgear.platform.common.integration.BlockIntegration;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -29,7 +30,7 @@ public class BlockIntegrationImpl {
 
             @Override
             public void registerFuelItem(ItemLike item, int burnTime) {
-                bus.addListener((FurnaceFuelBurnTimeEvent event) -> {
+                MinecraftForge.EVENT_BUS.addListener((FurnaceFuelBurnTimeEvent event) -> {
                     if (event.getItemStack().is(item.asItem())) {
                         event.setBurnTime(burnTime);
                     }

@@ -13,34 +13,34 @@ import net.minecraft.world.entity.player.Player;
 public class PacketRegistryImpl {
     public static void registerChannel(ResourceLocation channel, int version) { }
 
-    public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
+    public static <T extends Packet<T>> void registerClientbound(ResourceLocation name, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
         if (Environment.isClientSide()) {
-            ClientPacketRegistry.registerS2CPacket(channelPath(channel, id), handler);
+            ClientPacketRegistry.registerClientbound(createChannel(name, id), handler);
         }
     }
 
-    public static <T extends Packet<T>> void registerC2SPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
-        ServerPlayNetworking.registerGlobalReceiver(channelPath(channel, id), (server, player, handler1, buf, responseSender) -> {
+    public static <T extends Packet<T>> void registerServerbound(ResourceLocation name, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
+        ServerPlayNetworking.registerGlobalReceiver(createChannel(name, id), (server, player, handler1, buf, sender) -> {
             T decode = handler.decode(buf);
             server.execute(() -> handler.handle(decode).apply(player, player.level()));
         });
     }
 
-    public static <T extends Packet<T>> void sendToServer(ResourceLocation channel, T packet) {
+    public static <T extends Packet<T>> void sendToServer(ResourceLocation name, T packet) {
         if (Environment.isClientSide()) {
-            ClientPacketRegistry.sendToServer(channelPath(channel, packet.getId()), packet);
+            ClientPacketRegistry.sendToServer(createChannel(name, packet.getId()), packet);
         }
     }
 
-    public static <T extends Packet<T>> void sendToPlayer(ResourceLocation channel, T packet, Player player) {
+    public static <T extends Packet<T>> void sendToPlayer(ResourceLocation name, T packet, Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
             FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
             packet.getHandler().encode(packet, buf);
-            ServerPlayNetworking.send(serverPlayer, channelPath(channel, packet.getId()), buf);
+            ServerPlayNetworking.send(serverPlayer, createChannel(name, packet.getId()), buf);
         }
     }
 
-    private static ResourceLocation channelPath(ResourceLocation channel, ResourceLocation id) {
+    private static ResourceLocation createChannel(ResourceLocation channel, ResourceLocation id) {
         return new ResourceLocation(channel.getNamespace(), channel.getPath() + "/" + id.getNamespace() + "/" + id.getPath());
     }
 }

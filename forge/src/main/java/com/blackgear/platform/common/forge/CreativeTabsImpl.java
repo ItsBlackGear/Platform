@@ -1,24 +1,16 @@
 package com.blackgear.platform.common.forge;
 
-import com.blackgear.platform.Platform;
 import com.blackgear.platform.common.CreativeTabs;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-@Mod.EventBusSubscriber(
-    modid = Platform.MOD_ID,
-    value = Dist.CLIENT,
-    bus = Mod.EventBusSubscriber.Bus.MOD
-)
 public class CreativeTabsImpl {
     private static final Set<Consumer<BuildCreativeModeTabContentsEvent>> MODIFICATIONS = ConcurrentHashMap.newKeySet();
     

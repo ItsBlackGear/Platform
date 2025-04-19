@@ -22,10 +22,10 @@ public class NetworkChannel {
     }
 
     public <T extends Packet<T>> void registerPacket(NetworkDirection direction, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
-        if (direction == NetworkDirection.C2S) {
-            PacketRegistry.registerC2SPacket(this.channel, id, handler, packet);
+        if (direction == NetworkDirection.TO_SERVER) {
+            PacketRegistry.registerServerbound(this.channel, id, handler, packet);
         } else {
-            PacketRegistry.registerS2CPacket(this.channel, id, handler, packet);
+            PacketRegistry.registerClientbound(this.channel, id, handler, packet);
         }
     }
 
@@ -52,8 +52,7 @@ public class NetworkChannel {
     public <T extends Packet<T>> void sendToAllLoadedPlayers(T packet, Level level, BlockPos pos) {
         LevelChunk chunk = level.getChunkAt(pos);
         if (level.getChunkSource() instanceof ServerChunkCache cache) {
-            cache.chunkMap.getPlayers(chunk.getPos(), false)
-                .forEach(player -> sendToPlayer(packet, player));
+            cache.chunkMap.getPlayers(chunk.getPos(), false).forEach(player -> sendToPlayer(packet, player));
         }
     }
 

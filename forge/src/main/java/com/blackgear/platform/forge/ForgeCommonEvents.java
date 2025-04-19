@@ -3,9 +3,7 @@ package com.blackgear.platform.forge;
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.common.events.EntityEvents;
 import com.blackgear.platform.core.events.DatapackSyncEvents;
-import com.blackgear.platform.core.network.MessageHandler;
 import com.blackgear.platform.core.network.listener.ServerListenerEvents;
-import com.blackgear.platform.core.network.packet.NetworkPacketWrapper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -25,7 +23,6 @@ public class ForgeCommonEvents {
         if (!event.getEntity().level().isClientSide) {
             ServerListenerEvents.JOIN.invoker().listener(
                 ((ServerPlayer) event.getEntity()).connection,
-                (id, data) -> MessageHandler.DEFAULT_CHANNEL.sendToPlayer(new NetworkPacketWrapper(id, data), event.getEntity()),
                 event.getEntity().getServer()
             );
         }

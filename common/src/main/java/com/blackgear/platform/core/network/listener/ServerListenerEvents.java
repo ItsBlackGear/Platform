@@ -7,5 +7,5 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 public interface ServerListenerEvents {
     Event<ServerListenerEvents> JOIN = Event.create(ServerListenerEvents.class);
 
-    void listener(ServerGamePacketListenerImpl connection, PacketSender sender, MinecraftServer player);
+    void listener(ServerGamePacketListenerImpl connection, MinecraftServer player);
 }

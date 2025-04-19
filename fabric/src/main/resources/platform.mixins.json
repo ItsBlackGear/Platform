@@ -6,6 +6,7 @@
   "mixins": [
     "LivingDeathMixin",
     "LivingEntityMixin",
+    "PackRepositoryMixin",
     "PlayerAttackMixin",
     "ServerLevelMixin"
   ],

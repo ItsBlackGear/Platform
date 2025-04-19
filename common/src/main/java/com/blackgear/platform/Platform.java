@@ -2,6 +2,7 @@ package com.blackgear.platform;
 
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
+import com.blackgear.platform.core.network.MessageHandler;
 import com.blackgear.platform.core.util.config.ConfigLoader;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +16,7 @@ public class Platform {
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
 
+		MessageHandler.bootstrap();
 		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
 	}

@@ -1,6 +1,8 @@
 package com.blackgear.platform.client;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.SkullModelBase;
@@ -33,6 +35,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class GameRendering {
     public static final Map<Item, ModelResourceLocation> HAND_HELD_MODELS = new ConcurrentHashMap<>();
 
