@@ -5,6 +5,7 @@ import com.blackgear.platform.core.util.config.*;
 import com.blackgear.platform.fabric.PlatformFabric;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.thread.BlockableEventLoop;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,6 +17,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class EnvironmentImpl {
+    private static final Supplier<Supplier<BlockableEventLoop<?>>> CLIENT_EXECUTOR = () -> Minecraft::getInstance;
+
     public static boolean isClientSide() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
@@ -43,18 +46,9 @@ public class EnvironmentImpl {
 
     public static BlockableEventLoop<?> getGameExecutor() {
         if (Environment.isClientSide()) {
-            try {
-                // Use the client-only executor via reflection to avoid class loading on server
-                Class<?> clazz = Class.forName("com.blackgear.platform.core.fabric.ClientEnvironmentImpl");
-                java.lang.reflect.Field field = clazz.getField("CLIENT_EXECUTOR");
-                @SuppressWarnings("unchecked")
-                java.util.function.Supplier<BlockableEventLoop<?>> supplier = (java.util.function.Supplier<BlockableEventLoop<?>>) field.get(null);
-                return supplier.get();
-            } catch (Exception exception) {
-                throw new IllegalStateException("Failed to get client executor", exception);
-            }
+            return CLIENT_EXECUTOR.get().get();
         } else {
-            return Environment.getCurrentServer().orElseThrow(() -> new IllegalStateException("No server executor available"));
+            return Environment.getCurrentServer().orElseThrow(() -> new IllegalStateException("No server available"));
         }
     }
 

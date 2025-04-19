@@ -1,12 +1,12 @@
 package com.blackgear.platform.core.util.config;
 
-import com.blackgear.platform.Platform;
 import com.blackgear.platform.core.events.ServerLifecycleEvents;
 import com.blackgear.platform.core.mixin.access.LevelResourceAccessor;
+import com.blackgear.platform.core.network.MessageHandler;
 import com.blackgear.platform.core.network.listener.ServerListenerEvents;
+import com.blackgear.platform.core.network.packet.ConfigSyncPacket;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
@@ -21,7 +21,6 @@ import java.nio.file.Path;
 public class ConfigLoader {
     public static final Logger LOGGER = LogManager.getLogger();
     static final LevelResource SERVERCONFIG = LevelResourceAccessor.createLevelResource("serverconfig");
-    public static final ResourceLocation CONFIG_SYNC = new ResourceLocation(Platform.MOD_ID, "config_sync");
 
     private static Path getServerConfigPath(MinecraftServer server) {
         Path config = server.getWorldPath(SERVERCONFIG);
@@ -33,7 +32,7 @@ public class ConfigLoader {
         ServerLifecycleEvents.STARTING.register(server -> ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server)));
         ServerLifecycleEvents.STOPPING.register(server -> ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server)));
 
-        ServerListenerEvents.JOIN.register((handler, sender, server) -> {
+        ServerListenerEvents.JOIN.register((handler, server) -> {
             ServerPlayer player = handler.player;
             if (server.isSingleplayerOwner(player.getGameProfile())) return;
 
@@ -45,7 +44,7 @@ public class ConfigLoader {
                     FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
                     buf.writeUtf(name);
                     buf.writeByteArray(data);
-                    sender.sendPacket(CONFIG_SYNC, buf);
+                    MessageHandler.DEFAULT_CHANNEL.sendToPlayer(new ConfigSyncPacket(name, data), player);
                 } catch (IOException exception) {
                     throw new RuntimeException(exception);
                 }

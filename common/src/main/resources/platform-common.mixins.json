@@ -7,6 +7,7 @@
     "access.ActivityAccessor",
     "access.LevelResourceAccessor",
     "access.MemoryModuleTypeAccessor",
+    "access.PackRepositoryAccessor",
     "access.SensorTypeAccessor",
     "access.SimpleParticleTypeAccessor",
     "common.BlockEntityTypeMixin",
@@ -17,12 +18,12 @@
     "config.ServerMainMixin"
   ],
   "client": [
-    "client.AbstractClientPlayerMixin",
-    "client.ItemRendererMixin",
-    "client.MinecraftMixin",
     "access.CameraAccessor",
     "access.ItemPropertiesAccessor",
-    "access.NearPlaneAccessor"
+    "access.NearPlaneAccessor",
+    "client.AbstractClientPlayerMixin",
+    "client.ItemRendererMixin",
+    "client.MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

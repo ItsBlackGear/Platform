@@ -15,16 +15,16 @@ public class PacketRegistry {
     }
 
     @ExpectPlatform
-    public static <T extends Packet<T>> void registerS2CPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
+    public static <T extends Packet<T>> void registerClientbound(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static <T extends Packet<T>> void registerC2SPacket(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
+    public static <T extends Packet<T>> void registerServerbound(ResourceLocation channel, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
         throw new AssertionError();
     }
 
-    @ExpectPlatform @Environment(EnvType.CLIENT)
+    @ExpectPlatform
     public static <T extends Packet<T>> void sendToServer(ResourceLocation id, T packet) {
         throw new AssertionError();
     }

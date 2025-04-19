@@ -1,20 +1,21 @@
 package com.blackgear.platform.common.block.fabric;
 
-import com.blackgear.platform.core.Environment;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.properties.WoodType;
 
 public class WoodTypeRegistryImpl {
     public static WoodType create(ResourceLocation location) {
-        WoodType type = WoodType.register(new WoodTypeImpl(location));
-        if (Environment.isClientSide()) {
-            Sheets.SIGN_MATERIALS.put(type, Sheets.createSignMaterial(type));
-        }
-        
-        return type;
+        return WoodType.register(new WoodTypeImpl(location));
     }
-    
+
+    @Environment(EnvType.CLIENT)
+    public static void registerWoodType(WoodType type) {
+        Sheets.SIGN_MATERIALS.put(type, Sheets.createSignMaterial(type));
+    }
+
     public static class WoodTypeImpl extends WoodType {
         private final ResourceLocation location;
         

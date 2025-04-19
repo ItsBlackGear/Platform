@@ -1,6 +1,6 @@
 package com.blackgear.platform.core.mixin.common;
 
-import com.blackgear.platform.common.IntegrationHandler;
+import com.blackgear.platform.common.integration.BlockIntegration;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,8 +17,8 @@ public class SwordItemMixin {
         cancellable = true
     )
     private void platform$handleSwordables(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> cir) {
-        if (IntegrationHandler.SWORDABLES.containsKey(state)) {
-            cir.setReturnValue(IntegrationHandler.SWORDABLES.getFloat(state));
+        if (BlockIntegration.SWORDABLES.containsKey(state)) {
+            cir.setReturnValue(BlockIntegration.SWORDABLES.getFloat(state));
         }
     }
 }

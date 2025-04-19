@@ -16,9 +16,8 @@ public class Platform {
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
 
-		ConfigLoader.bootstrap();
 		MessageHandler.bootstrap();
-
+		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
 	}
 

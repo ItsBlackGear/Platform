@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ParticleRegistry {
-    public final CoreRegistry<ParticleType<?>> particles;
+    private final CoreRegistry<ParticleType<?>> particles;
 
     private ParticleRegistry(String modId) {
         this.particles = CoreRegistry.create(Registry.PARTICLE_TYPE, modId);
@@ -36,7 +36,7 @@ public class ParticleRegistry {
         ParticleOptions.Deserializer<T> deserializer,
         Function<ParticleType<T>, Codec<T>> factory
     ) {
-        return this.particles.register(name, () -> new ParticleType<T>(overrideLimiter, deserializer) {
+        return this.particles.register(name, () -> new ParticleType<>(overrideLimiter, deserializer) {
             @Override public Codec<T> codec() {
                 return factory.apply(this);
             }

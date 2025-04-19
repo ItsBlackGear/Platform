@@ -1,17 +1,18 @@
 package com.blackgear.platform.common.block.forge;
 
-import com.blackgear.platform.core.Environment;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class WoodTypeRegistryImpl {
     public static WoodType create(ResourceLocation location) {
-        WoodType type = WoodType.register(WoodType.create(location.toString()));
-        if (Environment.isClientSide()) {
-            Sheets.addWoodType(type);
-        }
-        
-        return type;
+        return WoodType.register(WoodType.create(location.toString()));
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void registerWoodType(WoodType type) {
+        Sheets.addWoodType(type);
     }
 }

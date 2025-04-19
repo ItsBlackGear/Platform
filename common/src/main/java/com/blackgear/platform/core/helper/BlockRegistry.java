@@ -1,11 +1,15 @@
 package com.blackgear.platform.core.helper;
 
 import com.blackgear.platform.core.CoreRegistry;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -90,6 +94,30 @@ public class BlockRegistry {
 
     public Supplier<Block> registerNoItem(String name, Supplier<Block> block) {
         return this.blocks.register(name, block);
+    }
+
+    public Supplier<Item> registerItem(String name, Supplier<Item> item) {
+        return this.items.register(name, item);
+    }
+
+    public boolean never(BlockState state, BlockGetter level, BlockPos pos, EntityType<?> entity) {
+        return false;
+    }
+
+    public boolean always(BlockState state, BlockGetter level, BlockPos pos, EntityType<?> entity) {
+        return true;
+    }
+
+    public boolean ocelotOrParrot(BlockState state, BlockGetter level, BlockPos pos, EntityType<?> entity) {
+        return entity == EntityType.OCELOT || entity == EntityType.PARROT;
+    }
+
+    public boolean always(BlockState state, BlockGetter level, BlockPos pos) {
+        return true;
+    }
+
+    public boolean never(BlockState state, BlockGetter level, BlockPos pos) {
+        return false;
     }
 
     public void register() {

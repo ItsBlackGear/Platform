@@ -4,6 +4,8 @@ import com.blackgear.platform.core.mixin.access.CameraAccessor;
 import com.blackgear.platform.core.mixin.access.NearPlaneAccessor;
 import com.blackgear.platform.core.util.event.Event;
 import com.mojang.blaze3d.shaders.FogShape;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.GameRenderer;
@@ -15,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.Arrays;
 
+@Environment(EnvType.CLIENT)
 public class FogRenderEvents {
     public static final Event<FogColor> FOG_COLOR = Event.create(FogColor.class);
     public static final Event<FogRendering> FOG_RENDERING = Event.create(FogRendering.class);
