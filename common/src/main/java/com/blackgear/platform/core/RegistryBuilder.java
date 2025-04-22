@@ -1,11 +1,11 @@
 package com.blackgear.platform.core;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
-
 
 /**
  * Utility class to help register custom registries.
@@ -40,7 +40,7 @@ public record RegistryBuilder(String modId) {
      * @return a ResourceKey for the registry
      */
     public <T> ResourceKey<Registry<T>> resource(String name) {
-        return ResourceKey.createRegistryKey(new ResourceLocation(this.modId, name));
+        return ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(this.modId, name));
     }
 
     /**
@@ -50,8 +50,8 @@ public record RegistryBuilder(String modId) {
      * @param bootstrap the bootstrap function
      * @return the created registry
      */
-    public <T> Registry<T> registry(ResourceKey<Registry<T>> key, Registry.RegistryBootstrap<T> bootstrap) {
-        return Registry.registerSimple(key, bootstrap);
+    public <T> Registry<T> registry(ResourceKey<Registry<T>> key, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
+        return BuiltInRegistries.registerSimple(key, bootstrap);
     }
 
     /**
@@ -63,8 +63,8 @@ public record RegistryBuilder(String modId) {
      * @return a RegistryReference containing the registry key and registry
      * @throws NullPointerException if key or bootstrap is null
      */
-    public <T> RegistryReference<T> create(String name, Registry.RegistryBootstrap<T> bootstrap) {
-        Objects.requireNonNull(name, "Registry key cannot be null");
+    public <T> RegistryReference<T> create(String name, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
+        Objects.requireNonNull(name, "Registry name cannot be null");
         Objects.requireNonNull(bootstrap, "Bootstrap function cannot be null");
 
         ResourceKey<Registry<T>> resource = resource(name);

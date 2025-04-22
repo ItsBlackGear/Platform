@@ -29,7 +29,7 @@ public class FogRenderEvents {
             
             for (Vec3 vector : Arrays.asList(((NearPlaneAccessor) plane).getForward(), plane.getTopLeft(), plane.getTopRight(), plane.getBottomLeft(), plane.getBottomRight())) {
                 Vec3 position = camera.getPosition().add(vector);
-                return access.getLevel().getBlockState(new BlockPos(position));
+                return access.getLevel().getBlockState(BlockPos.containing(position));
             }
         }
         

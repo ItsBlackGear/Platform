@@ -1,11 +1,16 @@
 plugins {
-    id 'dev.architectury.loom' version '1.7-SNAPSHOT' apply false
+    id 'dev.architectury.loom' version '1.9-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
 architectury {
-    minecraft = rootProject.minecraft_version
+    minecraft = project.minecraft_version
+}
+
+allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
 }
 
 subprojects {
@@ -22,12 +27,7 @@ subprojects {
     repositories {
         mavenCentral()
         maven { url "https://maven.parchmentmc.org" }
-        maven { url "https://maven.gegy.dev" }
         maven { url "https://cursemaven.com" }
-        maven {
-            url "https://maven.jamieswhiteshirt.com/libs-release"
-            content { includeGroup "com.jamieswhiteshirt" }
-        }
         flatDir { dirs "/libs" }
     }
 
@@ -36,7 +36,7 @@ subprojects {
     }
 
     dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
 
         mappings loom.layered() {
             officialMojangMappings()
@@ -49,10 +49,13 @@ subprojects {
         // if it is present.
         // If you remove this line, sources will not be generated.
         withSourcesJar()
+
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = 17
+        it.options.release = 21
     }
 
     // Configure Maven publishing.

@@ -2,7 +2,7 @@ package com.blackgear.platform.core.helper;
 
 import com.blackgear.platform.core.CoreRegistry;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.Item;
@@ -15,7 +15,7 @@ public class ItemRegistry {
     private final CoreRegistry<Item> items;
 
     private ItemRegistry(String modId) {
-        this.items = CoreRegistry.create(Registry.ITEM, modId);
+        this.items = CoreRegistry.create(BuiltInRegistries.ITEM, modId);
     }
 
     public static ItemRegistry create(String modId) {

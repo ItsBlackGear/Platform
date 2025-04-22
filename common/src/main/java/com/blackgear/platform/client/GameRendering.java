@@ -112,9 +112,9 @@ public class GameRendering {
     }
 
     public interface SpecialModelEvent {
-        void register(ResourceLocation model);
+        void register(ModelResourceLocation model);
 
-        void register(ResourceLocation... models);
+        void register(ModelResourceLocation... models);
     }
 
     public interface HandHeldModelEvent {

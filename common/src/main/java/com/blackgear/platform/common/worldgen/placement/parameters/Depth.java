@@ -7,7 +7,7 @@ public enum Depth {
     SURFACE(Parameter.point(0.0F)),
     UNDERGROUND(Parameter.span(0.2F, 0.9F)),
     FLOOR(Parameter.point(1.0F)),
-    FULL_RANGE(Parameter.span(-1.0F, 1.0F)),;
+    FULL_RANGE(Parameter.span(-1.0F, 1.0F));
     
     private final Parameter parameter;
     

@@ -179,7 +179,7 @@ public class SimpleConfigBuilder implements ConfigBuilder {
             this.levelTranslationKeys.put(new ArrayList<>(currentPath), this.context.getTranslationKey());
             this.context.setTranslationKey(null);
         }
-        
+
         this.context.ensureEmpty();
         return this;
     }

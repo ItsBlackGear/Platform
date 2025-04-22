@@ -11,12 +11,13 @@ public class FabricClientEvents {
     public static void bootstrap() {
         renderHudEvent();
     }
-    
+
     private static void renderHudEvent() {
-        HudRenderCallback.EVENT.register((matrices, tickDelta) -> {
+        HudRenderCallback.EVENT.register((matrices, deltaTracker) -> {
+            float tickDelta = deltaTracker.getGameTimeDeltaTicks();
             Minecraft minecraft = Minecraft.getInstance();
             HudRenderEvent.RenderContext context = new HudRenderEvent.RenderContext() {};
-            
+
             if (Minecraft.useFancyGraphics()) {
                 HudRenderEvent.RENDER_HUD.invoker().render(matrices, tickDelta, HudRenderEvent.ElementType.VIGNETTE, context);
             }

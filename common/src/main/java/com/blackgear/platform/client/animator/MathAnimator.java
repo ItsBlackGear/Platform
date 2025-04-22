@@ -1,16 +1,11 @@
 package com.blackgear.platform.client.animator;
 
-import com.blackgear.platform.client.animator.base.AnimatedChannel;
-import com.blackgear.platform.client.animator.base.AnimatedModel;
-import com.blackgear.platform.client.animator.base.AnimatedPoint;
 import com.google.common.collect.Maps;
-import com.mojang.math.Vector3f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.phys.Vec3;
-import org.apache.commons.compress.utils.Lists;
+import org.joml.Vector3f;
 
 import java.util.*;
 

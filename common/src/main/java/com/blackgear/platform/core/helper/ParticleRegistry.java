@@ -3,10 +3,13 @@ package com.blackgear.platform.core.helper;
 import com.blackgear.platform.core.CoreRegistry;
 import com.blackgear.platform.core.mixin.access.SimpleParticleTypeAccessor;
 import com.mojang.serialization.Codec;
-import net.minecraft.core.Registry;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -15,7 +18,7 @@ public class ParticleRegistry {
     private final CoreRegistry<ParticleType<?>> particles;
 
     private ParticleRegistry(String modId) {
-        this.particles = CoreRegistry.create(Registry.PARTICLE_TYPE, modId);
+        this.particles = CoreRegistry.create(BuiltInRegistries.PARTICLE_TYPE, modId);
     }
 
     public static ParticleRegistry create(String modId) {
@@ -33,11 +36,17 @@ public class ParticleRegistry {
     public <T extends ParticleOptions> Supplier<ParticleType<T>> register(
         String name,
         boolean overrideLimiter,
-        ParticleOptions.Deserializer<T> deserializer,
-        Function<ParticleType<T>, Codec<T>> factory
+        Function<ParticleType<T>, MapCodec<T>> deserializer,
+        Function<ParticleType<T>, StreamCodec<? super RegistryFriendlyByteBuf, T>> factory
     ) {
-        return this.particles.register(name, () -> new ParticleType<>(overrideLimiter, deserializer) {
-            @Override public Codec<T> codec() {
+        return this.particles.register(name, () -> new ParticleType<T>(overrideLimiter) {
+            @Override
+            public MapCodec<T> codec() {
+                return deserializer.apply(this);
+            }
+
+            @Override
+            public StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec() {
                 return factory.apply(this);
             }
         });

@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "platform",
   "version": "${version}",
-
   "name": "Platform",
   "description": "Cross-Platform library mod based on Architectury to access both Forge and Fabric APIs",
   "authors": [
@@ -27,7 +26,9 @@
     "platform-common.mixins.json"
   ],
   "depends": {
-    "fabricloader": "*",
-    "minecraft": ">=1.19.2"
+    "fabricloader": ">=0.16.12",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
   }
 }

@@ -39,7 +39,7 @@ public class ConfigTracker implements IConfigTracker {
         this.configsByMod.computeIfAbsent(config.getModId(), (k) -> new EnumMap<>(ModConfig.Type.class)).put(config.getType(), config);
         LOGGER.debug(CONFIG, "Config file {} for {} tracking", config.getFileName(), config.getModId());
     }
-
+    
     public void loadConfigs(ModConfig.Type type, Path configBasePath) {
         LOGGER.debug(CONFIG, "Loading configs type {}", type);
         this.configSets.get(type).forEach(config -> openConfig(config, configBasePath));
@@ -57,7 +57,7 @@ public class ConfigTracker implements IConfigTracker {
         ConfigEvents.LOADING.invoker().onModConfig(config);
         config.save();
     }
-
+    
     private void closeConfig(final ModConfig config, final Path configBasePath) {
         if (config.getConfigData() != null) {
             LOGGER.trace(CONFIG, "Closing config file type {} at {} for {}", config.getType(), config.getFileName(), config.getModId());

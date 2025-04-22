@@ -33,7 +33,7 @@ public class ResourcePackManagerImpl {
         if (minecraft.getResourcePackRepository() instanceof PackRepositoryAccessor repository) {
             Set<RepositorySource> sources = new HashSet<>(repository.getSources());
             getAdditionalPacks(PackType.CLIENT_RESOURCES)
-                .forEach(pack -> sources.add((onLoad, factory) -> onLoad.accept(pack.get())));
+                .forEach(pack -> sources.add(onLoad -> onLoad.accept(pack.get())));
             repository.setSources(sources);
         }
     }

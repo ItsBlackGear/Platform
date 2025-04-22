@@ -63,7 +63,7 @@ public abstract class CoreRegistry<T> {
      */
     public <E extends T> ResourceKey<T> resource(String name, Supplier<E> entry) {
         this.register(name, entry);
-        return ResourceKey.create(this.key(), new ResourceLocation(this.modId, name));
+        return ResourceKey.create(this.key(), ResourceLocation.fromNamespaceAndPath(this.modId, name));
     }
 
     /**

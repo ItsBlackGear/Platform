@@ -2,7 +2,8 @@ package com.blackgear.platform;
 
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
-import com.blackgear.platform.core.network.MessageHandler;
+import com.blackgear.platform.core.networking.ConfigSyncPayload;
+import com.blackgear.platform.core.networking.Networking;
 import com.blackgear.platform.core.util.config.ConfigLoader;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -16,12 +17,15 @@ public class Platform {
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
 
-		MessageHandler.bootstrap();
+		Networking.register(registrar -> {
+			registrar.registerToServer(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC, ConfigSyncPayload::handler);
+		});
+
 		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
 	}
 
 	public static ResourceLocation resource(String path) {
-		return new ResourceLocation(MOD_ID, path);
+		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
 	}
 }

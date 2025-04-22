@@ -1,7 +1,7 @@
 package com.blackgear.platform.common.integration.fabric;
 
-import com.blackgear.platform.common.integration.VillagerLevel;
 import com.blackgear.platform.common.integration.TradeIntegration;
+import com.blackgear.platform.common.integration.VillagerLevel;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerTrades;

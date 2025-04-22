@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 public interface EntityEvents {
     Event<LivingSpawn> ON_SPAWN = Event.create(LivingSpawn.class, events -> (entity, level) -> Arrays.stream(events).allMatch(event -> event.onSpawn(entity, level)));
-    Event<LivingAttack> ON_ATTACK = Event.create(LivingAttack.class, events -> (entity, source, amount) -> Arrays.stream(events).allMatch(event -> event.onAttack(entity, source, amount)));
+    Event<LivingAttack> ON_ATTACK = Event.create(LivingAttack.class, events -> (entity, source) -> Arrays.stream(events).allMatch(event -> event.onAttack(entity, source)));
     Event<LivingDeath> ON_DEATH = Event.create(LivingDeath.class, events -> (entity, source) -> Arrays.stream(events).allMatch(event -> event.onDeath(entity, source)));
     Event<EntityPickUp> ON_PICK = Event.create(EntityPickUp.class);
 
@@ -20,7 +20,7 @@ public interface EntityEvents {
     }
 
     interface LivingAttack {
-        boolean onAttack(Entity entity, DamageSource source, float amount);
+        boolean onAttack(Entity entity, DamageSource source);
     }
 
     interface LivingDeath {

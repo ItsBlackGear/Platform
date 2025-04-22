@@ -66,7 +66,7 @@ public class WorldGenSerialization {
 
         private final Codec<T> codec;
         private final Map<T, Optional<JsonElement>> cache;
-        private final AtomicInteger requestCount = new AtomicInteger(0);
+        private final AtomicInteger requestCount = new AtomicInteger();
 
         private CodecCache(Codec<T> codec, Map<T, Optional<JsonElement>> backing) {
             this.codec = codec;

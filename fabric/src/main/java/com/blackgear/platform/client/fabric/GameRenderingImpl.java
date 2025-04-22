@@ -3,12 +3,12 @@ package com.blackgear.platform.client.fabric;
 import com.blackgear.platform.client.GameRendering;
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.impl.client.model.ModelLoadingRegistryImpl;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.SkullModelBase;
@@ -16,6 +16,7 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
@@ -75,16 +76,15 @@ public class GameRenderingImpl {
         listener.accept((layer, definition) -> EntityModelLayerRegistry.registerModelLayer(layer, definition::get));
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
         GameRendering.SpecialModelEvent event = new GameRendering.SpecialModelEvent() {
             @Override
-            public void register(ResourceLocation model) {
-                ModelLoadingRegistryImpl.INSTANCE.registerModelProvider((manager, loader) -> loader.accept(model));
+            public void register(ModelResourceLocation model) {
+                ModelLoadingPlugin.register(context -> context.addModels(model.id()));
             }
 
             @Override
-            public void register(ResourceLocation... models) {
+            public void register(ModelResourceLocation... models) {
                 Arrays.stream(models).forEach(this::register);
             }
         };

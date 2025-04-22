@@ -8,6 +8,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -18,9 +19,9 @@ public class HudRenderEvent {
     
     @FunctionalInterface
     public interface RenderHud {
-        void render(PoseStack matrices, float tickDelta, ElementType type, RenderContext context);
+        void render(GuiGraphics matrices, float tickDelta, ElementType type, RenderContext context);
     }
-    
+
     public interface RenderContext {
         default Window window() {
             return this.minecraft().getWindow();
@@ -54,19 +55,18 @@ public class HudRenderEvent {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
             RenderSystem.setShaderTexture(0, texture);
             Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferBuilder = tesselator.getBuilder();
-            bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-            bufferBuilder.vertex(0.0, this.screenHeight(), -90.0).uv(0.0F, 1.0F).endVertex();
-            bufferBuilder.vertex(this.screenWidth(), this.screenHeight(), -90.0).uv(1.0F, 1.0F).endVertex();
-            bufferBuilder.vertex(this.screenWidth(), 0.0, -90.0).uv(1.0F, 0.0F).endVertex();
-            bufferBuilder.vertex(0.0, 0.0, -90.0).uv(0.0F, 0.0F).endVertex();
-            tesselator.end();
+            BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+            bufferBuilder.addVertex(0.0F, this.screenHeight(), -90.0F).setUv(0.0F, 1.0F);
+            bufferBuilder.addVertex(this.screenWidth(), this.screenHeight(), -90.0F).setUv(.0F, 1.0F);
+            bufferBuilder.addVertex(this.screenWidth(), 0.0F, -90.0F).setUv(1.0F, 0.0F);
+            bufferBuilder.addVertex(0.0F, 0.0F, -90.0F).setUv(0.0F, 0.0F);
+            BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
             RenderSystem.depthMask(true);
             RenderSystem.enableDepthTest();
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
-    
+
     public enum ElementType {
         DEFAULT, HEALTH, EXPERIENCE, FIRST_PERSON, VIGNETTE
     }

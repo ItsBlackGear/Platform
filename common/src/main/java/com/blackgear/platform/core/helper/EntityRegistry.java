@@ -4,7 +4,7 @@ import com.blackgear.platform.core.CoreRegistry;
 import com.blackgear.platform.core.mixin.access.ActivityAccessor;
 import com.blackgear.platform.core.mixin.access.SensorTypeAccessor;
 import com.mojang.serialization.Codec;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -26,10 +26,10 @@ public class EntityRegistry {
     }
 
     private EntityRegistry(String modId) {
-        this.entities = CoreRegistry.create(Registry.ENTITY_TYPE, modId);
-        this.activities = CoreRegistry.create(Registry.ACTIVITY, modId);
-        this.sensors = CoreRegistry.create(Registry.SENSOR_TYPE, modId);
-        this.memories = CoreRegistry.create(Registry.MEMORY_MODULE_TYPE, modId);
+        this.entities = CoreRegistry.create(BuiltInRegistries.ENTITY_TYPE, modId);
+        this.activities = CoreRegistry.create(BuiltInRegistries.ACTIVITY, modId);
+        this.sensors = CoreRegistry.create(BuiltInRegistries.SENSOR_TYPE, modId);
+        this.memories = CoreRegistry.create(BuiltInRegistries.MEMORY_MODULE_TYPE, modId);
     }
 
     public <T extends Entity> Supplier<EntityType<T>> entity(String name, EntityType.Builder<T> entity) {

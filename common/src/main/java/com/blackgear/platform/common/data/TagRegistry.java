@@ -19,7 +19,7 @@ public class TagRegistry<T> {
     }
     
     public TagKey<T> register(String key) {
-        return TagKey.create(this.registry, new ResourceLocation(this.modId, key));
+        return TagKey.create(this.registry, ResourceLocation.fromNamespaceAndPath(this.modId, key));
     }
     
     public void register() {}

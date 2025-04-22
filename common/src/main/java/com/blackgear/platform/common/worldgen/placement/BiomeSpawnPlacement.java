@@ -12,8 +12,8 @@ import java.util.List;
 
 public class BiomeSpawnPlacement {
     public static final List<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> BIOME_ENTRIES = Lists.newArrayList();
-    
-    private static void add(Pair<Climate.ParameterPoint, ResourceKey<Biome>> mapper) {
+
+    public static void add(Pair<Climate.ParameterPoint, ResourceKey<Biome>> mapper) {
         BIOME_ENTRIES.add(mapper);
     }
 
@@ -27,9 +27,14 @@ public class BiomeSpawnPlacement {
         float offset,
         ResourceKey<Biome> key
     ) {
-        add(Pair.of(Climate.parameters(temperature, humidity, continentalness, erosion, depth, weirdness, offset), key));
+        add(
+            Pair.of(
+                Climate.parameters(temperature, humidity, continentalness, erosion, depth, weirdness, offset),
+                key
+            )
+        );
     }
-    
+
     public static void addSurfaceBiome(
         Climate.Parameter temperature,
         Climate.Parameter humidity,
@@ -42,7 +47,7 @@ public class BiomeSpawnPlacement {
         addBiome(temperature, humidity, continentalness, erosion, Depth.SURFACE.parameter(), weirdness, offset, key);
         addBiome(temperature, humidity, continentalness, erosion, Depth.FLOOR.parameter(), weirdness, offset, key);
     }
-    
+
     public static void addUndergroundBiome(
         Climate.Parameter temperature,
         Climate.Parameter humidity,
@@ -64,9 +69,9 @@ public class BiomeSpawnPlacement {
         float offset,
         ResourceKey<Biome> key
     ) {
-        addBiome(temperature, humidity, continentalness, erosion, Depth.UNDERGROUND.parameter(), weirdness, offset, key);
+        addBiome(temperature, humidity, continentalness, erosion, Depth.FLOOR.parameter(), weirdness, offset, key);
     }
-    
+
     public static void addSurfaceBiome(
         Placement placement,
         Climate.Parameter temperature,

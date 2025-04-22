@@ -18,7 +18,7 @@ public class ItemPropertyRegistryImpl {
     }
     
     public static void registerCustomModelData(ItemPropertyFunction property) {
-        ItemPropertiesAccessor.callRegisterCustomModelData(property);
+        ItemProperties.registerCustomModelData(property);
     }
     
     public static void register(Item item, ResourceLocation name, ClampedItemPropertyFunction property) {

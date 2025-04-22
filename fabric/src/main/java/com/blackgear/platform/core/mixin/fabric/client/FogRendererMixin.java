@@ -1,19 +1,20 @@
 package com.blackgear.platform.core.mixin.fabric.client;
 
 import com.blackgear.platform.client.event.FogRenderEvents;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.material.FogType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(FogRenderer.class)
 public class FogRendererMixin {
@@ -93,6 +94,7 @@ public class FogRendererMixin {
     @Inject(
         method = "setupFog",
         at = @At("TAIL"),
+        locals = LocalCapture.CAPTURE_FAILHARD,
         cancellable = true
     )
     private static void platform$setupFogRendering(
@@ -102,8 +104,9 @@ public class FogRendererMixin {
         boolean nearFog,
         float tickDelta,
         CallbackInfo ci,
-        @Local FogType fogType,
-        @Local FogRenderer.FogData data
+        FogType fogType,
+        Entity entity,
+        FogRenderer.FogData data
     ) {
         FogRenderEvents.RenderContext context = new FogRenderEvents.RenderContext() {
             private float start = data.start;

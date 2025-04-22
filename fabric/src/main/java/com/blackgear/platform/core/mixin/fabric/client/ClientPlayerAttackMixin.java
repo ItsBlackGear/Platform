@@ -23,7 +23,7 @@ public class ClientPlayerAttackMixin {
         cancellable = true
     )
     private void platform$onAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (!EntityEvents.ON_ATTACK.invoker().onAttack((Player) (Object) this, source, amount)) {
+        if (!EntityEvents.ON_ATTACK.invoker().onAttack((Player) (Object) this, source)) {
             cir.setReturnValue(false);
         }
     }

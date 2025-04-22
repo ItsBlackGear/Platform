@@ -12,17 +12,17 @@ public enum Temperature {
     FROZEN(Parameter.span(-1.0F, -0.45F)),
     UNFROZEN(Parameter.span(-0.45F, 1.0F)),
     FULL_RANGE(Parameter.span(-1.0F, 1.0F));
-
+    
     private final Parameter parameter;
-
+    
     Temperature(Parameter parameter) {
         this.parameter = parameter;
     }
-
+    
     public Parameter parameter() {
         return this.parameter;
     }
-
+    
     public static Parameter span(Temperature min, Temperature max) {
         return Parameter.span(Climate.unquantizeCoord(min.parameter().min()), Climate.unquantizeCoord(max.parameter().max()));
     }

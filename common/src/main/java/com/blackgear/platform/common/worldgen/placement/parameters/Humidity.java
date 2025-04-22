@@ -10,17 +10,17 @@ public enum Humidity {
     WET(Parameter.span(0.1F, 0.3F)),
     HUMID(Parameter.span(0.3F, 1.0F)),
     FULL_RANGE(Parameter.span(-1.0F, 1.0F));
-
+    
     private final Parameter parameter;
-
+    
     Humidity(Parameter parameter) {
         this.parameter = parameter;
     }
-
+    
     public Parameter parameter() {
         return this.parameter;
     }
-
+    
     public static Parameter span(Humidity min, Humidity max) {
         return Parameter.span(Climate.unquantizeCoord(min.parameter().min()), Climate.unquantizeCoord(max.parameter().max()));
     }

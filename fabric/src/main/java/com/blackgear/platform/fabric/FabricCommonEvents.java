@@ -1,7 +1,7 @@
 package com.blackgear.platform.fabric;
 
 import com.blackgear.platform.core.events.DatapackSyncEvents;
-import com.blackgear.platform.core.network.listener.ServerListenerEvents;
+import com.blackgear.platform.core.networking.ServerListenerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 

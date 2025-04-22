@@ -1,0 +1,133 @@
+package com.blackgear.platform.client.neoforge;
+
+import com.blackgear.platform.client.GameRendering;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.material.Fluid;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+public class GameRenderingImpl {
+    public static void registerBlockColors(Consumer<GameRendering.BlockColorEvent> listener) {
+        IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+        GameRendering.BlockColorEvent colorEvent = new GameRendering.BlockColorEvent() {
+            @Override
+            public void register(ItemColor color, ItemLike... items) {
+                bus.addListener((RegisterColorHandlersEvent.Item event) -> event.register(color, items));
+            }
+
+            @Override
+            public void register(BlockColor color, Block... blocks) {
+                bus.addListener((RegisterColorHandlersEvent.Block event) -> event.register(color, blocks));
+            }
+        };
+
+        listener.accept(colorEvent);
+    }
+
+    public static void registerBlockRenderers(Consumer<GameRendering.BlockRendererEvent> listener) {
+        listener.accept(new GameRendering.BlockRendererEvent() {
+            @Override
+            public void register(RenderType type, Block... blocks) {
+                Arrays.stream(blocks).forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, type));
+            }
+
+            @Override
+            public void register(RenderType type, Fluid... fluids) {
+                Arrays.stream(fluids).forEach(fluid -> ItemBlockRenderTypes.setRenderLayer(fluid, type));
+            }
+        });
+    }
+
+    public static void registerEntityRenderers(Consumer<GameRendering.EntityRendererEvent> listener) {
+        Consumer<EntityRenderersEvent.RegisterRenderers> consumer = event -> listener.accept(event::registerEntityRenderer);
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+    }
+
+    public static void registerBlockEntityRenderers(Consumer<GameRendering.BlockEntityRendererEvent> listener) {
+        Consumer<EntityRenderersEvent.RegisterRenderers> consumer = event -> listener.accept(event::registerBlockEntityRenderer);
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+    }
+
+    public static void registerModelLayers(Consumer<GameRendering.ModelLayerEvent> listener) {
+        Consumer<EntityRenderersEvent.RegisterLayerDefinitions> consumer = event -> listener.accept(event::registerLayerDefinition);
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+    }
+
+    public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
+        Consumer<ModelEvent.RegisterAdditional> consumer = event -> {
+            GameRendering.SpecialModelEvent modelEvent = new GameRendering.SpecialModelEvent() {
+                @Override
+                public void register(ModelResourceLocation model) {
+                    event.register(model);
+                }
+
+                @Override
+                public void register(ModelResourceLocation... models) {
+                    Arrays.stream(models).forEach(event::register);
+                }
+            };
+            listener.accept(modelEvent);
+        };
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+    }
+
+    public static void registerSkullRenderers(Consumer<GameRendering.SkullRendererEvent> listener) {
+        Consumer<EntityRenderersEvent.CreateSkullModels> consumer = event -> {
+            GameRendering.SkullRendererEvent skullEvent = new GameRendering.SkullRendererEvent() {
+                @Override
+                public void registerSkullModel(SkullBlock.Type type, Function<ModelPart, SkullModelBase> model, ModelLayerLocation layer) {
+                    event.registerSkullModel(type, model.apply(event.getEntityModelSet().bakeLayer(layer)));
+                }
+
+                @Override
+                public void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture) {
+                    SkullBlockRenderer.SKIN_BY_TYPE.put(type, texture);
+                }
+            };
+            listener.accept(skullEvent);
+        };
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+    }
+
+    public static void registerParticleFactories(Consumer<GameRendering.ParticleFactoryEvent> listener) {
+        Consumer<RegisterParticleProvidersEvent> consumer = event -> {
+            GameRendering.ParticleFactoryEvent factoryEvent = new GameRendering.ParticleFactoryEvent() {
+                @Override
+                public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider) {
+                    event.registerSpecial(type.get(), provider);
+                }
+
+                @Override
+                public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory) {
+                    event.registerSpriteSet(type.get(), factory::create);
+                }
+            };
+            listener.accept(factoryEvent);
+        };
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+    }
+}

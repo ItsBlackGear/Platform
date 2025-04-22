@@ -1,7 +1,7 @@
 package com.blackgear.platform.common.integration.fabric;
 
-import com.blackgear.platform.common.integration.Interaction;
 import com.blackgear.platform.common.integration.BlockIntegration;
+import com.blackgear.platform.common.integration.Interaction;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.world.item.context.UseOnContext;
@@ -14,7 +14,7 @@ public class BlockIntegrationImpl {
         listener.accept(new BlockIntegration.Event() {
             @Override
             public void registerBlockInteraction(Interaction interaction) {
-                UseBlockCallback.EVENT.register((player, level, hand, hit) -> interaction.of(new UseOnContext(player, hand, hit)));
+                UseBlockCallback.EVENT.register((player, level, hand, hit) -> interaction.onUse(new UseOnContext(player, hand, hit)));
             }
 
             @Override

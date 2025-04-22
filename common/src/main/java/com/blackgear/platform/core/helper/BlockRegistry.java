@@ -2,7 +2,7 @@ package com.blackgear.platform.core.helper;
 
 import com.blackgear.platform.core.CoreRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -20,8 +20,8 @@ public class BlockRegistry {
     private final CoreRegistry<Item> items;
 
     private BlockRegistry(String modid) {
-        this.blocks = CoreRegistry.create(Registry.BLOCK, modid);
-        this.items = CoreRegistry.create(Registry.ITEM, modid);
+        this.blocks = CoreRegistry.create(BuiltInRegistries.BLOCK, modid);
+        this.items = CoreRegistry.create(BuiltInRegistries.ITEM, modid);
     }
 
     public static BlockRegistry create(String modid) {
@@ -96,6 +96,11 @@ public class BlockRegistry {
         return this.blocks.register(name, block);
     }
 
+    public void register() {
+        this.blocks.register();
+        this.items.register();
+    }
+
     public Supplier<Item> registerItem(String name, Supplier<Item> item) {
         return this.items.register(name, item);
     }
@@ -118,10 +123,5 @@ public class BlockRegistry {
 
     public boolean never(BlockState state, BlockGetter level, BlockPos pos) {
         return false;
-    }
-
-    public void register() {
-        this.blocks.register();
-        this.items.register();
     }
 }

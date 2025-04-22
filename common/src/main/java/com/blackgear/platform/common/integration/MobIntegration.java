@@ -5,7 +5,6 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.function.Consumer;
@@ -22,42 +21,36 @@ public class MobIntegration {
     public interface Event {
         void registerAttributes(Supplier<? extends EntityType<? extends LivingEntity>> type, Supplier<AttributeSupplier.Builder> builder);
 
-        default <T extends Mob> void registerPlacement(Supplier<EntityType<T>> entity, SpawnPlacements.Type spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
+        default <T extends Mob> void registerPlacement(Supplier<EntityType<T>> entity, SpawnPlacementType spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
             SpawnPlacements.register(entity.get(), spawnPlacement, heightmap, spawnPredicate);
         }
 
-        default void addGoal(Selector selector, Predicate<Mob> predicate, int priority, Function<Mob, Goal> factory) {
+        default void registerGoal(Predicate<Mob> predicate, int priority, Function<Mob, Goal> factory) {
             EntityEvents.ON_SPAWN.register((entity, level) -> {
                 if (entity instanceof Mob mob && predicate.test(mob)) {
-                    GoalSelector goalSelector = selector == Selector.GOAL ? mob.goalSelector : mob.targetSelector;
-                    goalSelector.addGoal(priority, factory.apply(mob));
+                    mob.goalSelector.addGoal(priority, factory.apply(mob));
                 }
 
                 return true;
             });
         }
 
-        default void addGoal(Selector selector, EntityType<?> entity, int priority, Function<Mob, Goal> factory) {
-            addGoal(selector, mob -> mob.getType() == entity, priority, factory);
+        default void registerGoal(EntityType<?> entity, int priority, Function<Mob, Goal> factory) {
+            registerGoal(mob -> mob.getType() == entity, priority, factory);
         }
 
-        default void removeGoal(Selector selector, Predicate<Mob> predicate, Function<Mob, Goal> factory) {
+        default void registerTarget(Predicate<Mob> predicate, int priority, Function<Mob, Goal> factory) {
             EntityEvents.ON_SPAWN.register((entity, level) -> {
                 if (entity instanceof Mob mob && predicate.test(mob)) {
-                    GoalSelector goalSelector = selector == Selector.GOAL ? mob.goalSelector : mob.targetSelector;
-                    goalSelector.removeGoal(factory.apply(mob));
+                    mob.targetSelector.addGoal(priority, factory.apply(mob));
                 }
 
                 return true;
             });
         }
 
-        default void removeGoal(Selector selector, EntityType<?> entity, Function<Mob, Goal> factory) {
-            removeGoal(selector, mob -> mob.getType() == entity, factory);
-        }
-
-        enum Selector {
-            GOAL, TARGET
+        default void registerTarget(EntityType<? extends Entity> entity, int priority, Function<Mob, Goal> factory) {
+            registerTarget(mob -> mob.getType() == entity, priority, factory);
         }
     }
 }

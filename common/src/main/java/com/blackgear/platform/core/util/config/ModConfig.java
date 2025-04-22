@@ -24,7 +24,7 @@ public class ModConfig {
     private final String fileName;
     private final String modId;
     private CommentedConfig configData;
-
+    
     public ModConfig(final Type type, final IConfigSpec<?> spec, final String modId, final String fileName) {
         this.type = type;
         this.spec = spec;

@@ -1,14 +1,13 @@
 package com.blackgear.platform.common.worldgen.modifier.fabric;
 
+import com.blackgear.platform.Platform;
 import com.blackgear.platform.common.worldgen.modifier.BiomeContext;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.common.worldgen.modifier.BiomeWriter;
-import com.blackgear.platform.Platform;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -24,7 +23,7 @@ import java.util.function.Predicate;
 
 public class BiomeManagerImpl {
     public static void bootstrap() {
-        BiomeModifications.create(Platform.resource("biome_modifier"))
+        BiomeModifications.create(ResourceLocation.fromNamespaceAndPath(Platform.MOD_ID, "biome_modifier"))
             .add(
                 ModificationPhase.ADDITIONS,
                 context -> true,
@@ -75,22 +74,22 @@ public class BiomeManagerImpl {
                 }
 
                 @Override
-                public boolean hasFeature(Holder<PlacedFeature> feature) {
-                    return selector.hasBuiltInPlacedFeature(feature.value());
+                public boolean hasFeature(ResourceKey<PlacedFeature> feature) {
+                    return selector.hasPlacedFeature(feature);
                 }
             };
         }
         
         @Override
-        public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
-            this.modifier.getGenerationSettings().addBuiltInFeature(decoration, feature.value());
+        public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            this.modifier.getGenerationSettings().addFeature(decoration, feature);
         }
 
         @Override
-        public void removeFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
-            this.modifier.getGenerationSettings().removeBuiltInFeature(decoration, feature.value());
+        public void removeFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            this.modifier.getGenerationSettings().removeFeature(decoration, feature);
         }
-
+        
         @Override
         public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data) {
             this.modifier.getSpawnSettings().addSpawn(category, data);
@@ -100,15 +99,15 @@ public class BiomeManagerImpl {
         public void removeSpawn(EntityType<?> entity) {
             this.modifier.getSpawnSettings().removeSpawnsOfEntityType(entity);
         }
-
+        
         @Override
-        public void addCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
-            this.modifier.getGenerationSettings().addBuiltInCarver(carving, carver.value());
+        public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            this.modifier.getGenerationSettings().addCarver(carving, carver);
         }
 
         @Override
-        public void removeCarver(GenerationStep.Carving carving, Holder<? extends ConfiguredWorldCarver<?>> carver) {
-            this.modifier.getGenerationSettings().removeBuiltInCarver(carving, carver.value());
+        public void removeCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            this.modifier.getGenerationSettings().removeCarver(carving, carver);
         }
     }
 }

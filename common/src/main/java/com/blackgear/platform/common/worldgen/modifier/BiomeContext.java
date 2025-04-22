@@ -1,14 +1,13 @@
 package com.blackgear.platform.common.worldgen.modifier;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSourceParameterList;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.Arrays;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
  * Utility class designed to identify the biome or biomes for implementing biome-specific features.
  **/
 public interface BiomeContext {
-    Predicate<BiomeContext> OVERWORLD_BIOME = context -> MultiNoiseBiomeSource.Preset.OVERWORLD.possibleBiomes().anyMatch(context::is);
+    Predicate<BiomeContext> OVERWORLD_BIOME = context -> MultiNoiseBiomeSourceParameterList.Preset.OVERWORLD.usedBiomes().anyMatch(context::is);
     
     ResourceKey<Biome> resource();
     
@@ -33,7 +32,7 @@ public interface BiomeContext {
     
     boolean is(Predicate<BiomeContext> context);
 
-    boolean hasFeature(Holder<PlacedFeature> feature);
+    boolean hasFeature(ResourceKey<PlacedFeature> feature);
 
     default boolean hasEntity(Supplier<EntityType<?>> entities) {
         return hasEntity(ImmutableSet.of(entities));

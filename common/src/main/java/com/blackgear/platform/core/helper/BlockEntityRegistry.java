@@ -1,7 +1,7 @@
 package com.blackgear.platform.core.helper;
 
 import com.blackgear.platform.core.CoreRegistry;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -11,7 +11,7 @@ public class BlockEntityRegistry {
     private final CoreRegistry<BlockEntityType<?>> registry;
 
     private BlockEntityRegistry(String modId) {
-        this.registry = CoreRegistry.create(Registry.BLOCK_ENTITY_TYPE, modId);
+        this.registry = CoreRegistry.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, modId);
     }
 
     public static BlockEntityRegistry create(String modId) {

@@ -8,7 +8,12 @@ import java.util.function.Consumer;
 
 public class ResourceReloadManager {
     @ExpectPlatform
-    public static void register(Consumer<ListenerEvent> listener) {
+    public static void registerClient(Consumer<ListenerEvent> listener) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static void registerServer(Consumer<ListenerEvent> listener) {
         throw new AssertionError();
     }
 

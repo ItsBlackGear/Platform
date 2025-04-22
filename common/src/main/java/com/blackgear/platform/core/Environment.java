@@ -1,6 +1,9 @@
 package com.blackgear.platform.core;
 
-import com.blackgear.platform.core.util.config.*;
+import com.blackgear.platform.core.util.config.ConfigBuilder;
+import com.blackgear.platform.core.util.config.ModConfig;
+import com.blackgear.platform.core.util.config.SimpleConfigBuilder;
+import com.blackgear.platform.core.util.config.SimpleConfigSpec;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.thread.BlockableEventLoop;
@@ -138,7 +141,9 @@ public class Environment {
      * @return the created configuration object
      */
     public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
-        return registerUnsafeConfig(modId, type, null, spec);
+        Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
+        new ModConfig(type, pair.getRight(), modId);
+        return pair.getLeft();
     }
 
     /**
@@ -154,11 +159,7 @@ public class Environment {
      */
     public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
         Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
-        if (fileName == null) {
-            new ModConfig(type, pair.getRight(), modId);
-        } else {
-            new ModConfig(type, pair.getRight(), modId, fileName);
-        }
+        new ModConfig(type, pair.getRight(), modId, fileName);
         return pair.getLeft();
     }
 

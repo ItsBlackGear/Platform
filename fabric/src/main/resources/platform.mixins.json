@@ -1,12 +1,11 @@
 {
   "required": true,
-  "minVersion": "0.8",
   "package": "com.blackgear.platform.core.mixin.fabric",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
   "mixins": [
     "LivingDeathMixin",
     "LivingEntityMixin",
-    "PackRepositoryMixin",
     "PlayerAttackMixin",
     "ServerLevelMixin"
   ],
@@ -16,7 +15,6 @@
     "client.FogRendererMixin",
     "client.GuiMixin",
     "client.MinecraftMixin",
-    "client.SheetsMixin",
     "client.SkullBlockRendererMixin"
   ],
   "injectors": {
