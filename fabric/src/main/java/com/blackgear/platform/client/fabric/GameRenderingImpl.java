@@ -16,7 +16,6 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
@@ -79,12 +78,12 @@ public class GameRenderingImpl {
     public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
         GameRendering.SpecialModelEvent event = new GameRendering.SpecialModelEvent() {
             @Override
-            public void register(ModelResourceLocation model) {
-                ModelLoadingPlugin.register(context -> context.addModels(model.id()));
+            public void register(ResourceLocation model) {
+                ModelLoadingPlugin.register(context -> context.addModels(model));
             }
 
             @Override
-            public void register(ModelResourceLocation... models) {
+            public void register(ResourceLocation... models) {
                 Arrays.stream(models).forEach(this::register);
             }
         };

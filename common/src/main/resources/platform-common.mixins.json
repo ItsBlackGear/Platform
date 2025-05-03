@@ -18,9 +18,9 @@
     "access.ItemPropertiesAccessor",
     "access.NearPlaneAccessor",
     "client.AbstractClientPlayerMixin",
-    "client.GuiGraphicsMixin",
     "client.ItemRendererMixin",
-    "client.MinecraftMixin"
+    "client.MinecraftMixin",
+    "client.ModelBakeryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

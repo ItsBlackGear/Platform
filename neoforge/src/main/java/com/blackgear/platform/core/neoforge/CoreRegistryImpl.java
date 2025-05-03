@@ -1,13 +1,17 @@
 package com.blackgear.platform.core.neoforge;
 
 import com.blackgear.platform.core.CoreRegistry;
+import com.blackgear.platform.core.RegistryHolder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CoreRegistryImpl<T> extends CoreRegistry<T> {
@@ -33,6 +37,38 @@ public class CoreRegistryImpl<T> extends CoreRegistry<T> {
         DeferredHolder<T, E> value = this.registry.register(name, entry);
         this.entries.add((Supplier<T>) value);
         return value;
+    }
+
+    @Override @SuppressWarnings("unchecked")
+    public <E extends T> RegistryHolder<E> registerHolder(String name, Supplier<E> entry) {
+        DeferredHolder<T, E> registered = this.registry.register(name, entry);
+        this.entries.add((Supplier<T>) registered);
+        return new RegistryHolder<E>() {
+            @Override
+            public E get() {
+                return registered.get();
+            }
+
+            @Override
+            public Optional<Holder<E>> getHolder() {
+                return Optional.of((Holder<E>) registered);
+            }
+
+            @Override
+            public boolean isPresent() {
+                return registered.isBound();
+            }
+
+            @Override
+            public ResourceLocation getId() {
+                return registered.getId();
+            }
+
+            @Override
+            public ResourceKey<E> getKey() {
+                return (ResourceKey<E>) registered.getKey();
+            }
+        };
     }
 
     @Override

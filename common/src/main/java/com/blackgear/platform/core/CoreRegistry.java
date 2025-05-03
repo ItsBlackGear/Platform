@@ -55,6 +55,8 @@ public abstract class CoreRegistry<T> {
      */
     public abstract <E extends T> Supplier<E> register(String name, Supplier<E> entry);
 
+    public abstract <E extends T> RegistryHolder<E> registerHolder(String name, Supplier<E> entry);
+
     /**
      * Registers an entry and returns its ResourceKey.
      * @param name The registry name

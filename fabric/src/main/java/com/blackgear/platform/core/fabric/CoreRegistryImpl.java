@@ -1,11 +1,14 @@
 package com.blackgear.platform.core.fabric;
 
 import com.blackgear.platform.core.CoreRegistry;
+import com.blackgear.platform.core.RegistryHolder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CoreRegistryImpl<T> extends CoreRegistry<T> {
@@ -33,6 +36,42 @@ public class CoreRegistryImpl<T> extends CoreRegistry<T> {
         E value = Registry.register(this.registry, ResourceLocation.fromNamespaceAndPath(this.modId, name), entry.get());
         this.entries.add(() -> value);
         return () -> value;
+    }
+
+    @Override @SuppressWarnings("unchecked")
+    public <E extends T> RegistryHolder<E> registerHolder(String name, Supplier<E> entry) {
+        ResourceLocation value = ResourceLocation.fromNamespaceAndPath(this.modId, name);
+        E registered = Registry.register(this.registry, value, entry.get());
+        this.entries.add(() -> registered);
+        return new RegistryHolder<>() {
+            final ResourceKey<E> key = ResourceKey.create((ResourceKey<? extends Registry<E>>) registry.key(), value);
+
+            @Override
+            public E get() {
+                return registered;
+            }
+
+            @Override
+            public Optional<Holder<E>> getHolder() {
+                Holder<E> holder = (Holder<E>) registry.getHolder((ResourceKey<T>) key).orElse(null);
+                return Optional.ofNullable(holder);
+            }
+
+            @Override
+            public boolean isPresent() {
+                return registry.containsKey(value);
+            }
+
+            @Override
+            public ResourceLocation getId() {
+                return value;
+            }
+
+            @Override
+            public ResourceKey<E> getKey() {
+                return key;
+            }
+        };
     }
 
     @Override

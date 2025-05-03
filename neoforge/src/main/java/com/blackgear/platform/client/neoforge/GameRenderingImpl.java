@@ -81,13 +81,14 @@ public class GameRenderingImpl {
         Consumer<ModelEvent.RegisterAdditional> consumer = event -> {
             GameRendering.SpecialModelEvent modelEvent = new GameRendering.SpecialModelEvent() {
                 @Override
-                public void register(ModelResourceLocation model) {
-                    event.register(model);
+                public void register(ResourceLocation model) {
+                    ResourceLocation wrapped = ResourceLocation.fromNamespaceAndPath(model.getNamespace(), "item/" + model.getPath());
+                    event.register(new ModelResourceLocation(wrapped, "standalone"));
                 }
 
                 @Override
-                public void register(ModelResourceLocation... models) {
-                    Arrays.stream(models).forEach(event::register);
+                public void register(ResourceLocation... models) {
+                    Arrays.stream(models).forEach(this::register);
                 }
             };
             listener.accept(modelEvent);

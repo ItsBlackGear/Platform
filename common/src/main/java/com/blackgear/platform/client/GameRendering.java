@@ -37,7 +37,7 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class GameRendering {
-    public static final Map<Item, ModelResourceLocation> HAND_HELD_MODELS = new ConcurrentHashMap<>();
+    public static final Map<Item, ResourceLocation> HAND_HELD_MODELS = new ConcurrentHashMap<>();
 
     @ExpectPlatform
     public static void registerBlockColors(Consumer<BlockColorEvent> listener) {
@@ -112,13 +112,30 @@ public class GameRendering {
     }
 
     public interface SpecialModelEvent {
-        void register(ModelResourceLocation model);
+        void register(ResourceLocation model);
 
-        void register(ModelResourceLocation... models);
+        void register(ResourceLocation... models);
+
+        @Deprecated
+        default void register(ModelResourceLocation model) {
+            register(model.id());
+        }
+
+        @Deprecated
+        default void register(ModelResourceLocation... models) {
+            for (ModelResourceLocation model : models) {
+                register(model.id());
+            }
+        }
     }
 
     public interface HandHeldModelEvent {
-        void register(Item item, ModelResourceLocation model);
+        void register(Item item, ResourceLocation model);
+
+        @Deprecated
+        default void register(Item item, ModelResourceLocation model) {
+            register(item, model.id());
+        }
     }
 
     public interface SkullRendererEvent {
