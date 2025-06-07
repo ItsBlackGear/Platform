@@ -2,6 +2,10 @@ package com.blackgear.platform.common.integration.neoforge;
 
 import com.blackgear.platform.common.integration.BlockIntegration;
 import com.blackgear.platform.common.integration.Interaction;
+import it.unimi.dsi.fastutil.objects.Object2FloatArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
@@ -13,6 +17,8 @@ import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import java.util.function.Consumer;
 
 public class BlockIntegrationImpl {
+    public static final Object2FloatMap<ItemLike> COMPOSTABLES = new Object2FloatOpenHashMap<>();
+
     public static void registerIntegrations(Consumer<BlockIntegration.Event> listener) {
         BlockIntegration.Event integration = new BlockIntegration.Event() {
             @Override
@@ -33,6 +39,11 @@ public class BlockIntegrationImpl {
                         event.setBurnTime(burnTime);
                     }
                 });
+            }
+
+            @Override
+            public void registerCompostableItem(ItemLike item, float chance) {
+                COMPOSTABLES.putIfAbsent(item.asItem(), chance);
             }
         };
 

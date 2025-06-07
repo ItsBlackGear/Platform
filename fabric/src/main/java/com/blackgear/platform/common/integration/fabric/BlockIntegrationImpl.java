@@ -3,6 +3,7 @@ package com.blackgear.platform.common.integration.fabric;
 import com.blackgear.platform.common.integration.BlockIntegration;
 import com.blackgear.platform.common.integration.Interaction;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
@@ -20,6 +21,11 @@ public class BlockIntegrationImpl {
             @Override
             public void registerFuelItem(ItemLike item, int burnTime) {
                 FuelRegistry.INSTANCE.add(item, burnTime);
+            }
+
+            @Override
+            public void registerCompostableItem(ItemLike item, float chance) {
+                CompostingChanceRegistry.INSTANCE.add(item, chance);
             }
         });
     }

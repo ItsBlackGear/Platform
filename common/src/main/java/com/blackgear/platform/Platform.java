@@ -17,9 +17,7 @@ public class Platform {
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
 
-		Networking.register(registrar -> {
-			registrar.registerToServer(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC, ConfigSyncPayload::handler);
-		});
+		Networking.register(registrar -> registrar.registerToServer(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC, ConfigSyncPayload::handler));
 
 		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
