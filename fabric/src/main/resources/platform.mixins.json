@@ -7,7 +7,9 @@
     "LivingDeathMixin",
     "LivingEntityMixin",
     "PlayerAttackMixin",
-    "ServerLevelMixin"
+    "ServerLevelMixin",
+    "loot.LootPoolMixin",
+    "loot.LootTableBuilderAccessor"
   ],
   "client": [
     "client.ClientLevelMixin",
