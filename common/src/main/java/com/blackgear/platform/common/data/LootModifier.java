@@ -4,6 +4,9 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+
+import java.util.ArrayList;
 
 /**
  * Utility class to apply modifications to Loot Tables
@@ -18,7 +21,7 @@ public class LootModifier {
      *
      * <pre>{@code
      *
-     * LootRegistry.modify((lootTables, path, context, builtin) -> {
+     * LootRegistry.modify((path, context, builtin) -> {
      *     if (path.equals(BuiltInLootTables.SIMPLE_DUNGEON)) {
      *         LootPool.Builder pool = LootPool.lootPool()
      *             .setRolls(UniformGenerator.between(1.0F, 3.0F))
@@ -37,14 +40,16 @@ public class LootModifier {
     }
     
     public interface LootTableModifier {
-        void modify(LootDataManager lootTables, ResourceLocation path, LootTableContext context, boolean builtin);
+        void modify(ResourceLocation path, LootTableContext context, boolean builtin);
     }
     
     public interface LootTableContext {
-        void addPool(LootPool pool);
-        
-        default void addPool(LootPool.Builder pool) {
-            this.addPool(pool.build());
+        void addPool(LootPool.Builder pool);
+
+        boolean addToPool(int index, ArrayList<LootPoolEntryContainer> content);
+
+        default boolean addToPool(ArrayList<LootPoolEntryContainer> content) {
+            return this.addToPool(0, content);
         }
     }
 }
