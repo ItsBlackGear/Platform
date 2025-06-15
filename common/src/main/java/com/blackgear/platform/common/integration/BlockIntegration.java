@@ -22,7 +22,7 @@ public class BlockIntegration {
     }
 
     public interface Event {
-        void registerBlockInteraction(Interaction interaction);
+        void registerBlockInteraction(BlockInteraction interaction);
 
         void registerFuelItem(ItemLike item, int burnTime);
 

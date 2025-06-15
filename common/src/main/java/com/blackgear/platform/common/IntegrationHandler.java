@@ -1,7 +1,7 @@
 package com.blackgear.platform.common;
 
 import com.blackgear.platform.common.integration.BlockIntegration;
-import com.blackgear.platform.common.integration.Interaction;
+import com.blackgear.platform.common.integration.BlockInteraction;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.*;
@@ -41,7 +41,7 @@ public final class IntegrationHandler {
         BlockIntegration.registerIntegrations(event -> event.registerDispenserBehavior(item, behavior));
     }
 
-    public static void addInteraction(Interaction interaction) {
+    public static void addInteraction(BlockInteraction interaction) {
         BlockIntegration.registerIntegrations(event -> event.registerBlockInteraction(interaction));
     }
 }

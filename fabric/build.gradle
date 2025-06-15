@@ -1,10 +1,26 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "com.github.johnrengelman.shadow"
 }
 
 loom {
     accessWidenerPath = project(":common").loom.accessWidenerPath
+
+    runs {
+        datagen {
+            inherit client
+
+            name "Data Generation"
+
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=platform"
+
+            runDir "build/datagen"
+        }
+    }
 }
+
+sourceSets.main.resources.srcDirs += project(":common").file("src/main/generated")
 
 architectury {
     platformSetupLoomIde()
@@ -16,7 +32,6 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
-
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
@@ -26,12 +41,6 @@ configurations {
     shadowBundle {
         canBeResolved = true
         canBeConsumed = false
-    }
-}
-
-configurations.configureEach {
-    resolutionStrategy {
-        force("net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}")
     }
 }
 
@@ -49,7 +58,7 @@ dependencies {
     annotationProcessor(implementation(include("io.github.llamalad7:mixinextras-fabric:0.4.1")))
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowBundle(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
+    shadowBundle project(path: ":common", configuration: "transformProductionFabric")
 }
 
 processResources {
@@ -68,13 +77,5 @@ shadowJar {
 
 remapJar {
     injectAccessWidener = true
-    inputFile.set(shadowJar.archiveFile)
-    dependsOn shadowJar
-    archiveClassifier = null
-}
-
-configurations.configureEach {
-    resolutionStrategy {
-        force("net.fabricmc:fabric-loader:${project.fabric_loader_version}")
-    }
+    inputFile.set shadowJar.archiveFile
 }

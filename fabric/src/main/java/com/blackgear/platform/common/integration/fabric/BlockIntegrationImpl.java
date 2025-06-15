@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.integration.fabric;
 
-import com.blackgear.platform.common.integration.Interaction;
+import com.blackgear.platform.common.integration.BlockInteraction;
 import com.blackgear.platform.common.integration.BlockIntegration;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
@@ -13,7 +13,7 @@ public class BlockIntegrationImpl {
     public static void registerIntegrations(Consumer<BlockIntegration.Event> listener) {
         listener.accept(new BlockIntegration.Event() {
             @Override
-            public void registerBlockInteraction(Interaction interaction) {
+            public void registerBlockInteraction(BlockInteraction interaction) {
                 UseBlockCallback.EVENT.register((player, level, hand, hit) -> interaction.onUse(new UseOnContext(player, hand, hit)));
             }
 

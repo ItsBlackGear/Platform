@@ -19,6 +19,8 @@ public class MobIntegration {
     }
 
     public interface Event {
+        void registerMobInteraction(MobInteraction interaction);
+
         void registerAttributes(Supplier<? extends EntityType<? extends LivingEntity>> type, Supplier<AttributeSupplier.Builder> builder);
 
         default <T extends Mob> void registerPlacement(Supplier<EntityType<T>> entity, SpawnPlacements.Type spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {

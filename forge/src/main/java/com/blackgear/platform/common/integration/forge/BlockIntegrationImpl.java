@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.integration.forge;
 
-import com.blackgear.platform.common.integration.Interaction;
+import com.blackgear.platform.common.integration.BlockInteraction;
 import com.blackgear.platform.common.integration.BlockIntegration;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
@@ -18,7 +18,7 @@ public class BlockIntegrationImpl {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BlockIntegration.Event integration = new BlockIntegration.Event() {
             @Override
-            public void registerBlockInteraction(Interaction interaction) {
+            public void registerBlockInteraction(BlockInteraction interaction) {
                 bus.addListener((PlayerInteractEvent.RightClickBlock event) -> {
                     InteractionResult result = interaction.onUse(new UseOnContext(event.getEntity(), event.getHand(), event.getHitVec()));
                     if (result != InteractionResult.PASS) {

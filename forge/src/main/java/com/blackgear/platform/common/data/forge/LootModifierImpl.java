@@ -10,7 +10,6 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +28,8 @@ public class LootModifierImpl {
                 new LootModifier.LootTableContext() {
                     @Override
                     public void addPool(LootPool.Builder pool) {
-                        event.getTable().addPool(pool.build());
+                        List<LootPool> pools = ((LootTableAccess) event.getTable()).getPools();
+                        pools.add(pool.build());
                     }
 
                     @Override
@@ -37,22 +37,17 @@ public class LootModifierImpl {
                         LootTable table = event.getTable();
 
                         try {
-                            Field pools = table.getClass().getDeclaredField("pools");
-                            pools.setAccessible(true);
-                            List<LootPool> localPools = (List<LootPool>) pools.get(table);
+                            List<LootPool> pools = ((LootTableAccess) table).getPools();
 
-                            if (localPools.size() > index) {
-                                LootPool pool = localPools.get(index);
+                            if (pools.size() > index) {
+                                LootPool pool = pools.get(index);
+                                LootPoolEntryContainer[] entries = ((LootPoolAccess) pool).getEntries();
 
-                                Field entries = pool.getClass().getDeclaredField("entries");
-                                entries.setAccessible(true);
-                                LootPoolEntryContainer[] localEntries = (LootPoolEntryContainer[]) entries.get(pool);
-
-                                List<LootPoolEntryContainer> modifiable = new ArrayList<>(Arrays.asList(localEntries));
+                                List<LootPoolEntryContainer> modifiable = new ArrayList<>(Arrays.asList(entries));
                                 modifiable.addAll(content);
                                 LootPoolEntryContainer[] modified = modifiable.toArray(new LootPoolEntryContainer[0]);
 
-                                entries.set(pool, modified);
+                                ((LootPoolAccess) pool).setEntries(modified);
                                 return true;
                             }
                         } catch (Throwable t) {

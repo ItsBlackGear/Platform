@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,20 +23,18 @@ public class LootModifierImpl {
                     @Override
                     public boolean addToPool(int index, ArrayList<LootPoolEntryContainer> content) {
                         try {
-                            Field pools = table.getClass().getDeclaredField("pools");
-                            pools.setAccessible(true);
-                            List<LootPool> local = (List<LootPool>) pools.get(table);
+                            List<LootPool> pools = ((LootTableAccess) table).getPools();
 
-                            if (local.size() <= index) {
+                            if (pools.size() <= index) {
                                 Platform.LOGGER.error("Failed to add content to loot pool at index {}: No pools found", index);
                                 return false;
                             }
 
-                            LootPool pool = local.get(index);
+                            LootPool pool = pools.get(index);
                             LootPool modified = ((LootPoolAccess) pool).mergeEntries(content);
-                            local.set(index, modified);
+                            pools.set(index, modified);
 
-                            pools.set(table, local);
+                            ((LootTableAccess) table).setPools(pools);
                             return true;
                         } catch (Throwable t) {
                             Platform.LOGGER.error("Failed to add content to loot pool at index {}: {}", index, t.getMessage(), t);
