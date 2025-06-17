@@ -34,5 +34,9 @@ accessible field net/minecraft/world/level/chunk/ChunkGenerator featuresPerStep 
 mutable field net/minecraft/world/level/chunk/ChunkGenerator featuresPerStep Ljava/util/function/Supplier;
 accessible field net/minecraft/world/level/chunk/ChunkGenerator generationSettingsGetter Ljava/util/function/Function;
 
+# Entity Goals
 accessible field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 accessible field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+
+# Resource Location
+accessible class net/minecraft/resources/ResourceLocation$Dummy

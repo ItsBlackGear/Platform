@@ -11,6 +11,7 @@
     "access.SimpleParticleTypeAccessor",
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",
+    "common.ResourceLocationMixin",
     "common.ShearsItemMixin",
     "config.ServerMainMixin"
   ],
