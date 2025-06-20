@@ -7,6 +7,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Utility class to apply modifications to Loot Tables
@@ -49,6 +50,16 @@ public class LootModifier {
         boolean addToPool(int index, ArrayList<LootPoolEntryContainer> content);
 
         default boolean addToPool(ArrayList<LootPoolEntryContainer> content) {
+            return this.addToPool(0, content);
+        }
+
+        default boolean addToPool(int index, LootPoolEntryContainer... content) {
+            ArrayList<LootPoolEntryContainer> entries = new ArrayList<>();
+            Collections.addAll(entries, content);
+            return this.addToPool(index, entries);
+        }
+
+        default boolean addToPool(LootPoolEntryContainer... content) {
             return this.addToPool(0, content);
         }
     }

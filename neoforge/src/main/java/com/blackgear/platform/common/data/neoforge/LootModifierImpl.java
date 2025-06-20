@@ -13,7 +13,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -43,14 +42,12 @@ public class LootModifierImpl {
 
                             if (pools.size() > index) {
                                 LootPool pool = pools.get(index);
-                                Field field = LootPool.class.getDeclaredField("entries");
-                                field.setAccessible(true);
 
-                                List<LootPoolEntryContainer> entries = (List<LootPoolEntryContainer>) field.get(pool);
-                                List<LootPoolEntryContainer> additions = new ArrayList<>(entries);
-                                additions.addAll(content);
+                                List<LootPoolEntryContainer> entries = ((LootPoolAccess) pool).getEntries();
+                                List<LootPoolEntryContainer> modified = new ArrayList<>(entries);
+                                modified.addAll(content);
 
-                                field.set(pool, additions);
+                                ((LootPoolAccess) pool).setEntries(modified);
                                 return true;
                             }
                         } catch (Throwable t) {

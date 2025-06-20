@@ -1,11 +1,9 @@
 package com.blackgear.platform.common.integration.neoforge;
 
 import com.blackgear.platform.common.integration.BlockIntegration;
-import com.blackgear.platform.common.integration.Interaction;
-import it.unimi.dsi.fastutil.objects.Object2FloatArrayMap;
+import com.blackgear.platform.common.integration.BlockInteraction;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import net.minecraft.network.protocol.PacketUtils;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
@@ -22,7 +20,7 @@ public class BlockIntegrationImpl {
     public static void registerIntegrations(Consumer<BlockIntegration.Event> listener) {
         BlockIntegration.Event integration = new BlockIntegration.Event() {
             @Override
-            public void registerBlockInteraction(Interaction interaction) {
+            public void registerBlockInteraction(BlockInteraction interaction) {
                 ModLoadingContext.get().getActiveContainer().getEventBus().addListener((PlayerInteractEvent.RightClickBlock event) -> {
                     InteractionResult result = interaction.onUse(new UseOnContext(event.getEntity(), event.getHand(), event.getHitVec()));
                     if (result != InteractionResult.PASS) {

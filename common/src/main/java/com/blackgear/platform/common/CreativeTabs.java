@@ -5,8 +5,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -41,39 +43,14 @@ public class CreativeTabs {
     public static CreativeModeTab create(Consumer<CreativeModeTab.Builder> consumer) {
         throw new AssertionError();
     }
-    
-    /**
-     * <p>Example of modifying a vanilla creative tab (recommended for adding items only):</p>
-     *
-     * <pre>{@code
-     *
-     * CreativeTabs.modify(
-     *     CreativeModeTabs.getDefaultTab(),
-     *     (flags, output, operatorBlocks) -> {
-     *         output.addAllAfter(
-     *             new ItemStack(Items.CHICKEN_SPAWN_EGG),
-     *             List.of(
-     *                 new ItemStack(Items.DUCK_SPAWN_EGG),
-     *                 new ItemStack(Items.TURKEY_SPAWN_EGG)
-     *             )
-     *         );
-     *     }
-     * );
-     *
-     * }</pre>
-     */
-    @ExpectPlatform
-    public static void modify(CreativeModeTab tab, Modifier modifier) {
-        throw new AssertionError();
-    }
-    
+
     @ExpectPlatform
     public static void modify(ResourceKey<CreativeModeTab> key, Modifier modifier) {
         throw new AssertionError();
     }
     
     public interface Modifier {
-        void accept(FeatureFlagSet flags, Output output, boolean operatorBlocks);
+        void accept(FeatureFlagSet flags, Output output, boolean operator);
     }
     
     public interface Output extends CreativeModeTab.Output {
@@ -91,13 +68,24 @@ public class CreativeTabs {
         default void addAfter(ItemStack target, ItemStack stack) {
             addAfter(target, stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         }
+
+        default void addAfter(ItemLike target, ItemLike stack) {
+            addAfter(target.asItem().getDefaultInstance(), stack.asItem().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        }
         
         default void addAllAfter(ItemStack target, Collection<ItemStack> stacks, CreativeModeTab.TabVisibility visibility) {
-            stacks.forEach(stack -> addAfter(target, stack, visibility));
+            List<ItemStack> list = List.copyOf(stacks);
+            for (int i = list.size() - 1; i >= 0; i--) this.addAfter(target, list.get(i), visibility);
         }
         
         default void addAllAfter(ItemStack target, Collection<ItemStack> stacks) {
-            stacks.forEach(stack -> addAfter(target, stack));
+            List<ItemStack> list = List.copyOf(stacks);
+            for (int i = list.size() - 1; i >= 0; i--) this.addAfter(target, list.get(i));
+        }
+
+        default void addAllAfter(ItemLike target, Collection<ItemLike> stacks) {
+            List<ItemLike> list = List.copyOf(stacks);
+            for (int i = list.size() - 1; i >= 0; i--) this.addAfter(target, list.get(i));
         }
         
         // ========== ADD BEFORE ===========
@@ -107,13 +95,24 @@ public class CreativeTabs {
         default void addBefore(ItemStack target, ItemStack stack) {
             addBefore(target, stack, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
         }
+
+        default void addBefore(ItemLike target, ItemLike stack) {
+            addBefore(target.asItem().getDefaultInstance(), stack.asItem().getDefaultInstance(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        }
         
         default void addAllBefore(ItemStack target, Collection<ItemStack> stacks, CreativeModeTab.TabVisibility visibility) {
-            stacks.forEach(stack -> addBefore(target, stack, visibility));
+            List<ItemStack> list = List.copyOf(stacks);
+            for (int i = list.size() - 1; i >= 0; i--) this.addBefore(target, list.get(i), visibility);
         }
         
         default void addAllBefore(ItemStack target, Collection<ItemStack> stacks) {
-            stacks.forEach(stack -> addBefore(target, stack));
+            List<ItemStack> list = List.copyOf(stacks);
+            for (int i = list.size() - 1; i >= 0; i--) this.addBefore(target, list.get(i));
+        }
+
+        default void addAllBefore(ItemLike target, Collection<ItemLike> stacks) {
+            List<ItemLike> list = List.copyOf(stacks);
+            for (int i = list.size() - 1; i >= 0; i--) this.addBefore(target, list.get(i));
         }
     }
 }
