@@ -23,9 +23,7 @@ public class MobIntegration {
 
         void registerAttributes(Supplier<? extends EntityType<? extends LivingEntity>> type, Supplier<AttributeSupplier.Builder> builder);
 
-        default <T extends Mob> void registerPlacement(Supplier<EntityType<T>> entity, SpawnPlacementType spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
-            SpawnPlacements.register(entity.get(), spawnPlacement, heightmap, spawnPredicate);
-        }
+        <T extends Mob> void registerPlacement(Supplier<EntityType<T>> entity, SpawnPlacementType spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
 
         default void registerGoal(Predicate<Mob> predicate, int priority, Function<Mob, Goal> factory) {
             EntityEvents.ON_SPAWN.register((entity, level) -> {
