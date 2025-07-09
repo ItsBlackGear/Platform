@@ -15,17 +15,21 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +45,11 @@ public class GameRendering {
 
     @ExpectPlatform
     public static void registerBlockColors(Consumer<BlockColorEvent> listener) {
+        throw new AssertionError();
+    }
+
+    @ExpectPlatform
+    public static void registerItemColors(Consumer<ItemColorEvent> listener) {
         throw new AssertionError();
     }
 
@@ -88,9 +97,15 @@ public class GameRendering {
     }
 
     public interface BlockColorEvent {
+        void register(BlockColor color, Block... blocks);
+
+        int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint);
+    }
+
+    public interface ItemColorEvent {
         void register(ItemColor color, ItemLike... items);
 
-        void register(BlockColor color, Block... blocks);
+        int getColor(ItemStack stack, int tint);
     }
 
     public interface BlockRendererEvent {
