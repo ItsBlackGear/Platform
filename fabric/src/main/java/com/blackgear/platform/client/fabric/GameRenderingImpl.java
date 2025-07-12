@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.SkullModelBase;
@@ -20,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
@@ -47,8 +49,7 @@ public class GameRenderingImpl {
 
             @Override
             public int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
-                BlockColor colors = ColorProviderRegistry.BLOCK.get(state.getBlock());
-                return colors != null ? colors.getColor(state, level, pos, tint) : -1;
+                return Minecraft.getInstance().getBlockColors().getColor(state, level, pos, tint);
             }
         });
     }
@@ -62,8 +63,8 @@ public class GameRenderingImpl {
 
             @Override
             public int getColor(ItemStack stack, int tint) {
-                ItemColor colors = ColorProviderRegistry.ITEM.get(stack.getItem());
-                return colors != null ? colors.getColor(stack, tint) : -1;
+                BlockState state = ((BlockItem) stack.getItem()).getBlock().defaultBlockState();
+                return Minecraft.getInstance().getBlockColors().getColor(state, null, null, tint);
             }
         });
     }
