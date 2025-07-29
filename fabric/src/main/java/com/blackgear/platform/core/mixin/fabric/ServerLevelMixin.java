@@ -18,7 +18,7 @@ public abstract class ServerLevelMixin {
         cancellable = true
     )
     private void platform$addPlayer(ServerPlayer player, CallbackInfo ci) {
-        if (!EntityEvents.ON_SPAWN.invoker().onSpawn(player, (ServerLevel) (Object) this)) {
+        if (EntityEvents.ON_SPAWN.invoker().onSpawn(player, (ServerLevel) (Object) this).isCancelled()) {
             ci.cancel();
         }
     }
@@ -29,7 +29,7 @@ public abstract class ServerLevelMixin {
         cancellable = true
     )
     private void platform$addEntity(Entity entity, CallbackInfoReturnable<Boolean> cir) {
-        if (!EntityEvents.ON_SPAWN.invoker().onSpawn(entity, (ServerLevel) (Object) this)) {
+        if (EntityEvents.ON_SPAWN.invoker().onSpawn(entity, (ServerLevel) (Object) this).isCancelled()) {
             cir.setReturnValue(false);
         }
     }

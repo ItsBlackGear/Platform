@@ -1,6 +1,7 @@
 package com.blackgear.platform.common.integration;
 
 import com.blackgear.platform.common.events.EntityEvents;
+import com.blackgear.platform.core.util.event.CancellableResult;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -33,7 +34,7 @@ public class MobIntegration {
                     mob.goalSelector.addGoal(priority, factory.apply(mob));
                 }
 
-                return true;
+                return CancellableResult.PASS;
             });
         }
 
@@ -47,7 +48,7 @@ public class MobIntegration {
                     mob.targetSelector.addGoal(priority, factory.apply(mob));
                 }
 
-                return true;
+                return CancellableResult.PASS;
             });
         }
 

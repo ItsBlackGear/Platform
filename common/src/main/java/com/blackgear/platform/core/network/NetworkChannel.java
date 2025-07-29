@@ -22,7 +22,7 @@ public class NetworkChannel {
     }
 
     public <T extends Packet<T>> void registerPacket(NetworkDirection direction, ResourceLocation id, PacketHandler<T> handler, Class<T> packet) {
-        if (direction == NetworkDirection.TO_SERVER) {
+        if (direction == NetworkDirection.SERVERBOUND) {
             PacketRegistry.registerServerbound(this.channel, id, handler, packet);
         } else {
             PacketRegistry.registerClientbound(this.channel, id, handler, packet);

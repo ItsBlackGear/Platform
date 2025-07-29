@@ -128,22 +128,6 @@ public class Environment {
     }
 
     /**
-     * Registers a configuration that generates in early stages of mod loading.
-     * This implementation is the same on Fabric but may work differently on Forge.
-     *
-     * @param modId the mod ID for the configuration
-     * @param type the configuration type
-     * @param spec the configuration specification builder
-     * @param <T> the type of configuration object
-     * @return the created configuration object
-     */
-    public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
-        Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
-        new ModConfig(type, pair.getRight(), modId);
-        return pair.getLeft();
-    }
-
-    /**
      * Registers a configuration with a custom filename that generates in early stages of mod loading.
      * This implementation is the same on Fabric but may work differently on Forge.
      *
@@ -158,6 +142,24 @@ public class Environment {
         Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
         new ModConfig(type, pair.getRight(), modId, fileName);
         return pair.getLeft();
+    }
+
+    /**
+     * Registers a configuration that generates in early stages of mod loading.
+     * This implementation is the same on Fabric but may work differently on Forge.
+     *
+     * @param modId the mod ID for the configuration
+     * @param type the configuration type
+     * @param spec the configuration specification builder
+     * @param <T> the type of configuration object
+     * @return the created configuration object
+     */
+    public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
+        return registerUnsafeConfig(modId, type, defaultConfigName(type, modId), spec);
+    }
+
+    private static String defaultConfigName(ModConfig.Type type, String modId) {
+        return String.format("%s-%s.toml", modId, type.extension());
     }
 
     /**

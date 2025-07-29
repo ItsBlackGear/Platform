@@ -12,17 +12,18 @@
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",
     "common.ResourceLocationMixin",
-    "common.ShearsItemMixin",
-    "config.ServerMainMixin"
+    "common.ShearsItemMixin"
   ],
   "client": [
     "access.CameraAccessor",
     "access.ItemPropertiesAccessor",
     "access.NearPlaneAccessor",
+    "access.ScreenAccessor",
     "client.AbstractClientPlayerMixin",
-    "client.GuiGraphicsMixin",
+    "client.AbstractContainerScreenMixin",
     "client.ItemRendererMixin",
-    "client.MinecraftMixin"
+    "client.MinecraftMixin",
+    "config.ClientHandshakePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1

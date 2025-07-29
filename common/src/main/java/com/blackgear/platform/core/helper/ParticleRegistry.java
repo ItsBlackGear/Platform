@@ -48,4 +48,8 @@ public class ParticleRegistry {
     public void register() {
         this.particles.register();
     }
+
+    public CoreRegistry<ParticleType<?>> registry() {
+        return this.particles;
+    }
 }

@@ -1,11 +1,9 @@
 package com.blackgear.platform.core.events.forge;
 
 import com.blackgear.platform.core.events.ResourceReloadManager;
-import com.blackgear.platform.forge.ForgeClientEventHandler;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import com.blackgear.platform.forge.client.ForgeClientEventHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.function.Consumer;
 

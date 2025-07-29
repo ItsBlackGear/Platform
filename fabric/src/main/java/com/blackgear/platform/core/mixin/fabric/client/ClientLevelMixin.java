@@ -16,7 +16,7 @@ public class ClientLevelMixin {
         cancellable = true
     )
     private void platform$addEntity(int entityId, Entity entityToSpawn, CallbackInfo ci) {
-        if (!EntityEvents.ON_SPAWN.invoker().onSpawn(entityToSpawn, (ClientLevel) (Object) this)) {
+        if (EntityEvents.ON_SPAWN.invoker().onSpawn(entityToSpawn, (ClientLevel) (Object) this).isCancelled()) {
             ci.cancel();
         }
     }

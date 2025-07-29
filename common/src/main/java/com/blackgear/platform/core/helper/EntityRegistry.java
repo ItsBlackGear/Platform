@@ -58,4 +58,20 @@ public class EntityRegistry {
         this.sensors.register();
         this.memories.register();
     }
+
+    public CoreRegistry<EntityType<?>> entities() {
+        return this.entities;
+    }
+
+    public CoreRegistry<Activity> activities() {
+        return this.activities;
+    }
+
+    public CoreRegistry<SensorType<?>> sensors() {
+        return this.sensors;
+    }
+
+    public CoreRegistry<MemoryModuleType<?>> memories() {
+        return this.memories;
+    }
 }

@@ -1,5 +1,6 @@
 package com.blackgear.platform.client;
 
+import com.blackgear.platform.client.v2.render.ItemRendererRegistry;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -80,7 +81,7 @@ public class GameRendering {
 
     public static void registerHandHeldModels(Consumer<HandHeldModelEvent> listener) {
         HandHeldModelEvent event = (item, model) -> {
-            HAND_HELD_MODELS.put(item, model);
+            ItemRendererRegistry.registerHandModel(item, model);
             registerSpecialModels(models -> models.register(model));
         };
         listener.accept(event);

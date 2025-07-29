@@ -1,4 +1,4 @@
-package com.blackgear.platform.forge;
+package com.blackgear.platform.forge.client;
 
 import com.blackgear.platform.core.events.ResourceReloadManager;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;

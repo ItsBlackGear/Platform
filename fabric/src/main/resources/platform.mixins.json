@@ -15,10 +15,16 @@
   "client": [
     "client.ClientLevelMixin",
     "client.ClientPlayerAttackMixin",
+    "client.ClientPlayerPacketListenerMixin",
     "client.FogRendererMixin",
     "client.GuiMixin",
     "client.MinecraftMixin",
-    "client.SkullBlockRendererMixin"
+    "client.SkullBlockRendererMixin",
+    "client.input.MouseHandlerMixin",
+    "client.screen.AbstractContainScreenMixin",
+    "client.screen.GameRendererMixin",
+    "client.screen.GuiGraphicsMixin",
+    "client.screen.ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

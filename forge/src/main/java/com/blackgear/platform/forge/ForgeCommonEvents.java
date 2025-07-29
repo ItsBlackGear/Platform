@@ -21,30 +21,27 @@ public class ForgeCommonEvents {
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!event.getEntity().level().isClientSide) {
-            ServerListenerEvents.JOIN.invoker().listener(
-                ((ServerPlayer) event.getEntity()).connection,
-                event.getEntity().getServer()
-            );
+            ServerListenerEvents.JOIN.invoker().listener(((ServerPlayer) event.getEntity()).connection, event.getEntity().getServer());
         }
     }
 
     @SubscribeEvent
     public static void onEntitySpawn(EntityJoinLevelEvent event) {
-        if (!EntityEvents.ON_SPAWN.invoker().onSpawn(event.getEntity(), event.getLevel())) {
+        if (EntityEvents.ON_SPAWN.invoker().onSpawn(event.getEntity(), event.getLevel()).isCancelled()) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public static void onEntityAttack(LivingAttackEvent event) {
-        if (!EntityEvents.ON_ATTACK.invoker().onAttack(event.getEntity(), event.getSource(), event.getAmount())) {
+        if (EntityEvents.ON_ATTACK.invoker().onAttack(event.getEntity(), event.getSource(), event.getAmount()).isCancelled()) {
             event.setCanceled(true);
         }
     }
 
     @SubscribeEvent
     public static void onEntityDeath(LivingDeathEvent event) {
-        if (!EntityEvents.ON_DEATH.invoker().onDeath(event.getEntity(), event.getSource())) {
+        if (EntityEvents.ON_DEATH.invoker().onDeath(event.getEntity(), event.getSource()).isCancelled()) {
             event.setCanceled(true);
         }
     }

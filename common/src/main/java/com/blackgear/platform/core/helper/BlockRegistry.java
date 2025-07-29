@@ -101,6 +101,14 @@ public class BlockRegistry {
         this.items.register();
     }
 
+    public CoreRegistry<Block> blocks() {
+        return this.blocks;
+    }
+
+    public CoreRegistry<Item> items() {
+        return this.items;
+    }
+
     public Supplier<Item> registerItem(String name, Supplier<Item> item) {
         return this.items.register(name, item);
     }
