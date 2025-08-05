@@ -27,14 +27,10 @@ public class ModInstanceBuilderImpl {
                 }
 
                 // Register common post-setup
-                bus.<FMLCommonSetupEvent>addListener(event -> {
-                    this.onPostCommon.accept(new ForgeParallelDispatch(event));
-                });
+                bus.<FMLCommonSetupEvent>addListener(event -> this.onPostCommon.accept(new ForgeParallelDispatch(event)));
 
                 // Register client post-setup (will only be called on client)
-                bus.<FMLClientSetupEvent>addListener(event -> {
-                    this.onPostClient.accept(new ForgeParallelDispatch(event));
-                });
+                bus.<FMLClientSetupEvent>addListener(event -> this.onPostClient.accept(new ForgeParallelDispatch(event)));
 
                 // Run common setup immediately
                 this.onCommon.run();

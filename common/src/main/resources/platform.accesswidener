@@ -38,5 +38,5 @@ accessible field net/minecraft/world/level/chunk/ChunkGenerator generationSettin
 accessible field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 accessible field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 
-# Resource Location
 accessible class net/minecraft/resources/ResourceLocation$Dummy
+accessible field net/minecraft/server/MinecraftServer resources Lnet/minecraft/server/MinecraftServer$ReloadableResources;

@@ -2,10 +2,10 @@ package com.blackgear.platform.common.data;
 
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Set;
-import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * WARNING: This class is used onto the ResourceLocation constructor
@@ -14,22 +14,45 @@ import java.util.Collections;
  * This class may get removed at some point in the short future...
  */
 public class DataTransformer {
-    private static final Map<String, ResourceLocation> DATA_TRANSFORMS = new ConcurrentHashMap<>();
-    private static final Set<String> NAMESPACES = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private static final ThreadLocal<Boolean> REENTRANT_GUARD = ThreadLocal.withInitial(() -> false);
+    private static final List<Function<ResourceLocation, ResourceLocation>> TRANSFORMERS = new CopyOnWriteArrayList<>();
 
-    private static final String SEPARATOR = ":";
-
-    public static void apply(ResourceLocation from, ResourceLocation to) {
-        DATA_TRANSFORMS.put(from.getNamespace() + SEPARATOR + from.getPath(), to);
-        NAMESPACES.add(from.getNamespace());
+    public static void onDataTransformation(Consumer<Transformer> consumer) {
+        consumer.accept(TRANSFORMERS::add);
     }
 
-    public static boolean shouldCheckNamespace(String namespace) {
-        return !NAMESPACES.isEmpty() && NAMESPACES.contains(namespace);
+    public static boolean shouldCheckNamespace() {
+        return !TRANSFORMERS.isEmpty();
     }
 
     public static ResourceLocation applyTransformsIfPossible(String namespace, String path) {
-        if (NAMESPACES.isEmpty() || !NAMESPACES.contains(namespace)) return null;
-        return DATA_TRANSFORMS.get(namespace + SEPARATOR + path);
+        if (TRANSFORMERS.isEmpty() || REENTRANT_GUARD.get()) return null;
+        REENTRANT_GUARD.set(true);
+        try {
+            ResourceLocation original = new ResourceLocation(namespace, path);
+            for (Function<ResourceLocation, ResourceLocation> transformer : TRANSFORMERS) {
+                ResourceLocation result = transformer.apply(original);
+                if (result != null) {
+                    return result;
+                }
+            }
+            return null;
+        } finally {
+            REENTRANT_GUARD.set(false);
+        }
+    }
+
+    public interface Transformer {
+        void add(Function<ResourceLocation, ResourceLocation> transformer);
+
+        default void remap(ResourceLocation original, ResourceLocation remapped) {
+            this.add(path -> {
+                if (path.equals(original)) {
+                    return remapped;
+                }
+
+                return null;
+            });
+        }
     }
 }

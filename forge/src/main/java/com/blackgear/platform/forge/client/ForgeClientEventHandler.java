@@ -1,9 +1,11 @@
 package com.blackgear.platform.forge.client;
 
 import com.blackgear.platform.core.events.ResourceReloadManager;
+import net.minecraft.core.RegistryAccess;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 // TODO: migrate all forge common events here
