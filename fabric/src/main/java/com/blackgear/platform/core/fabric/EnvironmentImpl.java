@@ -63,16 +63,18 @@ public class EnvironmentImpl {
         return FabricLoader.getInstance().getConfigDir();
     }
 
-    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
-        Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
-        new ModConfig(type, pair.getRight(), modId);
-        return pair.getLeft();
-    }
-
     public static <T> T registerSafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
         Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
         new ModConfig(type, pair.getRight(), modId, fileName);
         return pair.getLeft();
+    }
+
+    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
+        return registerSafeConfig(modId, type, defaultConfigName(type, modId), spec);
+    }
+
+    private static String defaultConfigName(ModConfig.Type type, String modId) {
+        return String.format("%s-%s.toml", modId, type.extension());
     }
 
     public static Environment.Loader getLoader() {

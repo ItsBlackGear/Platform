@@ -25,4 +25,8 @@ public class BlockEntityRegistry {
     public void register() {
         this.registry.register();
     }
+
+    public CoreRegistry<BlockEntityType<?>> registry() {
+        return this.registry;
+    }
 }

@@ -1,4 +1,4 @@
-package com.blackgear.platform.neoforge;
+package com.blackgear.platform.neoforge.client;
 
 import com.blackgear.platform.core.events.ResourceReloadManager;
 import net.neoforged.fml.ModLoadingContext;

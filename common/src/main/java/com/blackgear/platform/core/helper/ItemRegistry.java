@@ -54,6 +54,10 @@ public class ItemRegistry {
         this.items.register();
     }
 
+    public CoreRegistry<Item> registry() {
+        return this.items;
+    }
+
     @ExpectPlatform
     public static <T extends Mob> Item createSpawnEgg(Supplier<EntityType<T>> entity, int primaryColor, int secondaryColor, Item.Properties properties) {
         throw new AssertionError();

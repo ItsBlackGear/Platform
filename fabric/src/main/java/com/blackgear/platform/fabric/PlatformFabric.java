@@ -1,6 +1,7 @@
 package com.blackgear.platform.fabric;
 
 import com.blackgear.platform.Platform;
+import com.blackgear.platform.client.v2.emissive.fabric.BlockSpriteListener;
 import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.events.fabric.ServerLifecycle;
 import net.fabricmc.api.ModInitializer;
@@ -18,6 +19,7 @@ public class PlatformFabric implements ModInitializer {
 
         if (Environment.isClientSide()) {
             FabricClientEvents.bootstrap();
+            BlockSpriteListener.init();
         }
 
         FabricCommonEvents.bootstrap();

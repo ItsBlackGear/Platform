@@ -11,14 +11,18 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -32,20 +36,34 @@ import java.util.function.Supplier;
 
 public class GameRenderingImpl {
     public static void registerBlockColors(Consumer<GameRendering.BlockColorEvent> listener) {
-        IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
-        GameRendering.BlockColorEvent colorEvent = new GameRendering.BlockColorEvent() {
-            @Override
-            public void register(ItemColor color, ItemLike... items) {
-                bus.addListener((RegisterColorHandlersEvent.Item event) -> event.register(color, items));
-            }
-
+        Consumer<RegisterColorHandlersEvent.Block> consumer = event -> listener.accept(new GameRendering.BlockColorEvent() {
             @Override
             public void register(BlockColor color, Block... blocks) {
-                bus.addListener((RegisterColorHandlersEvent.Block event) -> event.register(color, blocks));
+                event.register(color, blocks);
             }
-        };
 
-        listener.accept(colorEvent);
+            @Override
+            public int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
+                return event.getBlockColors().getColor(state, level, pos, tint);
+            }
+        });
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+    }
+
+    public static void registerItemColors(Consumer<GameRendering.ItemColorEvent> listener) {
+        Consumer<RegisterColorHandlersEvent.Item> consumer = event -> listener.accept(new GameRendering.ItemColorEvent() {
+            @Override
+            public void register(ItemColor color, ItemLike... items) {
+                event.register(color, items);
+            }
+
+            @Override
+            public int getColor(ItemStack stack, int tint) {
+                BlockState state = ((BlockItem) stack.getItem()).getBlock().defaultBlockState();
+                return event.getBlockColors().getColor(state, null, null, tint);
+            }
+        });
+        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
     }
 
     public static void registerBlockRenderers(Consumer<GameRendering.BlockRendererEvent> listener) {

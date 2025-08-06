@@ -11,17 +11,24 @@
     "access.SimpleParticleTypeAccessor",
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",
-    "common.ResourceLocationMixin",
-    "config.ServerMainMixin"
+    "common.ResourceLocationMixin"
   ],
   "client": [
     "access.CameraAccessor",
     "access.ItemPropertiesAccessor",
     "access.NearPlaneAccessor",
+    "access.ScreenAccessor",
     "client.AbstractClientPlayerMixin",
+    "client.AbstractContainerScreenMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
-    "client.ModelBakeryMixin"
+    "client.ModelBakeryMixin",
+    "client.emissive.ModelBakeryMixin",
+    "client.emissive.ModelManagerMixin",
+    "client.emissive.SpriteLoaderMixin",
+    "client.emissive.SpriteResourceLoaderMixin",
+    "client.emissive.TextureAtlasSpriteMixin",
+    "config.ClientHandshakePacketListenerImplMixin"
   ],
   "injectors": {
     "defaultRequire": 1

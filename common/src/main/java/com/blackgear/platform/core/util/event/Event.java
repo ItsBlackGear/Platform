@@ -3,6 +3,7 @@ package com.blackgear.platform.core.util.event;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Objects;
 import java.util.function.Function;
 
 @SuppressWarnings({"unchecked", "SuspiciousInvocationHandlerImplementation"})
@@ -31,13 +32,13 @@ public abstract class Event<T> {
     public static <T> Event<T> cancellable(Class<? super T> type) {
         return create(type, callbacks -> (T) Proxy.newProxyInstance(Event.class.getClassLoader(), new Class[] { type }, (proxy, method, args) -> {
             for (Object callback : callbacks) {
-                boolean result = invokeFast(callback, method, args);
-                if (!result) {
-                    return false;
+                CancellableResult result = Objects.requireNonNull(invokeFast(callback, method, args));
+                if (result.isCancelled()) {
+                    return result;
                 }
             }
             
-            return true;
+            return CancellableResult.pass();
         }));
     }
     

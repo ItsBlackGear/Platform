@@ -20,7 +20,7 @@ public class ResourceLocationMixin {
         at = @At("TAIL")
     )
     private void onInit(String namespace, String path, CallbackInfo ci) {
-        if (!DataTransformer.shouldCheckNamespace(namespace)) return;
+        if (!DataTransformer.shouldCheckNamespace()) return;
 
         ResourceLocation remapped = DataTransformer.applyTransformsIfPossible(namespace, path);
         if (remapped != null) {

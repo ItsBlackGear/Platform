@@ -1,8 +1,11 @@
 package com.blackgear.platform.fabric;
 
 import com.blackgear.platform.client.event.HudRenderEvent;
+import com.blackgear.platform.client.event.screen.HudRendering;
+import com.blackgear.platform.client.event.screen.TooltipEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 
@@ -10,6 +13,12 @@ import net.minecraft.client.Minecraft;
 public class FabricClientEvents {
     public static void bootstrap() {
         renderHudEvent();
+        renderTooltipEvent();
+    }
+
+    private static void renderTooltipEvent() {
+        ItemTooltipCallback.EVENT.register(TooltipEvents.ITEM_SETUP.invoker()::registerTooltip);
+        HudRenderCallback.EVENT.register((graphics, tickDelta) -> HudRendering.RENDERING.invoker().onRender(Minecraft.getInstance(), graphics, tickDelta));
     }
 
     private static void renderHudEvent() {

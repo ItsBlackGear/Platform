@@ -10,12 +10,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(
-    value = {
-        LocalPlayer.class,
-        RemotePlayer.class
-    }
-)
+@Mixin(value = {
+    LocalPlayer.class,
+    RemotePlayer.class
+})
 public class ClientPlayerAttackMixin {
     @Inject(
         method = "hurt",
@@ -23,7 +21,7 @@ public class ClientPlayerAttackMixin {
         cancellable = true
     )
     private void platform$onAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (!EntityEvents.ON_ATTACK.invoker().onAttack((Player) (Object) this, source)) {
+        if (EntityEvents.ON_ATTACK.invoker().onAttack((Player) (Object) this, source).isCancelled()) {
             cir.setReturnValue(false);
         }
     }

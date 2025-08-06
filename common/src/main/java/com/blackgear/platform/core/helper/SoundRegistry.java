@@ -51,6 +51,10 @@ public class SoundRegistry {
         this.sounds.register();
     }
 
+    public CoreRegistry<SoundEvent> registry() {
+        return this.sounds;
+    }
+
     static class SoundTypeImpl extends SoundType {
         private final Supplier<SoundEvent> breakSound;
         private final Supplier<SoundEvent> stepSound;

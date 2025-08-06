@@ -26,17 +26,21 @@ public class CreativeTabsImpl {
     public static void modify(ResourceKey<CreativeModeTab> key, CreativeTabs.Modifier modifier) {
         MODIFICATIONS.add(event -> {
             if (event.getTabKey().equals(key)) {
-                modifier.accept(event.getFlags(), new CreativeTabs.Output() {
-                    @Override
-                    public void addAfter(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
-                        event.insertAfter(target, stack, visibility);
-                    }
+                modifier.accept(
+                    event.getFlags(),
+                    new CreativeTabs.Output() {
+                        @Override
+                        public void addAfter(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+                            event.insertAfter(target, stack, visibility);
+                        }
 
-                    @Override
-                    public void addBefore(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
-                        event.insertBefore(target, stack, visibility);
-                    }
-                }, event.hasPermissions());
+                        @Override
+                        public void addBefore(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+                            event.insertBefore(target, stack, visibility);
+                        }
+                    },
+                    event.hasPermissions()
+                );
             }
         });
     }

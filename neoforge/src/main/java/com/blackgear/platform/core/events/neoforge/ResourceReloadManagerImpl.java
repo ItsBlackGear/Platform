@@ -1,7 +1,7 @@
 package com.blackgear.platform.core.events.neoforge;
 
 import com.blackgear.platform.core.events.ResourceReloadManager;
-import com.blackgear.platform.neoforge.ForgeClientEventHandler;
+import com.blackgear.platform.neoforge.client.ForgeClientEventHandler;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 

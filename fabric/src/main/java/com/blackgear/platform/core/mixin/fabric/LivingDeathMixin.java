@@ -10,13 +10,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(
-    value = {
-        LivingEntity.class,
-        Player.class,
-        ServerPlayer.class
-    }
-)
+@Mixin(value = {
+    LivingEntity.class,
+    Player.class,
+    ServerPlayer.class
+})
 public class LivingDeathMixin {
     @Inject(
         method = "die",
@@ -24,7 +22,7 @@ public class LivingDeathMixin {
         cancellable = true
     )
     private void platform$onDeath(DamageSource source, CallbackInfo ci) {
-        if (!EntityEvents.ON_DEATH.invoker().onDeath((LivingEntity) (Object) this, source)) {
+        if (EntityEvents.ON_DEATH.invoker().onDeath((LivingEntity) (Object) this, source).isCancelled()) {
             ci.cancel();
         }
     }

@@ -1,10 +1,14 @@
 package com.blackgear.platform;
 
+import com.blackgear.platform.client.ClientSetup;
+import com.blackgear.platform.common.CommonSetup;
+import com.blackgear.platform.common.resource.RegistryAwareJsonReloadListener;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
-import com.blackgear.platform.core.networking.ConfigSyncPayload;
+import com.blackgear.platform.core.networking.packet.ClientboundConfigSyncPayload;
 import com.blackgear.platform.core.networking.Networking;
 import com.blackgear.platform.core.util.config.ConfigLoader;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,15 +16,22 @@ import org.apache.logging.log4j.Logger;
 public class Platform {
 	public static final String MOD_ID = "platform";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-	public static final ModInstance INSTANCE = ModInstance.create(MOD_ID).build();
+	public static final ModInstance INSTANCE = ModInstance.create(MOD_ID)
+		.client(ClientSetup::setup)
+		.common(CommonSetup::setup)
+		.build();
 
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
 
-		Networking.register(registrar -> registrar.registerToServer(ConfigSyncPayload.TYPE, ConfigSyncPayload.STREAM_CODEC, ConfigSyncPayload::handler));
+		Networking.register(registrar -> registrar.registerToClient(ClientboundConfigSyncPayload.TYPE, ClientboundConfigSyncPayload.STREAM_CODEC, ClientboundConfigSyncPayload::handler));
 
 		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
+	}
+
+	public static void afterDataReload(RegistryAccess registryAccess, boolean client) {
+		RegistryAwareJsonReloadListener.runReloads(registryAccess);
 	}
 
 	public static ResourceLocation resource(String path) {

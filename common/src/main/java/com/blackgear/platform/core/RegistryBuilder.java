@@ -1,11 +1,12 @@
 package com.blackgear.platform.core;
 
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Utility class to help register custom registries.
@@ -32,7 +33,18 @@ import java.util.Objects;
  * );
  * }</pre>
  */
-public record RegistryBuilder(String modId) {
+public abstract class RegistryBuilder {
+    protected final String modId;
+
+    protected RegistryBuilder(String modId) {
+        this.modId = modId;
+    }
+
+    @ExpectPlatform
+    public static RegistryBuilder create(String modId) {
+        throw new AssertionError();
+    }
+
     /**
      * Creates a ResourceKey for a registry with the given name.
      *
@@ -47,28 +59,23 @@ public record RegistryBuilder(String modId) {
      * Registers a simple registry with the given key and bootstrap function.
      *
      * @param key the registry key
-     * @param bootstrap the bootstrap function
      * @return the created registry
      */
-    public <T> Registry<T> registry(ResourceKey<Registry<T>> key, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
-        return BuiltInRegistries.registerSimple(key, bootstrap);
-    }
+    public abstract <T> Supplier<Registry<T>> registry(ResourceKey<Registry<T>> key);
 
     /**
      * Creates and registers a new registry type.
      *
      * @param name the registry name
-     * @param bootstrap the bootstrap function that provides the default registry value
      * @param <T> the type of registry being created
      * @return a RegistryReference containing the registry key and registry
      * @throws NullPointerException if key or bootstrap is null
      */
-    public <T> RegistryReference<T> create(String name, BuiltInRegistries.RegistryBootstrap<T> bootstrap) {
+    public <T> RegistryReference<T> reference(String name) {
         Objects.requireNonNull(name, "Registry name cannot be null");
-        Objects.requireNonNull(bootstrap, "Bootstrap function cannot be null");
 
-        ResourceKey<Registry<T>> resource = resource(name);
-        return new RegistryReference<>(resource, registry(resource, bootstrap));
+        ResourceKey<Registry<T>> resource = this.resource(name);
+        return new RegistryReference<>(resource, this.registry(resource));
     }
 
     /**
@@ -82,7 +89,7 @@ public record RegistryBuilder(String modId) {
      *
      * @param <T> the type of registry
      */
-    public record RegistryReference<T>(ResourceKey<Registry<T>> resource, Registry<T> registry) {
+    public record RegistryReference<T>(ResourceKey<Registry<T>> resource, Supplier<Registry<T>> registry) {
         /**
          * Gets the resource location for this registry.
          *

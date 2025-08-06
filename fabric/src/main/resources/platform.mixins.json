@@ -12,12 +12,18 @@
     "loot.LootTableBuilderAccessor"
   ],
   "client": [
+    "client.AbstractContainScreenMixin",
     "client.ClientLevelMixin",
     "client.ClientPlayerAttackMixin",
+    "client.ClientPlayerPacketListenerMixin",
     "client.FogRendererMixin",
+    "client.GameRendererMixin",
+    "client.GuiGraphicsMixin",
     "client.GuiMixin",
     "client.MinecraftMixin",
-    "client.SkullBlockRendererMixin"
+    "client.ScreenMixin",
+    "client.SkullBlockRendererMixin",
+    "client.input.MouseHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
