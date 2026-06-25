@@ -18,7 +18,7 @@ public class SoundRegistry {
 
     private SoundRegistry(String modId) {
         this.modId = modId;
-        this.sounds = CoreRegistry.create(BuiltInRegistries.SOUND_EVENT, this.modId);
+        this.sounds = CoreRegistry.create(BuiltInRegistries.SOUND_EVENT, modId);
     }
 
     public Supplier<SoundEvent> soundEvent(String name) {

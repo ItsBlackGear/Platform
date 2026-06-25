@@ -9,6 +9,7 @@
     "access.PackRepositoryAccessor",
     "access.SensorTypeAccessor",
     "access.SimpleParticleTypeAccessor",
+    "access.SpawnPlacementsAccessor",
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",
     "common.ResourceLocationMixin"
@@ -23,11 +24,6 @@
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
-    "client.emissive.ModelBakeryMixin",
-    "client.emissive.ModelManagerMixin",
-    "client.emissive.SpriteLoaderMixin",
-    "client.emissive.SpriteResourceLoaderMixin",
-    "client.emissive.TextureAtlasSpriteMixin",
     "config.ClientHandshakePacketListenerImplMixin"
   ],
   "injectors": {

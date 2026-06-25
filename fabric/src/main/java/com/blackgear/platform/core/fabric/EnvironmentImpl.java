@@ -1,22 +1,16 @@
 package com.blackgear.platform.core.fabric;
 
 import com.blackgear.platform.core.Environment;
-import com.blackgear.platform.core.util.config.ConfigBuilder;
-import com.blackgear.platform.core.util.config.ModConfig;
-import com.blackgear.platform.core.util.config.SimpleConfigBuilder;
-import com.blackgear.platform.core.util.config.SimpleConfigSpec;
 import com.blackgear.platform.fabric.PlatformFabric;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.thread.BlockableEventLoop;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class EnvironmentImpl {
@@ -61,20 +55,6 @@ public class EnvironmentImpl {
     
     public static Path getConfigDir() {
         return FabricLoader.getInstance().getConfigDir();
-    }
-
-    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
-        Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
-        new ModConfig(type, pair.getRight(), modId, fileName);
-        return pair.getLeft();
-    }
-
-    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
-        return registerSafeConfig(modId, type, defaultConfigName(type, modId), spec);
-    }
-
-    private static String defaultConfigName(ModConfig.Type type, String modId) {
-        return String.format("%s-%s.toml", modId, type.extension());
     }
 
     public static Environment.Loader getLoader() {

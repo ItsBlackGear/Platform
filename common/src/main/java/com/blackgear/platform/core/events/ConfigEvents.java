@@ -7,5 +7,5 @@ public interface ConfigEvents {
     Event<ConfigEvents> LOADING = Event.create(ConfigEvents.class);
     Event<ConfigEvents> RELOADING = Event.create(ConfigEvents.class);
 
-    void onModConfig(ModConfig config);
+    void accept(ModConfig config);
 }

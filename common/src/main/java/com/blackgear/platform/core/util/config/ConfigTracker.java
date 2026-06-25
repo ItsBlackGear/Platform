@@ -6,6 +6,7 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,14 +23,14 @@ public class ConfigTracker {
     private final ConcurrentHashMap<String, ModConfig> fileMap = new ConcurrentHashMap<>();
     private final EnumMap<ModConfig.Type, Set<ModConfig>> configSets = new EnumMap<>(ModConfig.Type.class);
     private final ConcurrentHashMap<String, Map<ModConfig.Type, ModConfig>> configsByMod = new ConcurrentHashMap<>();
-    
+
     private ConfigTracker() {
         for (var type : ModConfig.Type.values()) {
             this.configSets.put(type, Collections.synchronizedSet(new LinkedHashSet<>()));
         }
     }
     
-    void trackConfig(ModConfig config) {
+    public void trackConfig(ModConfig config) {
         if (this.fileMap.containsKey(config.getFileName())) {
             LOGGER.error("Detected config file conflict {} between {} and {}", config.getFileName(), this.fileMap.get(config.getFileName()).getModId(), config.getModId());
             throw new RuntimeException("Config conflict detected!");
@@ -40,7 +41,7 @@ public class ConfigTracker {
         this.configsByMod.computeIfAbsent(config.getModId(), (k) -> new EnumMap<>(ModConfig.Type.class)).put(config.getType(), config);
         LOGGER.debug("Config file {} for {} tracking", config.getFileName(), config.getModId());
     }
-    
+
     public void loadConfigs(ModConfig.Type type, Path configBasePath) {
         LOGGER.debug("Loading configs type {}", type);
         this.configSets.get(type).forEach(config -> openConfig(config, configBasePath));
@@ -62,11 +63,10 @@ public class ConfigTracker {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private void openConfig(final ModConfig config, final Path configBasePath) {
-        LOGGER.trace("Loading config file type {} at {} for {}", config.getType(), config.getFileName(), config.getModId());
+    private void openConfig(ModConfig config, Path configBasePath) {
         CommentedFileConfig configData = config.getHandler().reader(configBasePath).apply(config);
         config.setConfigData(configData);
-        ConfigEvents.LOADING.invoker().onModConfig(config);
+        ConfigEvents.LOADING.invoker().accept(config);
         config.save();
     }
     
@@ -79,10 +79,10 @@ public class ConfigTracker {
     }
 
     public void receiveSyncedConfig(ClientboundConfigSyncPayload payload) {
-        if (this.fileMap.containsKey(payload.name())) {
+        if (!Minecraft.getInstance().isLocalServer() && this.fileMap.containsKey(payload.name())) {
             ModConfig config = this.fileMap.get(payload.name());
             config.setConfigData((TomlFormat.instance().createParser().parse(new ByteArrayInputStream(payload.data()))));
-            ConfigEvents.RELOADING.invoker().onModConfig(config);
+            ConfigEvents.RELOADING.invoker().accept(config);
         }
     }
 
@@ -91,7 +91,7 @@ public class ConfigTracker {
             CommentedConfig commentedConfig = CommentedConfig.inMemory();
             config.getSpec().correct(commentedConfig);
             config.setConfigData(commentedConfig);
-            ConfigEvents.LOADING.invoker().onModConfig(config);
+            ConfigEvents.LOADING.invoker().accept(config);
         });
     }
 

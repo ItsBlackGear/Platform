@@ -47,7 +47,6 @@ public class ForgeClientEvents {
         }
     }
 
-
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onScreenInitialization(ScreenEvent.Init.Post event) {
         HudRendering.POST_INITIALIZE.invoker().onInitialize(Minecraft.getInstance(), event.getScreen(), new ScreenAccessImpl(event.getScreen()));

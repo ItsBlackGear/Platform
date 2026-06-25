@@ -1,5 +1,6 @@
 package com.blackgear.platform.client.fabric;
 
+import com.blackgear.platform.Platform;
 import com.blackgear.platform.client.GameRendering;
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -17,6 +18,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -30,7 +32,6 @@ import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -98,7 +99,7 @@ public class GameRenderingImpl {
     }
 
     public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
-        GameRendering.SpecialModelEvent event = new GameRendering.SpecialModelEvent() {
+        listener.accept(new GameRendering.SpecialModelEvent() {
             @Override
             public void register(ResourceLocation model) {
                 ModelLoadingPlugin.register(context -> context.addModels(model));
@@ -106,14 +107,49 @@ public class GameRenderingImpl {
 
             @Override
             public void register(ResourceLocation... models) {
-                Arrays.stream(models).forEach(this::register);
+                for (ResourceLocation model : models) this.register(model);
             }
-        };
-        listener.accept(event);
+        });
+    }
+
+    public static void registerModelOverrides(Consumer<GameRendering.ModelOverrideEvent> listener) {
+        ModelLoadingPlugin.register(plugin -> {
+            listener.accept(new GameRendering.ModelOverrideEvent() {
+                @Override
+                public void register(ResourceLocation original, ResourceLocation override, boolean condition) {
+                    GameRendering.ModelOverrideEvent.super.register(original, override, condition);
+                    plugin.addModels(wrapModel(override));
+                }
+            });
+
+            plugin.modifyModelAfterBake().register((model, context) -> {
+                ModelResourceLocation toLevel = context.topLevelId();
+
+                if (toLevel != null && "inventory".equals(toLevel.getVariant())) {
+                    ResourceLocation original = toLevel.id();
+                    ResourceLocation override = GameRendering.MODEL_OVERRIDES.get(original);
+
+                    if (override != null) {
+                        try {
+                            ResourceLocation overrideModel = wrapModel(override);
+                            return context.baker().bake(overrideModel, context.settings());
+                        } catch (Exception e) {
+                            Platform.LOGGER.error("Failed to load override model: {}", override);
+                        }
+                    }
+                }
+
+                return model;
+            });
+        });
+    }
+
+    private static ResourceLocation wrapModel(ResourceLocation model) {
+        return ResourceLocation.fromNamespaceAndPath(model.getNamespace(), "item/" + model.getPath());
     }
 
     public static void registerSkullRenderers(Consumer<GameRendering.SkullRendererEvent> listener) {
-        GameRendering.SkullRendererEvent event = new GameRendering.SkullRendererEvent() {
+        listener.accept(new GameRendering.SkullRendererEvent() {
             @Override
             public void registerSkullModel(SkullBlock.Type type, Function<ModelPart, SkullModelBase> model, ModelLayerLocation layer) {
                 MODEL_BY_SKULL.put(type, new Pair<>(model, layer));
@@ -123,12 +159,11 @@ public class GameRenderingImpl {
             public void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture) {
                 TEXTURE_BY_SKULL.put(type, texture);
             }
-        };
-        listener.accept(event);
+        });
     }
 
     public static void registerParticleFactories(Consumer<GameRendering.ParticleFactoryEvent> listener) {
-        GameRendering.ParticleFactoryEvent event = new GameRendering.ParticleFactoryEvent() {
+        listener.accept(new GameRendering.ParticleFactoryEvent() {
             @Override
             public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider) {
                 ParticleFactoryRegistry.getInstance().register(type.get(), provider);
@@ -138,7 +173,6 @@ public class GameRenderingImpl {
             public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory) {
                 ParticleFactoryRegistry.getInstance().register(type.get(), factory::create);
             }
-        };
-        listener.accept(event);
+        });
     }
 }

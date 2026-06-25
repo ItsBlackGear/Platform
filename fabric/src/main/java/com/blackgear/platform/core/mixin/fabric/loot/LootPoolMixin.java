@@ -1,7 +1,5 @@
 package com.blackgear.platform.core.mixin.fabric.loot;
 
-import com.blackgear.platform.Platform;
-
 import com.blackgear.platform.common.data.fabric.LootPoolAccess;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;

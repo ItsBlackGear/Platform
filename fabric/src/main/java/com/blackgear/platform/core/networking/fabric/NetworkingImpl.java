@@ -1,8 +1,8 @@
 package com.blackgear.platform.core.networking.fabric;
 
+import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.networking.PayloadContext;
 import com.blackgear.platform.core.networking.Networking;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -26,8 +26,7 @@ public class NetworkingImpl {
 
             @Override
             public <T extends CustomPacketPayload> void registerToClient(CustomPacketPayload.Type<T> type, StreamCodec<? super RegistryFriendlyByteBuf, T> codec, BiConsumer<T, PayloadContext> handler) {
-                PayloadTypeRegistry.playS2C().register(type, codec);
-                ClientPlayNetworking.registerGlobalReceiver(type, (payload, context) -> handler.accept(payload, clientboundWrapper(context)));
+                if (Environment.isClientSide()) ClientNetworking.registerToClient(type, codec, handler);
             }
         });
     }
@@ -57,42 +56,6 @@ public class NetworkingImpl {
             public <S> CompletableFuture<S> enqueueWork(Supplier<S> supplier) {
                 CompletableFuture<S> future = new CompletableFuture<>();
                 context.server().execute(() -> {
-                    try {
-                        future.complete(supplier.get());
-                    } catch (Exception e) {
-                        future.completeExceptionally(e);
-                    }
-                });
-                return future;
-            }
-        };
-    }
-
-    private static PayloadContext clientboundWrapper(ClientPlayNetworking.Context context) {
-        return new PayloadContext() {
-            @Override
-            public Player player() {
-                return context.player();
-            }
-
-            @Override
-            public CompletableFuture<Void> enqueueWork(Runnable runnable) {
-                CompletableFuture<Void> future = new CompletableFuture<>();
-                context.client().execute(() -> {
-                    try {
-                        runnable.run();
-                        future.complete(null);
-                    } catch (Exception exception) {
-                        future.completeExceptionally(exception);
-                    }
-                });
-                return future;
-            }
-
-            @Override
-            public <S> CompletableFuture<S> enqueueWork(Supplier<S> supplier) {
-                CompletableFuture<S> future = new CompletableFuture<>();
-                context.client().execute(() -> {
                     try {
                         future.complete(supplier.get());
                     } catch (Exception e) {

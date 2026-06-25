@@ -49,7 +49,11 @@ public class ForgeCommonEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onEntityDeath(LivingDeathEvent event) {
-        if (EntityEvents.ON_DEATH.invoker().onDeath(event.getEntity(), event.getSource()).isCancelled()) {
+        if (EntityEvents.ON_REMOVE.invoker().onRemove(event.getEntity(), event.getSource()).isCancelled()) {
+            event.setCanceled(true);
+        }
+
+        if (!EntityEvents.ON_DEATH.invoker().onDeath(event.getEntity(), event.getSource())) {
             event.setCanceled(true);
         }
     }

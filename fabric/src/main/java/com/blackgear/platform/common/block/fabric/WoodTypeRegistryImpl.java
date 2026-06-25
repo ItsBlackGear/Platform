@@ -14,5 +14,6 @@ public class WoodTypeRegistryImpl {
 
     @Environment(EnvType.CLIENT)
     public static void registerWoodType(WoodType type) {
+        // NO-OP
     }
 }

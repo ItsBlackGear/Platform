@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.*;
@@ -23,6 +24,10 @@ public class BlockIntegration {
         void registerFuelItem(ItemLike item, int burnTime);
 
         void registerCompostableItem(ItemLike item, float chance);
+
+        void registerWaxableBlock(Block unwaxed, Block waxed);
+
+        void registerOxidableBlock(Block less, Block more);
 
         default void registerDispenserBehavior(ItemLike item, DispenseItemBehavior behavior) {
             DispenserBlock.registerBehavior(item, behavior);

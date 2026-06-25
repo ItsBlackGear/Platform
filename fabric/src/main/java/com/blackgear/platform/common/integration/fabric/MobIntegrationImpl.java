@@ -2,6 +2,7 @@ package com.blackgear.platform.common.integration.fabric;
 
 import com.blackgear.platform.common.integration.MobIntegration;
 import com.blackgear.platform.common.integration.MobInteraction;
+import com.blackgear.platform.core.mixin.access.SpawnPlacementsAccessor;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.world.entity.*;
@@ -26,7 +27,11 @@ public class MobIntegrationImpl {
 
             @Override
             public <T extends Mob> void registerPlacement(Supplier<EntityType<T>> entity, SpawnPlacementType spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
-                SpawnPlacements.register(entity.get(), spawnPlacement, heightmap, spawnPredicate);
+                if (SpawnPlacementsAccessor.getDATA_BY_TYPE().get(entity.get()) != null) {
+                    SpawnPlacementsAccessor.getDATA_BY_TYPE().put(entity.get(), new SpawnPlacements.Data(heightmap, spawnPlacement, spawnPredicate));
+                } else {
+                    SpawnPlacements.register(entity.get(), spawnPlacement, heightmap, spawnPredicate);
+                }
             }
         });
     }

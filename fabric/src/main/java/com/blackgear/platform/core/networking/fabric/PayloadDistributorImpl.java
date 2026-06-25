@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.networking.fabric;
 
 import com.blackgear.platform.core.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -14,9 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PayloadDistributorImpl {
     public static void sendToServer(CustomPacketPayload payload) {
-        if (Environment.isClientSide()) {
-            ClientPlayNetworking.send(payload);
-        }
+        if (Environment.isClientSide()) ClientPayloadDistributor.sendToServer(payload);
     }
 
     public static void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {

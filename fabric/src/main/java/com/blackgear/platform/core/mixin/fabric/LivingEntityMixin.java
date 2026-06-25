@@ -17,9 +17,10 @@ public class LivingEntityMixin {
         cancellable = true
     )
     private void platform$onAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if ((Object) this instanceof Player) return;
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (self instanceof Player) return;
 
-        if (EntityEvents.ON_ATTACK.invoker().onAttack((LivingEntity) (Object) this, source).isCancelled()) {
+        if (EntityEvents.ON_ATTACK.invoker().onAttack(self, source).isCancelled()) {
             cir.setReturnValue(false);
         }
     }

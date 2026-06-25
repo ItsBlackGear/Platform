@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class BiomePlacement {
-    public static final List<Pair<ParameterPoint, ResourceKey<Biome>>> BIOME_PLACEMENTS = Lists.newArrayList();
+    public static final List<Consumer<Event>> LISTENERS = Lists.newArrayList();
 
     public static void registerBiomePlacements(Consumer<Event> listener) {
-        listener.accept(BIOME_PLACEMENTS::add);
+        LISTENERS.add(listener);
     }
 
     public interface Event {

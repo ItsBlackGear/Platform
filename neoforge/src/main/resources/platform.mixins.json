@@ -4,11 +4,15 @@
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "mixins": [
+    "ComposterBlockMixin",
+    "HoneycombItemMixin",
     "LootPoolMixin",
-    "access.LootTableAccessor",
-    "client.ComposterBlockMixin"
+    "WeatheringCopperMixin",
+    "access.LootTableAccessor"
   ],
   "client": [
+    "client.BEWLRMixin",
+    "client.BoatRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

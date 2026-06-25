@@ -18,6 +18,7 @@ public class ItemPropertyRegistryImpl {
     }
     
     public static void registerCustomModelData(ItemPropertyFunction property) {
+        ItemPropertiesAccessor.getGENERIC_PROPERTIES().put(ResourceLocation.withDefaultNamespace("custom_model_data"), property);
     }
     
     public static void register(Item item, ResourceLocation name, ClampedItemPropertyFunction property) {

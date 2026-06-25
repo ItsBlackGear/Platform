@@ -3,7 +3,11 @@ package com.blackgear.platform.core.events.fabric;
 import com.blackgear.platform.core.Environment;
 import com.blackgear.platform.core.events.ResourcePackManager;
 import com.blackgear.platform.core.mixin.access.PackRepositoryAccessor;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.RepositorySource;
@@ -14,32 +18,30 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ResourcePackManagerImpl {
-    private static final Map<PackType, List<Supplier<Pack>>> PACKS = new EnumMap<>(PackType.class);
+    public static final List<RepositorySource> PACKS = new ArrayList<>();
 
     public static void registerPack(Consumer<ResourcePackManager.Event> listener) {
-        listener.accept((packType, pack) -> {
-            if (pack == null) return;
-            PACKS.computeIfAbsent(packType, p -> new ArrayList<>()).add(pack);
+        listener.accept((type, source) -> {
+            if (Environment.isClientSide() && type == PackType.CLIENT_RESOURCES) {
+                if (Minecraft.getInstance().getResourcePackRepository() instanceof PackRepositoryAccessor repository) {
+                    Set<RepositorySource> sources = new HashSet<>(repository.getSources());
+                    sources.add(source);
+                    repository.setSources(sources);
+                }
+            }
 
-            // Update client resource repository immediately if applicable
-            if (Environment.isClientSide() && packType == PackType.CLIENT_RESOURCES) {
-                updateClientRepository();
+            if (type == PackType.SERVER_DATA) {
+                PACKS.add(source);
             }
         });
     }
 
-    private static void updateClientRepository() {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.getResourcePackRepository() instanceof PackRepositoryAccessor repository) {
-            Set<RepositorySource> sources = new HashSet<>(repository.getSources());
-            getAdditionalPacks(PackType.CLIENT_RESOURCES)
-                .forEach(pack -> sources.add(onLoad -> onLoad.accept(pack.get())));
-            repository.setSources(sources);
-        }
-    }
-
-    public static Collection<Supplier<Pack>> getAdditionalPacks(@Nullable PackType packType) {
-        List<Supplier<Pack>> result = PACKS.get(packType);
-        return result != null ? result : Collections.emptyList();
+    public static void registerBuiltResourcePack(ResourceLocation packId, String modId, String packName) {
+        ResourceManagerHelper.registerBuiltinResourcePack(
+            packId,
+            FabricLoader.getInstance().getModContainer(modId).orElseThrow(),
+            packName,
+            ResourcePackActivationType.NORMAL
+        );
     }
 }

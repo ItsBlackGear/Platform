@@ -2,8 +2,8 @@ package com.blackgear.platform.core.neoforge;
 
 import com.blackgear.platform.core.ModInstance;
 import com.blackgear.platform.core.ParallelDispatch;
+import com.blackgear.platform.core.util.EventBus;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -20,7 +20,7 @@ public class ModInstanceBuilderImpl {
     ) {
         return new ModInstance(modId, common, postCommon, client, postClient) {
             @Override public void bootstrap() {
-                IEventBus bus = ModLoadingContext.get().getActiveContainer().getEventBus();
+                IEventBus bus = EventBus.get(EventBus.MOD);
                 if (bus == null) {
                     throw new IllegalStateException("Failed to get Forge mod event bus");
                 }

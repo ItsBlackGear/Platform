@@ -21,7 +21,11 @@ public class OverworldBiomeBuilderMixin {
         at = @At("TAIL")
     )
     private void platform$addBiomes(Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper, CallbackInfo ci) {
-        BiomeSpawnPlacement.BIOME_ENTRIES.forEach(mapper);
-        BiomePlacement.BIOME_PLACEMENTS.forEach(mapper);
+        BiomeSpawnPlacement.BIOME_ENTRIES.forEach(mapper); // Deprecated
+
+        BiomePlacement.Event event = mapper::accept;
+        for (Consumer<BiomePlacement.Event> listener : BiomePlacement.LISTENERS) {
+            listener.accept(event);
+        }
     }
 }

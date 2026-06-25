@@ -8,11 +8,10 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public interface RegistryHolder<T> extends Supplier<T> {
-    @Override
-    T get();
+    @Override T get();
 
     default Optional<T> asOptional() {
-        return this.isPresent() ? Optional.of(this.get()) : Optional.empty();
+        return this.isPresent() ? Optional.ofNullable(this.get()) : Optional.empty();
     }
 
     Optional<Holder<T>> getHolder();

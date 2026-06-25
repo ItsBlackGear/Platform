@@ -1,23 +1,23 @@
 package com.blackgear.platform.core.helper;
 
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.network.syncher.EntityDataSerializers;
 
-public class DataSerializerRegistry {
-    public static DataSerializerRegistry create() {
-        return new DataSerializerRegistry();
+import java.util.function.Supplier;
+
+public abstract class DataSerializerRegistry {
+    @ExpectPlatform
+    public static DataSerializerRegistry create(String modId) {
+        throw new AssertionError();
     }
 
-    public <T> EntityDataSerializer<T> create(StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
-        return register(EntityDataSerializer.forValueType(codec));
+    public <T> Supplier<EntityDataSerializer<T>> register(String name, StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
+        return register(name, () -> EntityDataSerializer.forValueType(codec));
     }
 
-    public <T> EntityDataSerializer<T> register(EntityDataSerializer<T> serializer) {
-        EntityDataSerializers.registerSerializer(serializer);
-        return serializer;
-    }
+    public abstract <T> Supplier<EntityDataSerializer<T>> register(String name, Supplier<EntityDataSerializer<T>> serializer);
 
-    public void register() {}
+    public abstract void register();
 }

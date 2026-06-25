@@ -2,11 +2,11 @@ package com.blackgear.platform.core.networking.neoforge;
 
 import com.blackgear.platform.core.networking.PayloadContext;
 import com.blackgear.platform.core.networking.Networking;
+import com.blackgear.platform.core.util.EventBus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 public class NetworkingImpl {
     public static void register(Consumer<Networking.Registrar> listener) {
-        Consumer<RegisterPayloadHandlersEvent> consumer = event -> {
+        EventBus.get(EventBus.MOD).addListener((RegisterPayloadHandlersEvent event) -> {
             PayloadRegistrar registrar = event.registrar("1");
             listener.accept(new Networking.Registrar() {
                 @Override
@@ -32,8 +32,7 @@ public class NetworkingImpl {
                     registrar.playToClient(type, codec, (payload, context) -> handler.accept(payload, wrapper(context)));
                 }
             });
-        };
-        ModLoadingContext.get().getActiveContainer().getEventBus().addListener(consumer);
+        });
     }
 
     private static @NotNull PayloadContext wrapper(IPayloadContext context) {

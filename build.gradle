@@ -1,5 +1,5 @@
 plugins {
-    id 'dev.architectury.loom' version '1.9-SNAPSHOT' apply false
+    id 'dev.architectury.loom' version '1.11-SNAPSHOT' apply false
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
@@ -27,6 +27,8 @@ subprojects {
     repositories {
         mavenCentral()
         maven { url "https://maven.parchmentmc.org" }
+        maven { url "https://jitpack.io" }
+        maven { url "https://maven.gegy.dev" }
         maven { url "https://cursemaven.com" }
         flatDir { dirs "/libs" }
     }
@@ -48,7 +50,7 @@ subprojects {
         // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
         // if it is present.
         // If you remove this line, sources will not be generated.
-        withSourcesJar()
+//        withSourcesJar()
 
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -62,13 +64,17 @@ subprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifactId = base.archivesName.get()
+                artifactId = "${rootProject.archives_name}-${project.name}-${project.minecraft_version}"
                 from components.java
             }
         }
 
         // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
         repositories {
+            maven {
+                url = rootProject.file("build/local-repo")
+            }
+
             // Add repositories to publish to here.
             // Notice: This block does NOT have the same function as the block in the top level.
             // The repositories here will be used for publishing your artifact, not for

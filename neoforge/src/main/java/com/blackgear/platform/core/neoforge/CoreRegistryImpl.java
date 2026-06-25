@@ -2,12 +2,12 @@ package com.blackgear.platform.core.neoforge;
 
 import com.blackgear.platform.core.CoreRegistry;
 import com.blackgear.platform.core.RegistryHolder;
+import com.blackgear.platform.core.util.EventBus;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -32,18 +32,20 @@ public class CoreRegistryImpl<T> extends CoreRegistry<T> {
         return new CoreRegistryImpl(DeferredRegister.create(registry.key(), modId), modId);
     }
 
-    @Override @SuppressWarnings("unchecked")
+    @Override
     public <E extends T> Supplier<E> register(String name, Supplier<E> entry) {
-        DeferredHolder<T, E> value = this.registry.register(name, entry);
-        this.entries.add((Supplier<T>) value);
-        return value;
+        return this.registry.register(name, entry);
+    }
+
+    @Override
+    public <E extends T> Holder<T> holder(String name, Supplier<E> entry) {
+        return this.registry.register(name, entry);
     }
 
     @Override @SuppressWarnings("unchecked")
     public <E extends T> RegistryHolder<E> registerHolder(String name, Supplier<E> entry) {
         DeferredHolder<T, E> registered = this.registry.register(name, entry);
-        this.entries.add((Supplier<T>) registered);
-        return new RegistryHolder<E>() {
+        return new RegistryHolder<>() {
             @Override
             public E get() {
                 return registered.get();
@@ -88,6 +90,6 @@ public class CoreRegistryImpl<T> extends CoreRegistry<T> {
 
     @Override
     protected void bootstrap() {
-        this.registry.register(ModLoadingContext.get().getActiveContainer().getEventBus());
+        this.registry.register(EventBus.get(EventBus.MOD));
     }
 }

@@ -22,7 +22,12 @@ public class LivingDeathMixin {
         cancellable = true
     )
     private void platform$onDeath(DamageSource source, CallbackInfo ci) {
-        if (EntityEvents.ON_DEATH.invoker().onDeath((LivingEntity) (Object) this, source).isCancelled()) {
+        LivingEntity self = (LivingEntity) (Object) this;
+        if (EntityEvents.ON_REMOVE.invoker().onRemove(self, source).isCancelled()) {
+            ci.cancel();
+        }
+
+        if (!EntityEvents.ON_DEATH.invoker().onDeath(self, source)) {
             ci.cancel();
         }
     }

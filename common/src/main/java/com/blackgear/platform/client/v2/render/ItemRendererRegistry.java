@@ -1,34 +1,45 @@
 package com.blackgear.platform.client.v2.render;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.blackgear.platform.core.util.event.ResultHolder;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import net.minecraft.client.renderer.ItemModelShaper;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 public class ItemRendererRegistry {
-    private static final Map<Item, ModelResourceLocation> MODELS = new ConcurrentHashMap<>();
+    public static final Supplier<ItemRendererRegistry> INSTANCE = Suppliers.memoize(ItemRendererRegistry::new);
+    private static final Map<Item, Renderer> RENDERERS = new HashMap<>();
 
-    @ExpectPlatform
-    public static void registerRenderer(ItemLike item, DynamicItemRenderer renderer) {
-        throw new AssertionError();
+    public void register(ItemLike item, Renderer renderer) {
+        RENDERERS.putIfAbsent(item.asItem(), renderer);
     }
 
-    public static void registerHandModel(ItemLike item, ModelResourceLocation handModel) {
-        MODELS.put(item.asItem(), handModel);
+    public Renderer get(ItemLike item) {
+        return RENDERERS.get(item.asItem());
     }
 
-    public static ModelResourceLocation getHandModel(Item item) {
-        return MODELS.get(item);
+    public Map<Item, Renderer> getRenderers() {
+        return RENDERERS;
     }
 
-    public interface DynamicItemRenderer {
-        void render(ItemStack stack, ItemDisplayContext context, PoseStack pose, MultiBufferSource buffer, int packedLight, int combinedOverlay);
+    public interface Renderer {
+        ResultHolder<BakedModel> renderFirstPerson(ItemStack stack, ItemDisplayContext context, ItemModelShaper shaper);
+
+        ResultHolder<BakedModel> renderThirdPerson(ItemStack stack, ItemModelShaper shaper);
+
+        Set<ModelResourceLocation> registerModels();
+
+        default boolean shouldUse() {
+            return true;
+        }
     }
 }

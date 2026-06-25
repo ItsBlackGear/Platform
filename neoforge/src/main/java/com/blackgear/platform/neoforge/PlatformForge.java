@@ -6,7 +6,6 @@ import net.neoforged.fml.common.Mod;
 @Mod(Platform.MOD_ID)
 public final class PlatformForge {
     public PlatformForge() {
-        // Run our common setup.
         Platform.bootstrap();
     }
 }

@@ -2,7 +2,6 @@ package com.blackgear.platform.core.mixin.fabric.client;
 
 import com.blackgear.platform.client.fabric.GameRenderingImpl;
 import com.google.common.collect.ImmutableMap;
-import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
