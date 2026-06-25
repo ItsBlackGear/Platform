@@ -52,18 +52,10 @@ public abstract class ModInstance {
      * Prevents null pointer exceptions by populating the fields with empty methods.
      */
     private void populateIfEmpty() {
-        if (this.onCommon == null) {
-            this.onCommon = () -> {};
-        }
-        if (this.onPostCommon == null) {
-            this.onPostCommon = dispatch -> {};
-        }
-        if (this.onClient == null) {
-            this.onClient = () -> {};
-        }
-        if (this.onPostClient == null) {
-            this.onPostClient = dispatch -> {};
-        }
+        if (this.onCommon == null) this.onCommon = () -> {};
+        if (this.onPostCommon == null) this.onPostCommon = dispatch -> {};
+        if (this.onClient == null) this.onClient = () -> {};
+        if (this.onPostClient == null) this.onPostClient = dispatch -> {};
     }
 
     /**

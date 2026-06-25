@@ -1,5 +1,6 @@
 package com.blackgear.platform.core.mixin.fabric.client.input;
 
+import com.blackgear.platform.client.event.input.RawInputEvent;
 import com.blackgear.platform.client.event.screen.HudInteractions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
@@ -46,6 +47,23 @@ public class MouseHandlerMixin {
     public void onMouseScrollPost(long handle, double xOffset, double yOffset, CallbackInfo ci, double amountY, double x, double y) {
         if (!ci.isCancelled()) {
             HudInteractions.SCROLLING_POST.invoker().onScrolling(this.minecraft, this.minecraft.screen, x, y, amountY);
+        }
+    }
+
+    @Inject(method = "onScroll",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z",
+            ordinal = 0
+        ),
+        cancellable = true,
+        locals = LocalCapture.CAPTURE_FAILHARD
+    )
+    public void onRawMouseScrolled(long windowPointer, double xOffset, double yOffset, CallbackInfo ci, double deltaY, int i) {
+        if (!ci.isCancelled()) {
+            if (RawInputEvent.ON_MOUSE_SCROLL.invoker().handle(this.minecraft, deltaY).isCancelled()) {
+                ci.cancel();
+            }
         }
     }
 

@@ -1,6 +1,8 @@
 package com.blackgear.platform.client.forge;
 
+import com.blackgear.platform.Platform;
 import com.blackgear.platform.client.GameRendering;
+import com.blackgear.platform.core.util.EventBus;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.SkullModelBase;
@@ -10,6 +12,8 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -26,16 +30,15 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import java.util.Arrays;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class GameRenderingImpl {
     public static void registerBlockColors(Consumer<GameRendering.BlockColorEvent> listener) {
-        Consumer<RegisterColorHandlersEvent.Block> consumer = event -> {
+        EventBus.get(EventBus.MOD).addListener((RegisterColorHandlersEvent.Block event) -> {
             listener.accept(new GameRendering.BlockColorEvent() {
                 @Override
                 public void register(BlockColor color, Block... blocks) {
@@ -47,12 +50,11 @@ public class GameRenderingImpl {
                     return event.getBlockColors().getColor(state, level, pos, tint);
                 }
             });
-        };
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+        });
     }
 
     public static void registerItemColors(Consumer<GameRendering.ItemColorEvent> listener) {
-        Consumer<RegisterColorHandlersEvent.Item> consumer = event -> {
+        EventBus.get(EventBus.MOD).addListener((RegisterColorHandlersEvent.Item event) -> {
             listener.accept(new GameRendering.ItemColorEvent() {
                 @Override
                 public void register(ItemColor color, ItemLike... items) {
@@ -61,46 +63,46 @@ public class GameRenderingImpl {
 
                 @Override
                 public int getColor(ItemStack stack, int tint) {
-                    BlockState state = ((BlockItem) stack.getItem()).getBlock().defaultBlockState();
-                    return event.getBlockColors().getColor(state, null, null, tint);
+                    if (stack.getItem() instanceof BlockItem blockItem) {
+                        BlockState state = blockItem.getBlock().defaultBlockState();
+                        return event.getBlockColors().getColor(state, null, null, tint);
+                    }
+
+                    return 0xFFFFFF;
                 }
             });
-        };
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+        });
     }
 
     public static void registerBlockRenderers(Consumer<GameRendering.BlockRendererEvent> listener) {
         listener.accept(new GameRendering.BlockRendererEvent() {
             @Override
             public void register(RenderType type, Block... blocks) {
-                Arrays.stream(blocks).forEach(block -> ItemBlockRenderTypes.setRenderLayer(block, type));
+                for (Block block : blocks) ItemBlockRenderTypes.setRenderLayer(block, type);
             }
 
             @Override
             public void register(RenderType type, Fluid... fluids) {
-                Arrays.stream(fluids).forEach(fluid -> ItemBlockRenderTypes.setRenderLayer(fluid, type));
+                for (Fluid fluid : fluids) ItemBlockRenderTypes.setRenderLayer(fluid, type);
             }
         });
     }
 
     public static void registerEntityRenderers(Consumer<GameRendering.EntityRendererEvent> listener) {
-        Consumer<EntityRenderersEvent.RegisterRenderers> consumer = event -> listener.accept(event::registerEntityRenderer);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+        EventBus.get(EventBus.MOD).addListener((EntityRenderersEvent.RegisterRenderers event) -> listener.accept(event::registerEntityRenderer));
     }
 
     public static void registerBlockEntityRenderers(Consumer<GameRendering.BlockEntityRendererEvent> listener) {
-        Consumer<EntityRenderersEvent.RegisterRenderers> consumer = event -> listener.accept(event::registerBlockEntityRenderer);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+        EventBus.get(EventBus.MOD).addListener((EntityRenderersEvent.RegisterRenderers event) -> listener.accept(event::registerBlockEntityRenderer));
     }
 
     public static void registerModelLayers(Consumer<GameRendering.ModelLayerEvent> listener) {
-        Consumer<EntityRenderersEvent.RegisterLayerDefinitions> consumer = event -> listener.accept(event::registerLayerDefinition);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+        EventBus.get(EventBus.MOD).addListener((EntityRenderersEvent.RegisterLayerDefinitions event) -> listener.accept(event::registerLayerDefinition));
     }
 
     public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
-        Consumer<ModelEvent.RegisterAdditional> consumer = event -> {
-            GameRendering.SpecialModelEvent modelEvent = new GameRendering.SpecialModelEvent() {
+        EventBus.get(EventBus.MOD).addListener((ModelEvent.RegisterAdditional event) -> {
+            listener.accept(new GameRendering.SpecialModelEvent() {
                 @Override
                 public void register(ResourceLocation model) {
                     event.register(model);
@@ -108,17 +110,45 @@ public class GameRenderingImpl {
 
                 @Override
                 public void register(ResourceLocation... models) {
-                    Arrays.stream(models).forEach(event::register);
+                    for (ResourceLocation model : models) this.register(model);
                 }
-            };
-            listener.accept(modelEvent);
-        };
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+            });
+        });
+    }
+
+    public static void registerModelOverrides(Consumer<GameRendering.ModelOverrideEvent> listener) {
+        listener.accept(new GameRendering.ModelOverrideEvent() {});
+
+        EventBus.get(EventBus.MOD).addListener((ModelEvent.ModifyBakingResult event) -> {
+            Map<ResourceLocation, BakedModel> models = event.getModels();
+
+            for (Map.Entry<ResourceLocation, ResourceLocation> entry : GameRendering.MODEL_OVERRIDES.entrySet()) {
+                ModelResourceLocation originalItemModel = new ModelResourceLocation(entry.getKey(), "inventory");
+                ResourceLocation overrideModel = wrapModel(entry.getValue());
+                BakedModel bakedOverride = models.get(overrideModel);
+
+                if (bakedOverride != null) {
+                    models.put(originalItemModel, bakedOverride);
+                } else {
+                    Platform.LOGGER.error("Failed to find custom model: {}", overrideModel);
+                }
+            }
+        });
+        EventBus.get(EventBus.MOD).addListener((ModelEvent.RegisterAdditional event) -> {
+            for (ResourceLocation override : GameRendering.MODEL_OVERRIDES.values()) {
+                event.register(wrapModel(override));
+            }
+        });
+    }
+
+    private static ResourceLocation wrapModel(ResourceLocation id) {
+        if (id.getPath().startsWith("item/")) return id;
+        return new ResourceLocation(id.getNamespace(), "item/" + id.getPath());
     }
 
     public static void registerSkullRenderers(Consumer<GameRendering.SkullRendererEvent> listener) {
-        Consumer<EntityRenderersEvent.CreateSkullModels> consumer = event -> {
-            GameRendering.SkullRendererEvent skullEvent = new GameRendering.SkullRendererEvent() {
+        EventBus.get(EventBus.MOD).addListener((EntityRenderersEvent.CreateSkullModels event) -> {
+            listener.accept(new GameRendering.SkullRendererEvent() {
                 @Override
                 public void registerSkullModel(SkullBlock.Type type, Function<ModelPart, SkullModelBase> model, ModelLayerLocation layer) {
                     event.registerSkullModel(type, model.apply(event.getEntityModelSet().bakeLayer(layer)));
@@ -128,15 +158,13 @@ public class GameRenderingImpl {
                 public void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture) {
                     SkullBlockRenderer.SKIN_BY_TYPE.put(type, texture);
                 }
-            };
-            listener.accept(skullEvent);
-        };
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+            });
+        });
     }
 
     public static void registerParticleFactories(Consumer<GameRendering.ParticleFactoryEvent> listener) {
-        Consumer<RegisterParticleProvidersEvent> consumer = event -> {
-            GameRendering.ParticleFactoryEvent factoryEvent = new GameRendering.ParticleFactoryEvent() {
+        EventBus.get(EventBus.MOD).addListener((RegisterParticleProvidersEvent event) -> {
+            listener.accept(new GameRendering.ParticleFactoryEvent() {
                 @Override
                 public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider) {
                     event.registerSpecial(type.get(), provider);
@@ -146,9 +174,7 @@ public class GameRenderingImpl {
                 public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory) {
                     event.registerSpriteSet(type.get(), factory::create);
                 }
-            };
-            listener.accept(factoryEvent);
-        };
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(consumer);
+            });
+        });
     }
 }

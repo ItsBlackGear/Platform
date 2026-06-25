@@ -11,6 +11,8 @@ accessible class net/minecraft/client/renderer/FogRenderer$FogData
 mutable field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
 accessible field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
 accessible method net/minecraft/world/level/block/FireBlock setFlammable (Lnet/minecraft/world/level/block/Block;II)V
+mutable field net/minecraft/world/item/HoneycombItem WAXABLES Ljava/util/function/Supplier;
+mutable field net/minecraft/world/item/HoneycombItem WAX_OFF_BY_BLOCK Ljava/util/function/Supplier;
 
 # Registry Builder
 transitive-accessible method net/minecraft/core/registries/BuiltInRegistries registerSimple (Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap;)Lnet/minecraft/core/Registry;

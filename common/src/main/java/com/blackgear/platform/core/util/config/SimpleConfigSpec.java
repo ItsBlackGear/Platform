@@ -48,7 +48,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     public void setConfig(CommentedConfig config) {
         this.childConfig = config;
         if (config != null && !this.isCorrect(config)) {
-            String configName = config instanceof FileConfig ? ((FileConfig) config).getNioPath().toString() : config.toString();
+            String configName = config instanceof FileConfig fileConfig ? fileConfig.getNioPath().toString() : config.toString();
             LOGGER.warn("Configuration file {} is not correct. Correcting", configName);
             this.correct(config,
                 (action, path, incorrectValue, correctedValue) ->
@@ -56,8 +56,8 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
                 (action, path, incorrectValue, correctedValue) ->
                     LOGGER.debug("The comment on key {} does not match the spec. This may create a backup.", DOT_JOINER.join(path)));
             
-            if (config instanceof FileConfig) {
-                ((FileConfig) config).save();
+            if (config instanceof FileConfig fileConfig) {
+                fileConfig.save();
             }
         }
         this.afterReload();
@@ -97,8 +97,8 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     
     public void save() {
         Preconditions.checkNotNull(this.childConfig, "Cannot save config value without assigned Config object present");
-        if (this.childConfig instanceof FileConfig) {
-            ((FileConfig) this.childConfig).save();
+        if (this.childConfig instanceof FileConfig config) {
+            config.save();
         }
     }
     

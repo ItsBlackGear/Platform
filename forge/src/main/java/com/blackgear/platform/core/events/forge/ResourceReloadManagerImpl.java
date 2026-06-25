@@ -1,8 +1,8 @@
 package com.blackgear.platform.core.events.forge;
 
 import com.blackgear.platform.core.events.ResourceReloadManager;
+import com.blackgear.platform.core.util.EventBus;
 import com.blackgear.platform.forge.client.ForgeClientEventHandler;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 
 import java.util.function.Consumer;
@@ -13,10 +13,9 @@ public class ResourceReloadManagerImpl {
     }
 
     public static void registerServer(Consumer<ResourceReloadManager.ListenerEvent> exporter) {
-        Consumer<AddReloadListenerEvent> consumer = event -> {
+        EventBus.get(EventBus.LOADER).addListener((AddReloadListenerEvent event) -> {
             ResourceReloadManager.ListenerEvent listener = (id, reloadListener) -> event.addListener(reloadListener);
             exporter.accept(listener);
-        };
-        MinecraftForge.EVENT_BUS.addListener(consumer);
+        });
     }
 }

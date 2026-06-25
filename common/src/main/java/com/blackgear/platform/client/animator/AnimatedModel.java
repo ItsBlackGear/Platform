@@ -6,7 +6,7 @@ import net.minecraft.client.model.geom.ModelPart;
 
 import java.util.Optional;
 
-@Environment(EnvType.CLIENT)
+@Environment(EnvType.CLIENT) @Deprecated
 public interface AnimatedModel {
     ModelPart root();
 

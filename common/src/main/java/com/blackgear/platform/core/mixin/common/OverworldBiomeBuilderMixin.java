@@ -1,7 +1,6 @@
 package com.blackgear.platform.core.mixin.common;
 
 import com.blackgear.platform.common.worldgen.placement.BiomePlacement;
-import com.blackgear.platform.common.worldgen.placement.BiomeSpawnPlacement;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
@@ -21,7 +20,6 @@ public class OverworldBiomeBuilderMixin {
         at = @At("TAIL")
     )
     private void platform$addBiomes(Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper, CallbackInfo ci) {
-        BiomeSpawnPlacement.BIOME_ENTRIES.forEach(mapper);
         BiomePlacement.BIOME_PLACEMENTS.forEach(mapper);
     }
 }

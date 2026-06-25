@@ -10,8 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-@Environment(EnvType.CLIENT)
-@Deprecated(forRemoval = true)
+@Environment(EnvType.CLIENT) @Deprecated
 public class ParticleFactories {
     public static <T extends ParticleOptions, P extends ParticleType<T>> void create(Supplier<P> type, ParticleProvider<T> provider) {
         GameRendering.registerParticleFactories(event -> event.register(type, provider));

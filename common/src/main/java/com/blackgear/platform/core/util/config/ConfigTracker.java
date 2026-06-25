@@ -6,6 +6,7 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +30,7 @@ public class ConfigTracker {
         }
     }
     
-    void trackConfig(ModConfig config) {
+    public void trackConfig(ModConfig config) {
         if (this.fileMap.containsKey(config.getFileName())) {
             LOGGER.error("Detected config file conflict {} between {} and {}", config.getFileName(), this.fileMap.get(config.getFileName()).getModId(), config.getModId());
             throw new RuntimeException("Config conflict detected!");
@@ -65,7 +66,7 @@ public class ConfigTracker {
     private void openConfig(ModConfig config, Path configBasePath) {
         CommentedFileConfig configData = config.getHandler().reader(configBasePath).apply(config);
         config.setConfigData(configData);
-        ConfigEvents.LOADING.invoker().onModConfig(config);
+        ConfigEvents.LOADING.invoker().accept(config);
         config.save();
     }
     
@@ -78,11 +79,10 @@ public class ConfigTracker {
     }
 
     public void receiveSyncedConfig(ClientboundConfigSyncPacket packet) {
-        // FIXME: check local server
-        if (this.fileMap.containsKey(packet.name())) {
+        if (!Minecraft.getInstance().isLocalServer() && this.fileMap.containsKey(packet.name())) {
             ModConfig config = this.fileMap.get(packet.name());
             config.setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(packet.data())));
-            ConfigEvents.RELOADING.invoker().onModConfig(config);
+            ConfigEvents.RELOADING.invoker().accept(config);
         }
     }
 
@@ -91,7 +91,7 @@ public class ConfigTracker {
             CommentedConfig commentedConfig = CommentedConfig.inMemory();
             config.getSpec().correct(commentedConfig);
             config.setConfigData(commentedConfig);
-            ConfigEvents.LOADING.invoker().onModConfig(config);
+            ConfigEvents.LOADING.invoker().accept(config);
         });
     }
 

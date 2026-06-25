@@ -13,6 +13,7 @@ import java.util.function.Function;
  * <br>
  * This class may get removed at some point in the short future...
  */
+@Deprecated
 public class DataTransformer {
     private static final ThreadLocal<Boolean> REENTRANT_GUARD = ThreadLocal.withInitial(() -> false);
     private static final List<Function<ResourceLocation, ResourceLocation>> TRANSFORMERS = new CopyOnWriteArrayList<>();

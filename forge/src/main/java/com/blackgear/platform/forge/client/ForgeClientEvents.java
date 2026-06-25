@@ -1,16 +1,20 @@
 package com.blackgear.platform.forge.client;
 
 import com.blackgear.platform.Platform;
+import com.blackgear.platform.client.event.ComputeCameraAnglesCallback;
 import com.blackgear.platform.client.event.FogRendering;
 import com.blackgear.platform.client.event.HudRenderEvent;
 import com.blackgear.platform.client.event.LocalPlayerEvents;
+import com.blackgear.platform.client.event.input.RawInputEvent;
 import com.blackgear.platform.client.event.screen.HudRendering;
 import com.blackgear.platform.client.event.screen.TooltipEvents;
 import com.blackgear.platform.client.event.screen.api.ScreenAccessImpl;
+import com.blackgear.platform.common.events.TickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,6 +26,33 @@ import net.minecraftforge.fml.common.Mod;
     value = Dist.CLIENT
 )
 public class ForgeClientEvents {
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onCameraSetup(ViewportEvent.ComputeCameraAngles event) {
+        ComputeCameraAnglesCallback.EVENT.invoker().handle(new ComputeCameraAnglesCallback.ComputeCameraAngles(
+            event.getRenderer(),
+            event.getCamera(),
+            event.getPartialTick(),
+            event.getYaw(),
+            event.getPitch(),
+            event.getRoll()
+        ) {
+            @Override
+            public void setPitch(float pitch) {
+                event.setPitch(pitch);
+            }
+
+            @Override
+            public void setRoll(float roll) {
+                event.setRoll(roll);
+            }
+
+            @Override
+            public void setYaw(float yaw) {
+                event.setYaw(yaw);
+            }
+        });
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onItemTooltip(ItemTooltipEvent event) {
         TooltipEvents.ITEM_SETUP.invoker().registerTooltip(event.getItemStack(), event.getToolTip(), event.getFlags());
@@ -96,6 +127,27 @@ public class ForgeClientEvents {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onPlayerRespawn(ClientPlayerNetworkEvent.Clone event) {
         LocalPlayerEvents.ON_RESPAWN.invoker().onRespawn(event.getOldPlayer(), event.getNewPlayer());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onKeyPress(InputEvent.Key event) {
+        RawInputEvent.ON_KEY_PRESS.invoker().handle(Minecraft.getInstance(), event.getKey(), event.getScanCode(), event.getAction(), event.getModifiers());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
+        if (RawInputEvent.ON_MOUSE_SCROLL.invoker().handle(Minecraft.getInstance(), event.getScrollDelta()).isCancelled()) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+            TickEvents.CLIENT_TICK_PRE.invoker().handle();
+        } else {
+            TickEvents.CLIENT_TICK_POST.invoker().handle();
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

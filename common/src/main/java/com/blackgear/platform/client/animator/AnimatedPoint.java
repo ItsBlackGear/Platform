@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 
 import java.util.function.Function;
 
-@Environment(EnvType.CLIENT)
+@Environment(EnvType.CLIENT) @Deprecated
 public class AnimatedPoint {
     private final AnimationChannel.Target target;
     private final Function<Float, Float> x;

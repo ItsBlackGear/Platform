@@ -1,17 +1,8 @@
 {
   "required": true,
-  "minVersion": "0.8",
   "package": "com.blackgear.platform.core.mixin.fabric",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-    "LivingDeathMixin",
-    "LivingEntityMixin",
-    "LootPoolMixin",
-    "LootTableBuilderMixin",
-    "PackRepositoryMixin",
-    "PlayerAttackMixin",
-    "ServerLevelMixin"
-  ],
+  "minVersion": "0.8",
   "client": [
     "client.ClientLevelMixin",
     "client.ClientPlayerAttackMixin",
@@ -20,11 +11,25 @@
     "client.GuiMixin",
     "client.MinecraftMixin",
     "client.SkullBlockRendererMixin",
+    "client.input.KeyboardHandlerMixin",
     "client.input.MouseHandlerMixin",
+    "client.renderer.BoatRendererMixin",
     "client.screen.AbstractContainScreenMixin",
     "client.screen.GameRendererMixin",
     "client.screen.GuiGraphicsMixin",
     "client.screen.ScreenMixin"
+  ],
+  "mixins": [
+    "EntityDataSerializersMixin",
+    "EntityMixin",
+    "LivingDeathMixin",
+    "LivingEntityMixin",
+    "LootPoolMixin",
+    "LootTableBuilderMixin",
+    "CreateWorldScreenMixin",
+    "PlayerAttackMixin",
+    "ServerLevelMixin",
+    "ServerPacksSourceMixin"
   ],
   "injectors": {
     "defaultRequire": 1

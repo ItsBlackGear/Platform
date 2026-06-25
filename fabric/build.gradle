@@ -46,7 +46,7 @@ configurations {
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
     implementation('com.electronwill.night-config:core:3.6.0')
     shadowBundle("com.electronwill.night-config:core:3.6.0")
@@ -70,6 +70,8 @@ processResources {
 }
 
 shadowJar {
+    exclude "architectury.common.json"
+
     configurations = [project.configurations.shadowBundle]
     relocate "com.electronwill.nightconfig", "com.blackgear.platform.nightconfig"
     archiveClassifier = "dev-shadow"
@@ -79,3 +81,4 @@ remapJar {
     injectAccessWidener = true
     inputFile.set shadowJar.archiveFile
 }
+

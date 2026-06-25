@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 
 import java.util.*;
 
-@Environment(EnvType.CLIENT)
+@Environment(EnvType.CLIENT) @Deprecated
 public record MathAnimator(Map<String, List<AnimatedChannel>> animationsByBone) {
     public static void animate(HierarchicalModel<?> model, float animationProgress, MathAnimator builder) {
         float animTime = animationProgress / 20F;

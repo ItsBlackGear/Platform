@@ -4,10 +4,13 @@ import com.blackgear.platform.common.worldgen.modifier.BiomeContext;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.common.worldgen.modifier.BiomeWriter;
 import com.blackgear.platform.Platform;
-import com.blackgear.platform.core.util.WorldGenSerialization;
+import com.blackgear.platform.core.Environment;
+import com.blackgear.platform.core.util.EventBus;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,24 +25,23 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.common.world.ModifiableBiomeInfo;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class BiomeManagerImpl {
-    @Nullable
-    private static Codec<PlatformBiomeModifier> codec = null;
+    @Nullable private static Codec<PlatformBiomeModifier> codec = null;
     
     public static void bootstrap() {
-        FMLJavaModLoadingContext.get().getModEventBus().<RegisterEvent>addListener(event -> {
-            event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, entry -> entry.register(Platform.resource("biome_modifier_codec"), codec = Codec.unit(PlatformBiomeModifier.INSTANCE)));
-            event.register(ForgeRegistries.Keys.BIOME_MODIFIERS, entry -> entry.register(Platform.resource("biome_modifier"), PlatformBiomeModifier.INSTANCE));
+        EventBus.get(EventBus.MOD).<RegisterEvent>addListener(event -> {
+            event.register(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS,
+                entry -> entry.register(Platform.resource("biome_modifier_codec"), codec = Codec.unit(PlatformBiomeModifier.INSTANCE)));
+            event.register(ForgeRegistries.Keys.BIOME_MODIFIERS,
+                entry -> entry.register(Platform.resource("biome_modifier"), PlatformBiomeModifier.INSTANCE));
         });
     }
     
@@ -48,9 +50,7 @@ public class BiomeManagerImpl {
         
         @Override
         public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-            if (phase == Phase.ADD) {
-                BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome, builder));
-            }
+            if (phase == Phase.ADD) BiomeManager.INSTANCE.register(new ForgeBiomeWriter(biome, builder));
         }
         
         @Override
@@ -58,12 +58,16 @@ public class BiomeManagerImpl {
             return codec != null ? codec : Codec.unit(INSTANCE);
         }
     }
-    
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     static class ForgeBiomeWriter extends BiomeWriter {
         private final Holder<Biome> biome;
         private final ModifiableBiomeInfo.BiomeInfo.Builder builder;
+        private final Optional<RegistryAccess> registries;
       
         ForgeBiomeWriter(Holder<Biome> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+            Optional<MinecraftServer> server = Environment.getCurrentServer();
+            this.registries = server.map(MinecraftServer::registryAccess);
             this.biome = biome;
             this.builder = builder;
         }
@@ -102,16 +106,16 @@ public class BiomeManagerImpl {
                 }
 
                 @Override
-                public boolean hasFeature(ResourceKey<PlacedFeature> feature) {
-                    var optional = getRegistryEntry(Registries.PLACED_FEATURE, feature);
+                public boolean hasFeature(ResourceKey<PlacedFeature> key) {
+                    List<HolderSet<PlacedFeature>> features = builder.getGenerationSettings().build().features();
 
-                    if (optional.isPresent()) {
-                        Holder.Reference<PlacedFeature> placedFeature = optional.get();
-                        return Arrays.stream(GenerationStep.Decoration.values())
-                            .anyMatch(decoration -> builder.getGenerationSettings()
-                                .getFeatures(decoration)
-                                .stream()
-                                .anyMatch(match -> WorldGenSerialization.serializeAndCompareFeature(match.get(), placedFeature.get())));
+                    for (HolderSet<PlacedFeature> featureSet : features) {
+                        for (Holder<PlacedFeature> feature : featureSet) {
+                            Optional<ResourceKey<PlacedFeature>> featureKey = feature.unwrapKey();
+                            if (featureKey.isPresent() && featureKey.get() == key) {
+                                return true;
+                            }
+                        }
                     }
 
                     return false;
@@ -119,30 +123,22 @@ public class BiomeManagerImpl {
             };
         }
 
-        private static <T> Optional<Holder.Reference<T>> getRegistryEntry(ResourceKey<? extends Registry<T>> registryKey, ResourceKey<T> entryKey) {
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (server != null) {
-                return server.registryAccess()
-                    .registry(registryKey)
-                    .flatMap(registry -> registry.getHolder(entryKey));
-            }
-
-            return Optional.empty();
-        }
-        
         @Override
-        public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
-            getRegistryEntry(Registries.PLACED_FEATURE, feature)
-                .ifPresent(placedFeature -> builder.getGenerationSettings().addFeature(decoration, placedFeature));
+        public void addFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> key) {
+            this.registries.ifPresent(registry -> {
+                Registry<PlacedFeature> features = registry.registryOrThrow(Registries.PLACED_FEATURE);
+                builder.getGenerationSettings().addFeature(decoration, features.getHolderOrThrow(key));
+            });
         }
 
         @Override
-        public void removeFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
-            getRegistryEntry(Registries.PLACED_FEATURE, feature)
-                .ifPresent(placedFeature ->
-                    builder.getGenerationSettings()
-                        .getFeatures(decoration)
-                        .removeIf(match -> WorldGenSerialization.serializeAndCompareFeature(match.get(), placedFeature.get())));
+        public void removeFeature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> key) {
+            this.registries.ifPresent(registry -> {
+                Registry<PlacedFeature> features = registry.registryOrThrow(Registries.PLACED_FEATURE);
+                builder.getGenerationSettings()
+                    .getFeatures(decoration)
+                    .removeIf(holder -> holder.value() == features.getOrThrow(key));
+            });
         }
 
         @Override
@@ -158,19 +154,21 @@ public class BiomeManagerImpl {
         }
 
         @Override
-        public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
-            getRegistryEntry(Registries.CONFIGURED_CARVER, carver)
-                .ifPresent(configuredCarver ->
-                    builder.getGenerationSettings().addCarver(carving, configuredCarver));
+        public void addCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> key) {
+            this.registries.ifPresent(registry -> {
+                Registry<ConfiguredWorldCarver<?>> carvers = registry.registryOrThrow(Registries.CONFIGURED_CARVER);
+                builder.getGenerationSettings().addCarver(carving, carvers.getHolderOrThrow(key));
+            });
         }
 
         @Override
-        public void removeCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> carver) {
-            getRegistryEntry(Registries.CONFIGURED_CARVER, carver)
-                .ifPresent(configuredCarver ->
-                    builder.getGenerationSettings()
-                        .getCarvers(carving)
-                        .removeIf(match -> WorldGenSerialization.serializeAndCompareCarver(match.get(), configuredCarver.get())));
+        public void removeCarver(GenerationStep.Carving carving, ResourceKey<ConfiguredWorldCarver<?>> key) {
+            this.registries.ifPresent(registry -> {
+                Registry<ConfiguredWorldCarver<?>> carvers = registry.registryOrThrow(Registries.CONFIGURED_CARVER);
+                builder.getGenerationSettings()
+                    .getCarvers(carving)
+                    .removeIf(holder -> holder.value() == carvers.getOrThrow(key));
+            });
         }
     }
 }

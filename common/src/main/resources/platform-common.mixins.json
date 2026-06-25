@@ -6,9 +6,11 @@
   "mixins": [
     "access.ActivityAccessor",
     "access.LevelResourceAccessor",
+    "access.MappedRegistryAccessor",
     "access.PackRepositoryAccessor",
     "access.SensorTypeAccessor",
     "access.SimpleParticleTypeAccessor",
+    "access.SpawnPlacementsAccessor",
     "common.BlockEntityTypeMixin",
     "common.OverworldBiomeBuilderMixin",
     "common.ResourceLocationMixin",
@@ -21,13 +23,9 @@
     "access.ScreenAccessor",
     "client.AbstractClientPlayerMixin",
     "client.AbstractContainerScreenMixin",
-    "client.emissive.SpriteResourceLoaderMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
-    "client.emissive.ModelBakeryMixin",
-    "client.emissive.ModelManagerMixin",
-    "client.emissive.SpriteLoaderMixin",
-    "client.emissive.TextureAtlasSpriteMixin",
+    "client.ModelBakeryMixin",
     "config.ClientHandshakePacketListenerImplMixin"
   ],
   "injectors": {

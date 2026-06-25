@@ -6,7 +6,6 @@ import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileWatcher;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import com.electronwill.nightconfig.toml.TomlFormat;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,24 +50,28 @@ public class ConfigFileTypeHandler {
     public Function<ModConfig, CommentedFileConfig> reader(Path configBasePath) {
         return config -> {
             Path configPath = configBasePath.resolve(config.getFileName());
-            CommentedFileConfig configData = CommentedFileConfig.builder(configPath, TomlFormat.instance()).sync()
+            CommentedFileConfig configData = CommentedFileConfig.builder(configPath)
+                .sync()
                 .preserveInsertionOrder()
                 .autosave()
-                .onFileNotFound(this::setupConfigFile)
+                .onFileNotFound((file, format) -> this.setupConfigFile(config, file, format))
                 .writingMode(WritingMode.REPLACE)
                 .build();
-
             LOGGER.debug("Built TOML config for {}", configPath.toString());
+
             try {
-                configData.load();
+                ConfigLoader.tryLoadConfigFile(configData);
             } catch (ParsingException exception) {
+                LOGGER.error("Failed to parse config `{}`", configPath, exception);
                 throw new ConfigLoadingException(config, exception);
             }
 
+            ConfigLoader.tryRegisterDefaultConfig(config);
             LOGGER.debug("Loaded TOML config file {}", configPath.toString());
+
             try {
                 FileWatcher.defaultInstance().addWatch(configPath, new ConfigWatcher(config, configData, Thread.currentThread().getContextClassLoader()));
-                LOGGER.debug("Watching TOML config file {} for changes", configPath.toString());
+                LOGGER.debug("Watching TOML config file `{}` for changes", configPath.toString());
             } catch (IOException exception) {
                 throw new RuntimeException("Couldn't watch config file", exception);
             }
@@ -86,9 +89,16 @@ public class ConfigFileTypeHandler {
         }
     }
 
-    private boolean setupConfigFile(Path file, ConfigFormat<?> format) throws IOException {
-        Files.createFile(file);
-        format.initEmptyFile(file);
+    private boolean setupConfigFile(ModConfig config, Path file, ConfigFormat<?> format) throws IOException {
+        Files.createDirectories(file.getParent());
+        Path path = ConfigLoader.getDefaultConfigsDirectory().resolve(config.getFileName());
+        if (Files.exists(path)) {
+            LOGGER.info("Loading default config file from path {}", path);
+            Files.copy(path, file);
+        } else{
+            Files.createFile(file);
+            format.initEmptyFile(file);
+        }
         return true;
     }
 
@@ -109,9 +119,8 @@ public class ConfigFileTypeHandler {
             Thread.currentThread().setContextClassLoader(this.realClassLoader);
             if (!this.modConfig.getSpec().isCorrecting()) {
                 try {
-                    this.commentedFileConfig.load();
+                    ConfigLoader.tryLoadConfigFile(this.commentedFileConfig);
                     if (!this.modConfig.getSpec().isCorrect(this.commentedFileConfig)) {
-
                         LOGGER.warn("Configuration file {} is not correct. Correcting", this.commentedFileConfig.getFile().getAbsolutePath());
                         ConfigFileTypeHandler.backUpConfig(this.commentedFileConfig);
                         this.modConfig.getSpec().correct(this.commentedFileConfig);
@@ -123,7 +132,7 @@ public class ConfigFileTypeHandler {
                 
                 LOGGER.debug("Config file {} changed, sending notifies", this.modConfig.getFileName());
                 this.modConfig.getSpec().afterReload();
-                ConfigEvents.RELOADING.invoker().onModConfig(this.modConfig);
+                ConfigEvents.RELOADING.invoker().accept(this.modConfig);
             }
         }
     }

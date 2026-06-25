@@ -1,5 +1,6 @@
 package com.blackgear.platform.client.fabric;
 
+import com.blackgear.platform.Platform;
 import com.blackgear.platform.client.GameRendering;
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -17,6 +18,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -49,7 +51,8 @@ public class GameRenderingImpl {
 
             @Override
             public int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
-                return Minecraft.getInstance().getBlockColors().getColor(state, level, pos, tint);
+                BlockColor colors = ColorProviderRegistry.BLOCK.get(state.getBlock());
+                return colors != null ? colors.getColor(state, level, pos, tint) : -1;
             }
         });
     }
@@ -104,10 +107,61 @@ public class GameRenderingImpl {
 
             @Override
             public void register(ResourceLocation... models) {
-                ModelLoadingPlugin.register(context -> context.addModels(models));
+                for (ResourceLocation model : models) this.register(model);
             }
         };
         listener.accept(event);
+    }
+
+    public static void registerModelOverrides(Consumer<GameRendering.ModelOverrideEvent> listener) {
+        ModelLoadingPlugin.register(plugin -> {
+            listener.accept(new GameRendering.ModelOverrideEvent() {
+                @Override
+                public void register(ResourceLocation original, ResourceLocation override, boolean condition) {
+                    GameRendering.ModelOverrideEvent.super.register(original, override, condition);
+                    plugin.addModels(wrapModel(override));
+                }
+            });
+
+            plugin.modifyModelAfterBake().register((model, context) -> {
+                ResourceLocation modelId = context.id();
+
+                if (modelId != null) {
+                    String modelIdString = modelId.toString();
+
+                    if (modelIdString.endsWith("#inventory")) {
+                        String itemIdString = modelIdString.substring(0, modelIdString.length() - 10);
+                        ResourceLocation itemId = new ResourceLocation(itemIdString);
+
+                        ResourceLocation override = GameRendering.MODEL_OVERRIDES.get(itemId);
+
+                        if (override != null) {
+                            try {
+                                ResourceLocation overrideModel = wrapModel(override);
+                                BakedModel bakedOverride = context.baker().bake(overrideModel, context.settings());
+
+                                if (bakedOverride != null) {
+                                    return bakedOverride;
+                                }
+                            } catch (Exception e) {
+                                Platform.LOGGER.error("Failed to load override model: {}", override, e);
+                            }
+                        }
+                    }
+                }
+
+                return model;
+            });
+        });
+    }
+
+    private static ResourceLocation wrapModel(ResourceLocation id) {
+        // If it already has item/ prefix, return as-is
+        if (id.getPath().startsWith("item/")) {
+            return id;
+        }
+        // Otherwise, add the item/ prefix
+        return new ResourceLocation(id.getNamespace(), "item/" + id.getPath());
     }
 
     public static void registerSkullRenderers(Consumer<GameRendering.SkullRendererEvent> listener) {

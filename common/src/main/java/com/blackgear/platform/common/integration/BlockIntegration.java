@@ -26,6 +26,12 @@ public class BlockIntegration {
 
         void registerFuelItem(ItemLike item, int burnTime);
 
+        void registerCompostableItem(ItemLike item, float chance);
+
+        void registerWaxableBlock(Block unwaxed, Block waxed);
+
+        void registerOxidableBlock(Block less, Block more);
+
         default void registerDispenserBehavior(ItemLike item, DispenseItemBehavior behavior) {
             DispenserBlock.registerBehavior(item, behavior);
         }
@@ -53,10 +59,6 @@ public class BlockIntegration {
 
         default void registerFlammableBlock(Block target, int encouragement, int flammability) {
             ((FireBlock) Blocks.FIRE).setFlammable(target, encouragement, flammability);
-        }
-
-        default void registerCompostableItem(ItemLike item, float chance) {
-            ComposterBlock.COMPOSTABLES.putIfAbsent(item, chance);
         }
     }
 }

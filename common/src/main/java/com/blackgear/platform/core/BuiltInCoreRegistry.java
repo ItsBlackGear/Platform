@@ -8,6 +8,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class BuiltInCoreRegistry<T> {
     private final Map<ResourceLocation, T> hardcodedEntries = new HashMap<>();
@@ -16,7 +17,11 @@ public class BuiltInCoreRegistry<T> {
     private final String modId;
     private final Registry<T> registry;
     protected boolean isPresent = false;
-
+    
+    public static <T> BuiltInCoreRegistry<T> create(Registry<T> registry, String modId) {
+        return new BuiltInCoreRegistry<>(registry, modId);
+    }
+    
     public BuiltInCoreRegistry(Registry<T> registry, String modId) {
         this.modId = modId;
         this.registry = registry;
@@ -32,13 +37,14 @@ public class BuiltInCoreRegistry<T> {
         return this.hardcodedEntries.put(location, entry);
     }
 
-    public T registerDataDriven(ResourceLocation name, T entry) {
-        return this.dataDrivenEntries.put(name, entry);
+    public ResourceKey<T> resource(String name, T entry) {
+        return this.resource(name, key -> entry);
     }
-
-    public <E extends T> ResourceKey<T> resource(String name, E entry) {
-        this.register(name, entry);
-        return ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, name));
+    
+    public <E extends T> ResourceKey<T> resource(String name, Function<ResourceKey<T>, E> entry) {
+        ResourceKey<T> key = ResourceKey.create(this.registry.key(), new ResourceLocation(this.modId, name));
+        this.register(name, entry.apply(key));
+        return key;
     }
 
     public T getOrDefault(ResourceLocation name, T fallback) {
@@ -55,13 +61,11 @@ public class BuiltInCoreRegistry<T> {
 
         return fallback;
     }
-
+    
     public T get(ResourceLocation name) {
-        // Data-driven entries have priority
-        if (this.dataDrivenEntries.containsKey(name)) {
-            return this.dataDrivenEntries.get(name);
-        }
-        return this.hardcodedEntries.get(name);
+        return this.dataDrivenEntries.containsKey(name)
+            ? this.dataDrivenEntries.get(name)
+            : this.hardcodedEntries.get(name);
     }
 
     public T get(ResourceKey<T> name) {
@@ -131,7 +135,9 @@ public class BuiltInCoreRegistry<T> {
     }
 
     private Map<ResourceLocation, T> getAllEntries() {
-        Map<ResourceLocation, T> combined = new HashMap<>(this.hardcodedEntries);
+        Map<ResourceLocation, T> combined = new HashMap<>();
+        this.registry.entrySet().forEach(entry -> combined.put(entry.getKey().location(), entry.getValue()));
+        combined.putAll(this.hardcodedEntries);
         combined.putAll(this.dataDrivenEntries); // Data-driven overrides hardcoded
         return combined;
     }
@@ -143,7 +149,11 @@ public class BuiltInCoreRegistry<T> {
     public Map<ResourceLocation, T> entries() {
         return Collections.unmodifiableMap(this.getAllEntries());
     }
-
+    
+    public void registerDataDriven(ResourceLocation name, T entry) {
+        this.dataDrivenEntries.put(name, entry);
+    }
+    
     public void clearDataDrivenEntries() {
         this.dataDrivenEntries.clear();
     }

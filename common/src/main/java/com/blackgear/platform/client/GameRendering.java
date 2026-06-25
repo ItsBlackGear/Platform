@@ -1,5 +1,6 @@
 package com.blackgear.platform.client;
 
+import com.blackgear.platform.client.v2.render.HandHeldItemRenderer;
 import com.blackgear.platform.client.v2.render.ItemRendererRegistry;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.fabricmc.api.EnvType;
@@ -19,10 +20,12 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.ItemLike;
@@ -35,6 +38,7 @@ import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -42,7 +46,7 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class GameRendering {
-    public static final Map<Item, ModelResourceLocation> HAND_HELD_MODELS = new ConcurrentHashMap<>();
+    public static final Map<ResourceLocation, ResourceLocation> MODEL_OVERRIDES = new ConcurrentHashMap<>();
 
     @ExpectPlatform
     public static void registerBlockColors(Consumer<BlockColorEvent> listener) {
@@ -80,11 +84,13 @@ public class GameRendering {
     }
 
     public static void registerHandHeldModels(Consumer<HandHeldModelEvent> listener) {
-        HandHeldModelEvent event = (item, model) -> {
-            ItemRendererRegistry.registerHandModel(item, model);
-            registerSpecialModels(models -> models.register(model));
-        };
+        HandHeldModelEvent event = (item, original, handHeld, perspectives) -> ItemRendererRegistry.INSTANCE.get().register(item, new HandHeldItemRenderer(original, handHeld));
         listener.accept(event);
+    }
+
+    @ExpectPlatform
+    public static void registerModelOverrides(Consumer<ModelOverrideEvent> listener) {
+        throw new AssertionError();
     }
 
     @ExpectPlatform
@@ -133,8 +139,40 @@ public class GameRendering {
         void register(ResourceLocation... models);
     }
 
+    public interface ModelOverrideEvent {
+        default void register(ResourceLocation original, ResourceLocation override, boolean condition) {
+            if (condition) {
+                MODEL_OVERRIDES.put(original, override);
+            } else {
+                MODEL_OVERRIDES.remove(original);
+            }
+        }
+
+        default void register(ResourceLocation original, ResourceLocation override) {
+            this.register(original, override, true);
+        }
+    }
+
     public interface HandHeldModelEvent {
-        void register(Item item, ModelResourceLocation model);
+        default void register(Item item, ModelResourceLocation handHeld) {
+            this.register(item, new ModelResourceLocation(BuiltInRegistries.ITEM.getKey(item), "inventory"), handHeld);
+        }
+
+        void register(Item item, ModelResourceLocation original, ModelResourceLocation handheld, Set<ItemDisplayContext> perspectives);
+
+        default void register(Item item, ResourceLocation original, ResourceLocation handheld, Set<ItemDisplayContext> perspectives) {
+            this.register(item, new ModelResourceLocation(original, "inventory"), new ModelResourceLocation(handheld, "inventory"), perspectives);
+        }
+
+        default void register(Item item, ModelResourceLocation original, ModelResourceLocation handheld) {
+            this.register(item, original, handheld, Set.of(ItemDisplayContext.GUI, ItemDisplayContext.GROUND, ItemDisplayContext.FIXED));
+        }
+
+        default void register(Item item, ResourceLocation original, ResourceLocation handheld) {
+            this.register(item, new ModelResourceLocation(original, "inventory"), new ModelResourceLocation(handheld, "inventory"));
+        }
+
+        record Models(ModelResourceLocation original, ModelResourceLocation handheld, Set<ItemDisplayContext> perspectives) {}
     }
 
     public interface SkullRendererEvent {

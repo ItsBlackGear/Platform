@@ -1,37 +1,42 @@
 package com.blackgear.platform.core.helper;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DynamicOps;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.IdMap;
+import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.resources.ResourceKey;
 
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class DataSerializerRegistry {
-    public static DataSerializerRegistry create() {
-        return new DataSerializerRegistry();
+public abstract class DataSerializerRegistry {
+    @ExpectPlatform
+    public static DataSerializerRegistry create(String modId) {
+        throw new AssertionError();
     }
 
-    public <T> EntityDataSerializer<T> simple(FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
-        return register(EntityDataSerializer.simple(writer, reader));
+    public <T> Supplier<EntityDataSerializer<T>> simple(String name, FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
+        return register(name, () -> EntityDataSerializer.simple(writer, reader));
     }
 
-    public <T> EntityDataSerializer<Optional<T>> optional(FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
-        return register(EntityDataSerializer.optional(writer, reader));
+    public <T> Supplier<EntityDataSerializer<Optional<T>>> optional(String name, FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
+        return register(name, () -> EntityDataSerializer.optional(writer, reader));
     }
 
-    public <T extends Enum<T>> EntityDataSerializer<T> simpleEnum(Class<T> clazz) {
-        return register(EntityDataSerializer.simpleEnum(clazz));
+    public <T extends Enum<T>> Supplier<EntityDataSerializer<T>> simpleEnum(String name, Class<T> clazz) {
+        return register(name, () -> EntityDataSerializer.simpleEnum(clazz));
     }
 
-    public <T> EntityDataSerializer<T> simpleId(IdMap<T> idMap) {
-        return register(EntityDataSerializer.simpleId(idMap));
+    public <T> Supplier<EntityDataSerializer<T>> simpleId(String name, IdMap<T> idMap) {
+        return register(name, () -> EntityDataSerializer.simpleId(idMap));
     }
 
-    public <T> EntityDataSerializer<T> register(EntityDataSerializer<T> serializer) {
-        EntityDataSerializers.registerSerializer(serializer);
-        return serializer;
-    }
+    public abstract <T> Supplier<EntityDataSerializer<T>> register(String name, Supplier<EntityDataSerializer<T>> serializer);
 
-    public void register() {}
+    public abstract void register();
 }

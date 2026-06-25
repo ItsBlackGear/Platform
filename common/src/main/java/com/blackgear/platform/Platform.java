@@ -1,6 +1,5 @@
 package com.blackgear.platform;
 
-import com.blackgear.platform.client.ClientSetup;
 import com.blackgear.platform.common.CommonSetup;
 import com.blackgear.platform.common.resource.RegistryAwareJsonReloadListener;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
@@ -16,7 +15,6 @@ public class Platform {
 	public static final String MOD_ID = "platform";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	public static final ModInstance INSTANCE = ModInstance.create(MOD_ID)
-		.client(ClientSetup::setup)
 		.common(CommonSetup::setup)
 		.build();
 

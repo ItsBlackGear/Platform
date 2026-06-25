@@ -1,6 +1,6 @@
 package com.blackgear.platform.common.entity;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import com.blackgear.platform.common.integration.MobIntegration;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -14,23 +14,17 @@ import java.util.function.Supplier;
 @Deprecated(forRemoval = true)
 public class EntityFactory {
     public static void registerSpawnPlacements(Consumer<EntityPlacementEvent> listener) {
-        EntityPlacementEvent event = new EntityPlacementEvent() {
-            @Override
-            public <T extends Mob> void register(Supplier<EntityType<T>> entity, SpawnPlacements.Type spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
-                SpawnPlacements.register(entity.get(), spawnPlacement, heightmap, spawnPredicate);
-            }
-        };
-
-        listener.accept(event);
+        listener.accept(new EntityPlacementEvent() {});
     }
 
-    @ExpectPlatform
     public static void registerMobAttributes(Consumer<EntityAttributesEvent> listener) {
-        throw new AssertionError();
+        listener.accept((type, builder) -> MobIntegration.registerIntegrations(event -> event.registerAttributes(type, builder)));
     }
 
     public interface EntityPlacementEvent {
-        <T extends Mob> void register(Supplier<EntityType<T>> entity, SpawnPlacements.Type spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
+        default <T extends Mob> void register(Supplier<EntityType<T>> entity, SpawnPlacements.Type spawnPlacement, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
+            SpawnPlacements.register(entity.get(), spawnPlacement, heightmap, spawnPredicate);
+        }
     }
 
     public interface EntityAttributesEvent {

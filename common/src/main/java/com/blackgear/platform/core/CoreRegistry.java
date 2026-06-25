@@ -1,14 +1,14 @@
 package com.blackgear.platform.core;
 
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -19,10 +19,13 @@ public abstract class CoreRegistry<T> {
     protected final String modId;
     protected boolean isPresent = false;
 
-    protected final Set<Supplier<T>> entries = new HashSet<>();
-
     protected CoreRegistry(String modId) {
         this.modId = modId;
+    }
+
+    @ExpectPlatform
+    public static <T> void register(ResourceKey<Registry<T>> registry, Consumer<BiConsumer<T, ResourceLocation>> source) {
+        throw new AssertionError();
     }
 
     /**
@@ -55,6 +58,8 @@ public abstract class CoreRegistry<T> {
      */
     public abstract <E extends T> Supplier<E> register(String name, Supplier<E> entry);
 
+    public abstract <E extends T> Holder<T> holder(String name, Supplier<E> entry);
+
     /**
      * Registers an entry and returns its ResourceKey.
      * @param name The registry name
@@ -62,15 +67,13 @@ public abstract class CoreRegistry<T> {
      * @return The ResourceKey for the registered entry
      */
     public <E extends T> ResourceKey<T> resource(String name, Supplier<E> entry) {
-        this.register(name, entry);
-        return ResourceKey.create(this.key(), new ResourceLocation(this.modId, name));
+        return this.resource(name, key -> entry);
     }
-
-    /**
-     * @return All registered entries
-     */
-    public Collection<Supplier<T>> entries() {
-        return Collections.unmodifiableSet(this.entries);
+    
+    public <E extends T> ResourceKey<T> resource(String name, Function<ResourceKey<T>, Supplier<E>> entry) {
+        ResourceKey<T> key = ResourceKey.create(this.key(), new ResourceLocation(this.modId, name));
+        this.register(name, entry.apply(key));
+        return key;
     }
 
     /**

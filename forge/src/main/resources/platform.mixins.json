@@ -6,9 +6,13 @@
   "mixins": [
     "LootPoolMixin",
     "LootTableMixin",
-    "access.ItemAccessor"
+    "access.ItemAccessor",
+    "access.RegistryBuilderAccessor",
+    "access.ModContainerAccessor"
   ],
   "client": [
+    "client.BEWLRMixin",
+    "client.renderer.BoatRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
