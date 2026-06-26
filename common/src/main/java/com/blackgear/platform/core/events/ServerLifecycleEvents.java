@@ -4,6 +4,7 @@ import com.blackgear.platform.core.util.event.Event;
 import net.minecraft.server.MinecraftServer;
 
 public interface ServerLifecycleEvents {
+    Event<ServerLifecycleEvents> PRE_STARTING = Event.create(ServerLifecycleEvents.class);
     Event<ServerLifecycleEvents> STARTING = Event.create(ServerLifecycleEvents.class);
     Event<ServerLifecycleEvents> STARTED = Event.create(ServerLifecycleEvents.class);
     Event<ServerLifecycleEvents> STOPPING = Event.create(ServerLifecycleEvents.class);

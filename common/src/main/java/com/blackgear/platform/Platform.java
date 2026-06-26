@@ -4,7 +4,6 @@ import com.blackgear.platform.common.CommonSetup;
 import com.blackgear.platform.common.resource.RegistryAwareJsonReloadListener;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
-import com.blackgear.platform.core.network.MessageHandler;
 import com.blackgear.platform.core.util.config.ConfigLoader;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +20,6 @@ public class Platform {
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
 
-		MessageHandler.bootstrap();
 		ConfigLoader.bootstrap();
 		BiomeManager.bootstrap();
 	}

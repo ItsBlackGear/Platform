@@ -11,25 +11,28 @@
     "client.GuiMixin",
     "client.MinecraftMixin",
     "client.SkullBlockRendererMixin",
+    "config.ClientHandshakePacketListenerImplMixin",
     "client.input.KeyboardHandlerMixin",
     "client.input.MouseHandlerMixin",
     "client.renderer.BoatRendererMixin",
     "client.screen.AbstractContainScreenMixin",
     "client.screen.GameRendererMixin",
     "client.screen.GuiGraphicsMixin",
-    "client.screen.ScreenMixin"
+    "client.screen.ScreenMixin",
+    "lifecycles.IntegratedServerMixin"
   ],
   "mixins": [
+    "CreateWorldScreenMixin",
     "EntityDataSerializersMixin",
     "EntityMixin",
     "LivingDeathMixin",
     "LivingEntityMixin",
     "LootPoolMixin",
     "LootTableBuilderMixin",
-    "CreateWorldScreenMixin",
     "PlayerAttackMixin",
     "ServerLevelMixin",
-    "ServerPacksSourceMixin"
+    "ServerPacksSourceMixin",
+    "lifecycles.DedicatedServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

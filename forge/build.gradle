@@ -41,8 +41,8 @@ configurations {
 dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
 
-    annotationProcessor('org.spongepowered:mixin:0.8.3:processor')
-    annotationProcessor(shadowBundle('io.github.llamalad7:mixinextras-common:0.5.0'))
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
+    implementation(include("io.github.llamalad7:mixinextras-forge:0.5.0"))
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionForge')
@@ -61,11 +61,9 @@ shadowJar {
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowBundle]
-    relocate "com.llamalad7.mixinextras", "com.blackgear.platform.mixinextras.forge"
     archiveClassifier = "dev-shadow"
 }
 
 remapJar {
     inputFile.set(shadowJar.archiveFile)
 }
-

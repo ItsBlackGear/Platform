@@ -25,8 +25,7 @@
     "client.AbstractContainerScreenMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
-    "client.ModelBakeryMixin",
-    "config.ClientHandshakePacketListenerImplMixin"
+    "client.ModelBakeryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

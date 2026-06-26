@@ -10,6 +10,11 @@ import net.minecraftforge.fml.common.Mod;
 public class ServerLifecycle {
     @SubscribeEvent
     public static void onServerStartup(ServerAboutToStartEvent event) {
+        ServerLifecycleEvents.PRE_STARTING.invoker().onLifecycle(event.getServer());
+    }
+    
+    @SubscribeEvent
+    public static void onServerStartup(ServerStartingEvent event) {
         ServerLifecycleEvents.STARTING.invoker().onLifecycle(event.getServer());
     }
 

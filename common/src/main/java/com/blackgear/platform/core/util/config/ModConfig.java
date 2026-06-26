@@ -1,68 +1,28 @@
 package com.blackgear.platform.core.util.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.file.FileConfig;
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Locale;
 
-public class ModConfig {
-    private final Type type;
-    private final IConfigSpec<?> spec;
-    private final String fileName;
-    private final String modId;
-    private final ConfigFileTypeHandler configHandler = ConfigFileTypeHandler.TOML;
-    private CommentedConfig configData;
+public interface ModConfig {
+    Type getType();
     
-    public ModConfig(final Type type, final IConfigSpec<?> spec, final String modId, final String fileName) {
-        this.type = type;
-        this.spec = spec;
-        this.fileName = fileName;
-        this.modId = modId;
-        ConfigTracker.INSTANCE.trackConfig(this);
-    }
-
-    public Type getType() {
-        return type;
-    }
+    String getFileName();
     
-    public String getFileName() {
-        return fileName;
-    }
-
-    public ConfigFileTypeHandler getHandler() {
-        return configHandler;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends IConfigSpec<T>> IConfigSpec<T> getSpec() {
-        return (IConfigSpec<T>) spec;
-    }
-
-    public String getModId() {
-        return this.modId;
-    }
+    UnmodifiableConfig getSpec();
     
-    public CommentedConfig getConfigData() {
-        return this.configData;
-    }
+    String getModId();
     
-    void setConfigData(final CommentedConfig configData) {
-        this.configData = configData;
-        this.spec.setConfig(this.configData);
-    }
+    CommentedConfig getConfigData();
     
-    public void save() {
-        if (this.configData instanceof FileConfig config) {
-            config.save();
-        }
-    }
+    void save();
     
-    public Path getFullPath() {
-        return this.configData instanceof FileConfig config ? config.getNioPath() : null;
-    }
-
-    public enum Type {
+    @Nullable Path getFullPath();
+    
+    enum Type {
         /**
          * Common mod config for configuration that needs to be loaded on both environments.
          * <p>Loaded on both servers and clients.

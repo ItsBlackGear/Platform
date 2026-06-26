@@ -269,10 +269,10 @@ public interface ConfigBuilder {
     
     ConfigBuilder pop(int count);
     
-    interface ConfigValue<T> {
+    interface ConfigValue<T> extends Supplier<T> {
         List<String> getPath();
         
-        T get();
+        @Override T get();
         
         ConfigBuilder next();
         

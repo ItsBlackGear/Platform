@@ -2,13 +2,12 @@ package com.blackgear.platform.core.util.config;
 
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.core.Environment;
-import com.blackgear.platform.core.events.ServerLifecycleEvents;
 import com.blackgear.platform.core.mixin.access.LevelResourceAccessor;
-import com.blackgear.platform.core.network.listener.ServerListenerEvents;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.google.common.collect.ImmutableMap;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import org.apache.commons.io.FilenameUtils;
@@ -25,7 +24,7 @@ public class ConfigLoader {
     private static final String DEFAULTCONFIGS = "defaultconfigs";
     public static final Map<String, Map<String, Object>> DEFAULT_CONFIG_VALUES = new ConcurrentHashMap<>();
 
-    private static Path getOrCreateDirectory(Path dirPath, String dirLabel) {
+    private static void getOrCreateDirectory(Path dirPath, String dirLabel) {
         if (!Files.isDirectory(dirPath.getParent())) {
             getOrCreateDirectory(dirPath.getParent(), "parent of " + dirLabel);
         }
@@ -45,21 +44,20 @@ public class ConfigLoader {
         } else {
             Platform.LOGGER.debug("Found existing {} directory : {}", dirLabel, dirPath);
         }
-        return dirPath;
     }
-
+    
     public static Path getServerConfigDirectory(MinecraftServer server) {
         final Path serverConfig = server.getWorldPath(SERVERCONFIG);
         getOrCreateDirectory(serverConfig, "server config directory");
         return serverConfig;
     }
-
+    
     public static Path getDefaultConfigsDirectory() {
         Path defaultConfigs = Environment.getGameDir().resolve(DEFAULTCONFIGS);
         getOrCreateDirectory(defaultConfigs, "default configs directory");
         return defaultConfigs;
     }
-
+    
     public static void tryLoadConfigFile(FileConfig config) {
         try {
             config.load();
@@ -76,6 +74,7 @@ public class ConfigLoader {
             throw e;
         }
     }
+    
     public static void tryRegisterDefaultConfig(ModConfig modConfig) {
         String fileName = modConfig.getFileName();
         Path path = getDefaultConfigsDirectory().resolve(fileName);
@@ -89,11 +88,11 @@ public class ConfigLoader {
                 }
                 Platform.LOGGER.debug("Loaded default config values for future corrections from file at path {}", path);
             } catch (Exception ignored) {
-
+            
             }
         }
     }
-
+    
     public static void backUpConfig(final Path commentedFileConfig, final int maxBackups) {
         if (!Files.exists(commentedFileConfig)) return;
         Path bakFileLocation = commentedFileConfig.getParent();
@@ -114,15 +113,7 @@ public class ConfigLoader {
             Platform.LOGGER.warn("Failed to back up config file {}", commentedFileConfig, exception);
         }
     }
-
-    public static void bootstrap() {
-        ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, Environment.getConfigDir());
-        if (Environment.isClientSide()) {
-            ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, Environment.getConfigDir());
-        }
-
-        ServerLifecycleEvents.STARTING.register(server -> ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.SERVER, getServerConfigDirectory(server)));
-        ServerLifecycleEvents.STOPPING.register(server -> ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigDirectory(server)));
-        ServerListenerEvents.JOIN.register((connection, player) -> ConfigTracker.INSTANCE.syncConfigs(Environment.isClientSide()));
-    }
+    
+    @ExpectPlatform
+    public static void bootstrap() { /* NO-OP */ }
 }

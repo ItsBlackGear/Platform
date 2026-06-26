@@ -1,6 +1,6 @@
-package com.blackgear.platform.core.mixin.config;
+package com.blackgear.platform.core.mixin.fabric.config;
 
-import com.blackgear.platform.core.util.config.ConfigTracker;
+import com.blackgear.platform.core.util.config.fabric.ConfigTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
 import net.minecraft.network.protocol.login.ClientboundCustomQueryPacket;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientHandshakePacketListenerImplMixin {
     @Shadow @Final private Minecraft minecraft;
     @Unique private boolean hasLoadedConfigs;
-
+    
     @Inject(method = "handleCustomQuery", at = @At("HEAD"))
     public void handleCustomQuery(ClientboundCustomQueryPacket packet, CallbackInfo ci) {
         if (!this.hasLoadedConfigs && !this.minecraft.hasSingleplayerServer()) {

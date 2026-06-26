@@ -4,7 +4,7 @@ import com.blackgear.platform.Platform;
 import com.blackgear.platform.core.network.base.Packet;
 import com.blackgear.platform.core.network.base.PacketContext;
 import com.blackgear.platform.core.network.base.PacketHandler;
-import com.blackgear.platform.core.util.config.ConfigTracker;
+import com.blackgear.platform.core.util.config.fabric.ConfigTracker;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 

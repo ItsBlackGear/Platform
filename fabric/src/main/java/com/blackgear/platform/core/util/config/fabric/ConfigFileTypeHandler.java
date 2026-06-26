@@ -1,6 +1,7 @@
-package com.blackgear.platform.core.util.config;
+package com.blackgear.platform.core.util.config.fabric;
 
 import com.blackgear.platform.core.events.ConfigEvents;
+import com.blackgear.platform.core.util.config.ConfigLoader;
 import com.electronwill.nightconfig.core.ConfigFormat;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileWatcher;
@@ -18,7 +19,7 @@ import java.util.function.Function;
 public class ConfigFileTypeHandler {
     private static final Logger LOGGER = LogManager.getLogger();
     static ConfigFileTypeHandler TOML = new ConfigFileTypeHandler();
-
+    
     public static void backUpConfig(final CommentedFileConfig commentedFileConfig) {
         backUpConfig(commentedFileConfig, 5);
     }
@@ -28,7 +29,7 @@ public class ConfigFileTypeHandler {
         String bakFileName = FilenameUtils.removeExtension(commentedFileConfig.getFile().getName());
         String bakFileExtension = FilenameUtils.getExtension(commentedFileConfig.getFile().getName()) + ".bak";
         Path bakFile = bakFileLocation.resolve(bakFileName + "-1" + "." + bakFileExtension);
-
+        
         try {
             for (int i = maxBackups; i > 0; i--) {
                 Path oldBak = bakFileLocation.resolve(bakFileName + "-" + i + "." + bakFileExtension);
@@ -40,14 +41,14 @@ public class ConfigFileTypeHandler {
                     }
                 }
             }
-
+            
             Files.copy(commentedFileConfig.getNioPath(), bakFile);
         } catch (IOException exception) {
             LOGGER.warn("Failed to back up config file {}", commentedFileConfig.getNioPath(), exception);
         }
     }
 
-    public Function<ModConfig, CommentedFileConfig> reader(Path configBasePath) {
+    public Function<ModConfigImpl, CommentedFileConfig> reader(Path configBasePath) {
         return config -> {
             Path configPath = configBasePath.resolve(config.getFileName());
             CommentedFileConfig configData = CommentedFileConfig.builder(configPath)
@@ -58,29 +59,29 @@ public class ConfigFileTypeHandler {
                 .writingMode(WritingMode.REPLACE)
                 .build();
             LOGGER.debug("Built TOML config for {}", configPath.toString());
-
+            
             try {
                 ConfigLoader.tryLoadConfigFile(configData);
             } catch (ParsingException exception) {
                 LOGGER.error("Failed to parse config `{}`", configPath, exception);
                 throw new ConfigLoadingException(config, exception);
             }
-
+            
             ConfigLoader.tryRegisterDefaultConfig(config);
             LOGGER.debug("Loaded TOML config file {}", configPath.toString());
-
+            
             try {
                 FileWatcher.defaultInstance().addWatch(configPath, new ConfigWatcher(config, configData, Thread.currentThread().getContextClassLoader()));
                 LOGGER.debug("Watching TOML config file `{}` for changes", configPath.toString());
             } catch (IOException exception) {
                 throw new RuntimeException("Couldn't watch config file", exception);
             }
-
+            
             return configData;
         };
     }
 
-    public void unload(Path configBasePath, ModConfig config) {
+    public void unload(Path configBasePath, ModConfigImpl config) {
         Path configPath = configBasePath.resolve(config.getFileName());
         try {
             FileWatcher.defaultInstance().removeWatch(configBasePath.resolve(config.getFileName()));
@@ -89,7 +90,7 @@ public class ConfigFileTypeHandler {
         }
     }
 
-    private boolean setupConfigFile(ModConfig config, Path file, ConfigFormat<?> format) throws IOException {
+    private boolean setupConfigFile(ModConfigImpl config, Path file, ConfigFormat<?> format) throws IOException {
         Files.createDirectories(file.getParent());
         Path path = ConfigLoader.getDefaultConfigsDirectory().resolve(config.getFileName());
         if (Files.exists(path)) {
@@ -103,16 +104,16 @@ public class ConfigFileTypeHandler {
     }
 
     private static class ConfigWatcher implements Runnable {
-        private final ModConfig modConfig;
+        private final ModConfigImpl modConfig;
         private final CommentedFileConfig commentedFileConfig;
         private final ClassLoader realClassLoader;
-        
-        ConfigWatcher(final ModConfig modConfig, final CommentedFileConfig commentedFileConfig, final ClassLoader classLoader) {
+
+        ConfigWatcher(final ModConfigImpl modConfig, final CommentedFileConfig commentedFileConfig, final ClassLoader classLoader) {
             this.modConfig = modConfig;
             this.commentedFileConfig = commentedFileConfig;
             this.realClassLoader = classLoader;
         }
-        
+
         @Override
         public void run() {
             // Force the regular classloader onto the special thread
@@ -136,9 +137,9 @@ public class ConfigFileTypeHandler {
             }
         }
     }
-    
+
     private static class ConfigLoadingException extends RuntimeException {
-        public ConfigLoadingException(ModConfig config, Exception cause) {
+        public ConfigLoadingException(ModConfigImpl config, Throwable cause) {
             super("Failed loading config file " + config.getFileName() + " of type " + config.getType() + " for modid " + config.getModId(), cause);
         }
     }

@@ -1,5 +1,9 @@
-package com.blackgear.platform.core.util.config;
+package com.blackgear.platform.core.util.config.fabric;
 
+import com.blackgear.platform.Platform;
+import com.blackgear.platform.core.util.config.ConfigBuilder;
+import com.blackgear.platform.core.util.config.ConfigLoader;
+import com.blackgear.platform.core.util.config.fabric.FabricConfigBuilder.BuilderContext;
 import com.electronwill.nightconfig.core.*;
 import com.electronwill.nightconfig.core.ConfigSpec.CorrectionListener;
 import com.electronwill.nightconfig.core.file.FileConfig;
@@ -7,9 +11,8 @@ import com.electronwill.nightconfig.core.utils.UnmodifiableConfigWrapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -18,52 +21,40 @@ import java.util.function.Supplier;
 
 import static com.electronwill.nightconfig.core.ConfigSpec.CorrectionAction.*;
 
-public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements IConfigSpec<SimpleConfigSpec> {
+public class FabricConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> {
+    static final Joiner LINE_JOINER = Joiner.on("\n");
+    static final Joiner DOT_JOINER = Joiner.on(".");
+    private static final Marker CORE = MarkerManager.getMarker("CORE");
     private final Map<List<String>, String> levelComments;
-    private final Map<List<String>, String> levelTranslationKeys;
-
     private final UnmodifiableConfig values;
     private Config childConfig;
     
     private boolean isCorrecting = false;
-
-    private static final Logger LOGGER = LogManager.getLogger();
-
-    SimpleConfigSpec(UnmodifiableConfig storage, UnmodifiableConfig values, Map<List<String>, String> levelComments, Map<List<String>, String> levelTranslationKeys) {
+    
+    FabricConfigSpec(UnmodifiableConfig storage, UnmodifiableConfig values, Map<List<String>, String> levelComments) {
         super(storage);
         this.values = values;
         this.levelComments = levelComments;
-        this.levelTranslationKeys = levelTranslationKeys;
     }
-
-    public String getLevelComment(List<String> path) {
-        return this.levelComments.get(path);
-    }
-
-    public String getLevelTranslationKey(List<String> path) {
-        return this.levelTranslationKeys.get(path);
-    }
-
-    @Override
+    
     public void setConfig(CommentedConfig config) {
         this.childConfig = config;
         if (config != null && !this.isCorrect(config)) {
-            String configName = config instanceof FileConfig fileConfig ? fileConfig.getNioPath().toString() : config.toString();
-            LOGGER.warn("Configuration file {} is not correct. Correcting", configName);
+            String configName = config instanceof FileConfig ? ((FileConfig) config).getNioPath().toString() : config.toString();
+            Platform.LOGGER.warn("Configuration file {} is not correct. Correcting", configName);
             this.correct(config,
                 (action, path, incorrectValue, correctedValue) ->
-                    LOGGER.warn("Incorrect key {} was corrected from {} to its default, {}. {}", DOT_JOINER.join(path), incorrectValue, correctedValue, incorrectValue == correctedValue ? "This seems to be an error." : ""),
+                    Platform.LOGGER.warn("Incorrect key {} was corrected from {} to its default, {}. {}", DOT_JOINER.join(path), incorrectValue, correctedValue, incorrectValue == correctedValue ? "This seems to be an error." : ""),
                 (action, path, incorrectValue, correctedValue) ->
-                    LOGGER.debug("The comment on key {} does not match the spec. This may create a backup.", DOT_JOINER.join(path)));
+                    Platform.LOGGER.debug("The comment on key {} does not match the spec. This may create a backup.", DOT_JOINER.join(path)));
             
-            if (config instanceof FileConfig fileConfig) {
-                fileConfig.save();
+            if (config instanceof FileConfig) {
+                ((FileConfig) config).save();
             }
         }
         this.afterReload();
     }
 
-    @Override
     public boolean isCorrecting() {
         return this.isCorrecting;
     }
@@ -80,7 +71,6 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         return this.values;
     }
     
-    @Override
     public void afterReload() {
         this.resetCaches(this.getValues().valueMap().values());
     }
@@ -97,18 +87,16 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     
     public void save() {
         Preconditions.checkNotNull(this.childConfig, "Cannot save config value without assigned Config object present");
-        if (this.childConfig instanceof FileConfig config) {
-            config.save();
+        if (this.childConfig instanceof FileConfig) {
+            ((FileConfig) this.childConfig).save();
         }
     }
     
-    @Override
     public synchronized boolean isCorrect(CommentedConfig config) {
         LinkedList<String> parent = new LinkedList<>();
-        return this.correct(this.config, config, parent, Collections.unmodifiableList(parent), (action, path, incorrectValue, correctedValue) -> {}, null, true) == 0;
+        return this.correct(this.config, config, null, parent, Collections.unmodifiableList(parent), (action, path, incorrectValue, correctedValue) -> {}, null, true) == 0;
     }
     
-    @Override
     public int correct(CommentedConfig config) {
         return this.correct(config, (action, path, incorrectValue, correctedValue) -> {}, null);
     }
@@ -123,7 +111,15 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
 
         try {
             this.isCorrecting = true;
-            ret = this.correct(this.config, config, parent, Collections.unmodifiableList(parent), listener, commentListener, false);
+            
+            final Map<String, Object> defaultMap;
+            if (config instanceof FileConfig fileConfig) {
+                defaultMap = ConfigLoader.DEFAULT_CONFIG_VALUES.get(fileConfig.getNioPath().getFileName().toString().intern());
+            } else {
+                defaultMap = null;
+            }
+            
+            ret = this.correct(this.config, config, defaultMap, parent, Collections.unmodifiableList(parent), listener, commentListener, false);
         } finally {
             this.isCorrecting = false;
         }
@@ -131,7 +127,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         return ret;
     }
     
-    private int correct(UnmodifiableConfig spec, CommentedConfig config, LinkedList<String> parentPath, List<String> parentPathUnmodifiable, CorrectionListener listener, CorrectionListener commentListener, boolean dryRun) {
+    private int correct(UnmodifiableConfig spec, CommentedConfig config, @Nullable Map<String, Object> defaultMap, LinkedList<String> parentPath, List<String> parentPathUnmodifiable, CorrectionListener listener, CorrectionListener commentListener, boolean dryRun) {
         int count = 0;
         
         Map<String, Object> specMap = spec.valueMap();
@@ -147,7 +143,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
             
             if (specValue instanceof Config) {
                 if (configValue instanceof CommentedConfig) {
-                    count += this.correct((Config) specValue, (CommentedConfig) configValue, parentPath, parentPathUnmodifiable, listener, commentListener, dryRun);
+                    count += this.correct((Config) specValue, (CommentedConfig) configValue, defaultMap != null && defaultMap.get(key) instanceof Config defaultConfig ? defaultConfig.valueMap() : null, parentPath, parentPathUnmodifiable, listener, commentListener, dryRun);
                     
                     if (count > 0 && dryRun) {
                         return count;
@@ -159,13 +155,13 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
                     configMap.put(key, newValue);
                     listener.onCorrect(action, parentPathUnmodifiable, configValue, newValue);
                     count++;
-                    count += this.correct((Config) specValue, newValue, parentPath, parentPathUnmodifiable, listener, commentListener, dryRun);
+                    count += this.correct((Config) specValue, newValue, defaultMap != null && defaultMap.get(key) instanceof Config defaultConfig ? defaultConfig.valueMap() : null, parentPath, parentPathUnmodifiable, listener, commentListener, dryRun);
                 }
                 
                 String newComment = levelComments.get(parentPath);
                 String oldComment = config.getComment(key);
                 
-                if (!stringsMatchIgnoringNewlines(oldComment, newComment)) {
+                if (stringsNotEqual(oldComment, newComment)) {
                     if (commentListener != null) {
                         commentListener.onCorrect(action, parentPathUnmodifiable, oldComment, newComment);
                     }
@@ -184,13 +180,24 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
                     }
                     
                     Object newValue = valueSpec.correct(configValue);
+                    if (defaultMap != null && defaultMap.containsKey(key)) {
+                        if (valueSpec.getRange() != null) {
+                            newValue = valueSpec.getRange().correct(configValue, defaultMap.get(key));
+                        } else {
+                            newValue = defaultMap.get(key);
+                        }
+                        if (!valueSpec.test(newValue)) {
+                            newValue = valueSpec.correct(configValue);
+                        }
+                    }
+                    
                     configMap.put(key, newValue);
                     listener.onCorrect(action, parentPathUnmodifiable, configValue, newValue);
                     count++;
                 }
                 
                 String oldComment = config.getComment(key);
-                if (!stringsMatchIgnoringNewlines(oldComment, valueSpec.getComment())) {
+                if (stringsNotEqual(oldComment, valueSpec.getComment())) {
                     if (commentListener != null) {
                         commentListener.onCorrect(action, parentPathUnmodifiable, oldComment, valueSpec.getComment());
                     }
@@ -225,94 +232,14 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         return count;
     }
     
-    private boolean stringsMatchIgnoringNewlines(@Nullable Object obj1, @Nullable Object obj2) {
+    private boolean stringsNotEqual(@Nullable Object obj1, @Nullable Object obj2) {
         if (obj1 instanceof String string1 && obj2 instanceof String string2) {
-            if (!string1.isEmpty() && !string2.isEmpty()) {
-                return string1.replaceAll("\r\n", "\n")
-                    .equals(string2.replaceAll("\r\n", "\n"));
-            }
+            if (string1.length() > 0 && string2.length() > 0)
+                return !string1.replaceAll("\r\n", "\n").equals(string2.replaceAll("\r\n", "\n"));
         }
         
         // Fallback for when we're not given Strings, or one of them is empty
-        return Objects.equals(obj1, obj2);
-    }
-    
-    static class BuilderContext {
-        private @NotNull String[] comment = new String[0];
-        private String langKey;
-        private Range<?> range;
-        private boolean worldRestart = false;
-        private Class<?> clazz;
-        
-        public void setComment(String... value) {
-            this.validate(value == null, "Passed in null value for comment");
-            this.comment = value;
-        }
-        
-        public boolean hasComment() {
-            return this.comment.length > 0;
-        }
-        
-        public String[] getComment() {
-            return this.comment;
-        }
-        
-        public String buildComment() {
-            return LINE_JOINER.join(this.comment);
-        }
-        
-        public void setTranslationKey(String value) {
-            this.langKey = value;
-        }
-        
-        public String getTranslationKey() {
-            return this.langKey;
-        }
-        
-        public <V extends Comparable<? super V>> void setRange(Range<V> value) {
-            this.range = value;
-            this.setClazz(value.getClazz());
-        }
-        
-        @SuppressWarnings("unchecked")
-        public <V extends Comparable<? super V>> Range<V> getRange() {
-            return (Range<V>) this.range;
-        }
-        
-        public void worldRestart() {
-            this.worldRestart = true;
-        }
-        
-        public boolean needsWorldRestart() {
-            return this.worldRestart;
-        }
-        
-        public void setClazz(Class<?> clazz) {
-            this.clazz = clazz;
-        }
-        
-        public Class<?> getClazz() {
-            return this.clazz;
-        }
-        
-        public void ensureEmpty() {
-            this.validate(this.hasComment(), "Non-empty comment when empty expected");
-            this.validate(this.langKey, "Non-null translation key when null expected");
-            this.validate(this.range, "Non-null range when null expected");
-            this.validate(this.worldRestart, "Dangeling world restart value set to true");
-        }
-        
-        private void validate(Object value, String message) {
-            if (value != null) {
-                throw new IllegalStateException(message);
-            }
-        }
-        
-        private void validate(boolean value, String message) {
-            if (value) {
-                throw new IllegalStateException(message);
-            }
-        }
+        return !Objects.equals(obj1, obj2);
     }
     
     public static class Range<V extends Comparable<? super V>> implements Predicate<Object> {
@@ -349,7 +276,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
                 boolean result = ((Number) this.min).doubleValue() <= n.doubleValue() && n.doubleValue() <= ((Number) this.max).doubleValue();
                 
                 if (!result) {
-                    LOGGER.debug("Range value {} is not within its bounds {}-{}", n.doubleValue(), ((Number) this.min).doubleValue(), ((Number) this.max).doubleValue());
+                    Platform.LOGGER.debug(CORE, "Range value {} is not within its bounds {}-{}", n.doubleValue(), ((Number) this.min).doubleValue(), ((Number) this.max).doubleValue());
                 }
                 
                 return result;
@@ -363,7 +290,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
             
             boolean result = c.compareTo(this.min) >= 0 && c.compareTo(this.max) <= 0;
             if (!result) {
-                LOGGER.debug("Range value {} is not within its bounds {}-{}", c, this.min, this.max);
+                Platform.LOGGER.debug(CORE, "Range value {} is not within its bounds {}-{}", c, this.min, this.max);
             }
             
             return result;
@@ -416,14 +343,8 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         private Object _default = null;
         
         ValueSpec(Supplier<?> supplier, Predicate<Object> validator, BuilderContext context) {
-            Objects.requireNonNull(
-                supplier,
-                "Default supplier can not be null"
-            );
-            Objects.requireNonNull(
-                validator,
-                "Validator can not be null"
-            );
+            Objects.requireNonNull(supplier, "Default supplier can not be null");
+            Objects.requireNonNull(validator, "Validator can not be null");
             
             this.comment = context.hasComment() ? context.buildComment() : null;
             this.langKey = context.getTranslationKey();
@@ -475,15 +396,15 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     public static class FabricConfigValue<T> implements ConfigBuilder.ConfigValue<T> {
         private static final boolean USE_CACHES = true;
         
-        private final SimpleConfigBuilder parent;
+        private final FabricConfigBuilder parent;
         private final List<String> path;
         private final Supplier<T> defaultSupplier;
         
         private T cachedValue = null;
         
-        SimpleConfigSpec spec;
+        FabricConfigSpec spec;
         
-        FabricConfigValue(SimpleConfigBuilder parent, List<String> path, Supplier<T> defaultSupplier) {
+        FabricConfigValue(FabricConfigBuilder parent, List<String> path, Supplier<T> defaultSupplier) {
             this.parent = parent;
             this.path = path;
             this.defaultSupplier = defaultSupplier;
@@ -531,14 +452,8 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         
         @Override
         public void set(T value) {
-            Preconditions.checkNotNull(
-                this.spec,
-                "Cannot set config value before spec is built"
-            );
-            Preconditions.checkNotNull(
-                this.spec.childConfig,
-                "Cannot set config value without assigned Config object present"
-            );
+            Preconditions.checkNotNull(this.spec, "Cannot set config value before spec is built");
+            Preconditions.checkNotNull(this.spec.childConfig, "Cannot set config value without assigned Config object present");
             
             this.spec.childConfig.set(this.path, value);
             this.cachedValue = value;
@@ -551,13 +466,13 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     }
     
     public static class BooleanValue extends FabricConfigValue<Boolean> {
-        BooleanValue(SimpleConfigBuilder parent, List<String> path, Supplier<Boolean> defaultSupplier) {
+        BooleanValue(FabricConfigBuilder parent, List<String> path, Supplier<Boolean> defaultSupplier) {
             super(parent, path, defaultSupplier);
         }
     }
     
     public static class IntValue extends FabricConfigValue<Integer> {
-        IntValue(SimpleConfigBuilder parent, List<String> path, Supplier<Integer> defaultSupplier) {
+        IntValue(FabricConfigBuilder parent, List<String> path, Supplier<Integer> defaultSupplier) {
             super(parent, path, defaultSupplier);
         }
         
@@ -568,7 +483,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     }
     
     public static class LongValue extends FabricConfigValue<Long> {
-        LongValue(SimpleConfigBuilder parent, List<String> path, Supplier<Long> defaultSupplier) {
+        LongValue(FabricConfigBuilder parent, List<String> path, Supplier<Long> defaultSupplier) {
             super(parent, path, defaultSupplier);
         }
         
@@ -579,7 +494,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
     }
     
     public static class DoubleValue extends FabricConfigValue<Double> {
-        DoubleValue(SimpleConfigBuilder parent, List<String> path, Supplier<Double> defaultSupplier) {
+        DoubleValue(FabricConfigBuilder parent, List<String> path, Supplier<Double> defaultSupplier) {
             super(parent, path, defaultSupplier);
         }
         
@@ -594,7 +509,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         private final EnumGetMethod converter;
         private final Class<T> clazz;
         
-        EnumValue(SimpleConfigBuilder parent, List<String> path, Supplier<T> defaultSupplier, EnumGetMethod converter, Class<T> clazz) {
+        EnumValue(FabricConfigBuilder parent, List<String> path, Supplier<T> defaultSupplier, EnumGetMethod converter, Class<T> clazz) {
             super(parent, path, defaultSupplier);
             this.converter = converter;
             this.clazz = clazz;
@@ -602,10 +517,7 @@ public class SimpleConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConf
         
         @Override
         protected T getRaw(Config config, List<String> path, Supplier<T> defaultSupplier) {
-            return config.getEnumOrElse(path, clazz, converter, defaultSupplier);
+            return config.getEnumOrElse(path, this.clazz, this.converter, defaultSupplier);
         }
     }
-    
-    private static final Joiner LINE_JOINER = Joiner.on("\n");
-    static final Joiner DOT_JOINER = Joiner.on(".");
 }
