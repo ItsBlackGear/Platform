@@ -1,13 +1,16 @@
-package com.blackgear.platform.core.util.config;
+package com.blackgear.platform.core.util.config.fabric;
 
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.core.Environment;
+import com.blackgear.platform.core.util.config.ConfigBuilder;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.EnumGetMethod;
 import com.electronwill.nightconfig.core.InMemoryFormat;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ObjectArrays;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
@@ -15,15 +18,14 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class SimpleConfigBuilder implements ConfigBuilder {
-    private final Config storage = Config.of(LinkedHashMap::new, InMemoryFormat.withUniversalSupport()); // Use LinkedHashMap for consistent ordering
+public class FabricConfigBuilder implements ConfigBuilder {
+    private final Config storage = Config.of(LinkedHashMap::new, InMemoryFormat.withUniversalSupport());
     private final Map<List<String>, String> levelComments = new HashMap<>();
-    private final Map<List<String>, String> levelTranslationKeys = new HashMap<>();
     private final List<String> currentPath = new ArrayList<>();
-    List<SimpleConfigSpec.FabricConfigValue<?>> values = new ArrayList<>();
-    private SimpleConfigSpec.BuilderContext context = new SimpleConfigSpec.BuilderContext();
-    
-    private <T> ConfigValue<T> define(List<String> path, SimpleConfigSpec.ValueSpec value, Supplier<T> defaultSupplier) { // This is the root where everything at the end of the day ends up.
+    List<FabricConfigSpec.FabricConfigValue<?>> values = new ArrayList<>();
+    private BuilderContext context = new BuilderContext();
+
+    private <T> ConfigValue<T> define(List<String> path, FabricConfigSpec.ValueSpec value, Supplier<T> defaultSupplier) {
         if (!this.currentPath.isEmpty()) {
             List<String> tmp = new ArrayList<>(this.currentPath.size() + path.size());
             tmp.addAll(this.currentPath);
@@ -32,19 +34,19 @@ public class SimpleConfigBuilder implements ConfigBuilder {
         }
         
         this.storage.set(path, value);
-        this.context = new SimpleConfigSpec.BuilderContext();
-        return new SimpleConfigSpec.FabricConfigValue<>(this, path, defaultSupplier);
+        this.context = new BuilderContext();
+        return new FabricConfigSpec.FabricConfigValue<>(this, path, defaultSupplier);
     }
-    
+
     @Override
     public <T> ConfigValue<T> define(List<String> path, Supplier<T> defaultSupplier, Predicate<Object> validator, Class<?> clazz) {
         this.context.setClazz(clazz);
-        return this.define(path, new SimpleConfigSpec.ValueSpec(defaultSupplier, validator, context), defaultSupplier);
+        return this.define(path, new FabricConfigSpec.ValueSpec(defaultSupplier, validator, this.context), defaultSupplier);
     }
-    
+
     @Override
     public <V extends Comparable<? super V>> ConfigValue<V> defineInRange(List<String> path, Supplier<V> defaultSupplier, V min, V max, Class<V> clazz) {
-        SimpleConfigSpec.Range<V> range = new SimpleConfigSpec.Range<>(clazz, min, max);
+        FabricConfigSpec.Range<V> range = new FabricConfigSpec.Range<>(clazz, min, max);
         this.context.setRange(range);
         this.context.setComment(ObjectArrays.concat(this.context.getComment(), "Range: " + range));
         
@@ -54,11 +56,11 @@ public class SimpleConfigBuilder implements ConfigBuilder {
         
         return this.define(path, defaultSupplier, range);
     }
-    
+
     @Override
     public <T> ConfigValue<List<? extends T>> defineList(List<String> path, Supplier<List<? extends T>> defaultSupplier, Predicate<Object> elementValidator) {
         this.context.setClazz(List.class);
-        return this.define(path, new SimpleConfigSpec.ValueSpec(defaultSupplier, x -> x instanceof List && ((List<?>) x).stream().allMatch(elementValidator), this.context) {
+        return this.define(path, new FabricConfigSpec.ValueSpec(defaultSupplier, x -> x instanceof List && ((List<?>) x).stream().allMatch(elementValidator), this.context) {
             @Override
             public Object correct(Object value) {
                 if (!(value instanceof List) || ((List<?>) value).isEmpty()) {
@@ -75,11 +77,11 @@ public class SimpleConfigBuilder implements ConfigBuilder {
             }
         }, defaultSupplier);
     }
-    
+
     @Override
     public <T> ConfigValue<List<? extends T>> defineListAllowEmpty(List<String> path, Supplier<List<? extends T>> defaultSupplier, Predicate<Object> elementValidator) {
         this.context.setClazz(List.class);
-        return this.define(path, new SimpleConfigSpec.ValueSpec(defaultSupplier, x -> x instanceof List && ((List<?>) x).stream().allMatch(elementValidator), this.context) {
+        return this.define(path, new FabricConfigSpec.ValueSpec(defaultSupplier, x -> x instanceof List && ((List<?>) x).stream().allMatch(elementValidator), this.context) {
             @Override
             public Object correct(Object value) {
                 if (!(value instanceof List)) {
@@ -96,77 +98,77 @@ public class SimpleConfigBuilder implements ConfigBuilder {
             }
         }, defaultSupplier);
     }
-    
+
     @Override
     public <V extends Enum<V>> ConfigValue<V> defineEnum(List<String> path, Supplier<V> defaultSupplier, EnumGetMethod converter, Predicate<Object> validator, Class<V> clazz) {
         this.context.setClazz(clazz);
         V[] allowedValues = clazz.getEnumConstants();
         this.context.setComment(ObjectArrays.concat(this.context.getComment(), "Allowed Values: " + Arrays.stream(allowedValues).filter(validator).map(Enum::name).collect(Collectors.joining(", "))));
-        return new SimpleConfigSpec.EnumValue<>(this, this.define(path, new SimpleConfigSpec.ValueSpec(defaultSupplier, validator, this.context), defaultSupplier).getPath(), defaultSupplier, converter, clazz);
+        return new FabricConfigSpec.EnumValue<>(this, this.define(path, new FabricConfigSpec.ValueSpec(defaultSupplier, validator, this.context), defaultSupplier).getPath(), defaultSupplier, converter, clazz);
     }
-    
+
     @Override
     public ConfigValue<Boolean> define(List<String> path, Supplier<Boolean> defaultSupplier) {
-        return new SimpleConfigSpec.BooleanValue(this, define(path, defaultSupplier, o -> {
+        return new FabricConfigSpec.BooleanValue(this, define(path, defaultSupplier, o -> {
             if (o instanceof String)
                 return ((String) o).equalsIgnoreCase("true") || ((String) o).equalsIgnoreCase("false");
             return o instanceof Boolean;
         }, Boolean.class).getPath(), defaultSupplier);
     }
-    
+
     @Override
     public ConfigValue<Double> defineInRange(List<String> path, Supplier<Double> defaultSupplier, double min, double max) {
-        return new SimpleConfigSpec.DoubleValue(this, this.defineInRange(path, defaultSupplier, min, max, Double.class).getPath(), defaultSupplier);
+        return new FabricConfigSpec.DoubleValue(this, this.defineInRange(path, defaultSupplier, min, max, Double.class).getPath(), defaultSupplier);
     }
-    
+
     @Override
     public ConfigValue<Integer> defineInRange(List<String> path, Supplier<Integer> defaultSupplier, int min, int max) {
-        return new SimpleConfigSpec.IntValue(this, this.defineInRange(path, defaultSupplier, min, max, Integer.class).getPath(), defaultSupplier);
+        return new FabricConfigSpec.IntValue(this, this.defineInRange(path, defaultSupplier, min, max, Integer.class).getPath(), defaultSupplier);
     }
-    
+
     @Override
     public ConfigValue<Long> defineInRange(List<String> path, Supplier<Long> defaultSupplier, long min, long max) {
-        return new SimpleConfigSpec.LongValue(this, this.defineInRange(path, defaultSupplier, min, max, Long.class).getPath(), defaultSupplier);
+        return new FabricConfigSpec.LongValue(this, this.defineInRange(path, defaultSupplier, min, max, Long.class).getPath(), defaultSupplier);
     }
-    
+
     @Override
     public ConfigBuilder comment(String comment) {
         if (comment == null || comment.isEmpty()) {
             comment = "No comment";
-            if (!Environment.isProduction()) {
-                Platform.LOGGER.error("Null comment for config option {}, this is invalid and may be disallowed in the future.", SimpleConfigSpec.DOT_JOINER.join(this.currentPath));
+            if (Environment.isDevelopment()) {
+                Platform.LOGGER.error("Null comment for config option {}, this is invalid and may be disallowed in the future.", FabricConfigSpec.DOT_JOINER.join(this.currentPath));
             }
         }
         
         this.context.setComment(comment);
         return this;
     }
-    
+
     @Override
     public ConfigBuilder comment(String... comment) {
         if (comment == null || comment.length < 1 || (comment.length == 1 && comment[0].isEmpty())) {
             comment = new String[]{"No comment"};
-            if (!Environment.isProduction()) {
-                Platform.LOGGER.error("Null comment for config option {}, this is invalid and may be disallowed in the future.", SimpleConfigSpec.DOT_JOINER.join(this.currentPath));
+            if (Environment.isDevelopment()) {
+                Platform.LOGGER.error("Null comment for config option {}, this is invalid and may be disallowed in the future.", FabricConfigSpec.DOT_JOINER.join(this.currentPath));
             }
         }
         
         this.context.setComment(comment);
         return this;
     }
-    
+
     @Override
     public ConfigBuilder translation(String translationKey) {
         this.context.setTranslationKey(translationKey);
         return this;
     }
-    
+
     @Override
     public ConfigBuilder worldRestart() {
         this.context.worldRestart();
         return this;
     }
-    
+
     @Override
     public ConfigBuilder push(List<String> path) {
         this.currentPath.addAll(path);
@@ -174,16 +176,11 @@ public class SimpleConfigBuilder implements ConfigBuilder {
             this.levelComments.put(new ArrayList<>(currentPath), this.context.buildComment());
             this.context.setComment(); // Set to empty
         }
-
-        if (this.context.getTranslationKey() != null) {
-            this.levelTranslationKeys.put(new ArrayList<>(currentPath), this.context.getTranslationKey());
-            this.context.setTranslationKey(null);
-        }
-
+        
         this.context.ensureEmpty();
         return this;
     }
-    
+
     @Override
     public ConfigBuilder pop(int count) {
         if (count > this.currentPath.size()) {
@@ -196,19 +193,95 @@ public class SimpleConfigBuilder implements ConfigBuilder {
         
         return this;
     }
-    
-    public <T> Pair<T, SimpleConfigSpec> configure(Function<ConfigBuilder, T> consumer) {
+
+    public <T> Pair<T, FabricConfigSpec> configure(Function<ConfigBuilder, T> consumer) {
         T o = consumer.apply(this);
         return Pair.of(o, this.build());
     }
-    
-    public SimpleConfigSpec build() {
+
+    public FabricConfigSpec build() {
         this.context.ensureEmpty();
         Config valueCfg = Config.of(Config.getDefaultMapCreator(true, true), InMemoryFormat.withSupport(ConfigValue.class::isAssignableFrom));
         this.values.forEach(v -> valueCfg.set(v.getPath(), v));
-        
-        SimpleConfigSpec ret = new SimpleConfigSpec(this.storage, valueCfg, this.levelComments, this.levelTranslationKeys);
+
+        FabricConfigSpec ret = new FabricConfigSpec(this.storage, valueCfg, this.levelComments);
         this.values.forEach(v -> v.spec = ret);
         return ret;
+    }
+
+    static class BuilderContext {
+        private @NotNull String[] comment = new String[0];
+        private String langKey;
+        private FabricConfigSpec.Range<?> range;
+        private boolean worldRestart = false;
+        private Class<?> clazz;
+
+        public boolean hasComment() {
+            return this.comment.length > 0;
+        }
+
+        public String[] getComment() {
+            return this.comment;
+        }
+
+        public void setComment(String... value) {
+            Preconditions.checkNotNull(value, "Comments must not be null");
+            this.comment = value;
+        }
+
+        public String buildComment() {
+            return FabricConfigSpec.LINE_JOINER.join(this.comment);
+        }
+
+        public String getTranslationKey() {
+            return this.langKey;
+        }
+
+        public void setTranslationKey(String value) {
+            this.langKey = value;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <V extends Comparable<? super V>> FabricConfigSpec.Range<V> getRange() {
+            return (FabricConfigSpec.Range<V>) this.range;
+        }
+
+        public <V extends Comparable<? super V>> void setRange(FabricConfigSpec.Range<V> value) {
+            this.range = value;
+            this.setClazz(value.getClazz());
+        }
+
+        public void worldRestart() {
+            this.worldRestart = true;
+        }
+
+        public boolean needsWorldRestart() {
+            return this.worldRestart;
+        }
+
+        public Class<?> getClazz() {
+            return this.clazz;
+        }
+
+        public void setClazz(Class<?> clazz) {
+            this.clazz = clazz;
+        }
+
+        public void ensureEmpty() {
+            validate(this.hasComment(), "Non-empty comment when empty expected");
+            validate(this.langKey, "Non-null translation key when null expected");
+            validate(this.range, "Non-null range when null expected");
+            validate(this.worldRestart, "Dangeling world restart value set to true");
+        }
+
+        private void validate(Object value, String message) {
+            if (value != null)
+                throw new IllegalStateException(message);
+        }
+
+        private void validate(boolean value, String message) {
+            if (value)
+                throw new IllegalStateException(message);
+        }
     }
 }

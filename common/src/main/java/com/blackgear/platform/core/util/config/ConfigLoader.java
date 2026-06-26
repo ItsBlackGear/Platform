@@ -2,13 +2,12 @@ package com.blackgear.platform.core.util.config;
 
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.core.Environment;
-import com.blackgear.platform.core.events.ServerLifecycleEvents;
 import com.blackgear.platform.core.mixin.access.LevelResourceAccessor;
-import com.blackgear.platform.core.networking.ServerListenerEvents;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.google.common.collect.ImmutableMap;
+import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import org.apache.commons.io.FilenameUtils;
@@ -24,7 +23,7 @@ public class ConfigLoader {
     private static final String DEFAULTCONFIGS = "defaultconfigs";
     public static final Map<String, Map<String, Object>> DEFAULT_CONFIG_VALUES = new ConcurrentHashMap<>();
 
-    private static Path getOrCreateDirectory(Path dirPath, String dirLabel) {
+    private static void getOrCreateDirectory(Path dirPath, String dirLabel) {
         if (!Files.isDirectory(dirPath.getParent())) {
             getOrCreateDirectory(dirPath.getParent(), "parent of " + dirLabel);
         }
@@ -44,7 +43,6 @@ public class ConfigLoader {
         } else {
             Platform.LOGGER.debug("Found existing {} directory : {}", dirLabel, dirPath);
         }
-        return dirPath;
     }
 
     public static Path getServerConfigDirectory(MinecraftServer server) {
@@ -113,15 +111,7 @@ public class ConfigLoader {
             Platform.LOGGER.warn("Failed to back up config file {}", commentedFileConfig, exception);
         }
     }
-
-    public static void bootstrap() {
-        ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, Environment.getConfigDir());
-        if (Environment.isClientSide()) {
-            ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, Environment.getConfigDir());
-        }
-
-        ServerLifecycleEvents.STARTING.register(server -> ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.SERVER, getServerConfigDirectory(server)));
-        ServerLifecycleEvents.STOPPING.register(server -> ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigDirectory(server)));
-        ServerListenerEvents.JOIN.register((connection, player) -> ConfigTracker.INSTANCE.syncConfigs(Environment.isClientSide()));
-    }
+    
+    @ExpectPlatform
+    public static void bootstrap() { /* NO-OP */ }
 }

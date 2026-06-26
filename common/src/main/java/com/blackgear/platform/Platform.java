@@ -5,8 +5,6 @@ import com.blackgear.platform.common.resource.RegistryAwareJsonReloadListener;
 import com.blackgear.platform.common.worldgen.modifier.BiomeManager;
 import com.blackgear.platform.core.ModInstance;
 import com.blackgear.platform.core.helper.AttachmentRegistry;
-import com.blackgear.platform.core.networking.packet.ClientboundConfigSyncPayload;
-import com.blackgear.platform.core.networking.Networking;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -21,8 +19,6 @@ public class Platform {
 
 	public static void bootstrap() {
 		INSTANCE.bootstrap();
-
-		Networking.register(registrar -> registrar.registerToClient(ClientboundConfigSyncPayload.TYPE, ClientboundConfigSyncPayload.STREAM_CODEC, ClientboundConfigSyncPayload::handler));
 
 		BiomeManager.bootstrap();
 		AttachmentRegistry.bootstrap();

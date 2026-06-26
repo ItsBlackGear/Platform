@@ -2,12 +2,10 @@ package com.blackgear.platform.core;
 
 import com.blackgear.platform.core.util.config.ConfigBuilder;
 import com.blackgear.platform.core.util.config.ModConfig;
-import com.blackgear.platform.core.util.config.SimpleConfigBuilder;
-import com.blackgear.platform.core.util.config.SimpleConfigSpec;
 import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.thread.BlockableEventLoop;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -35,6 +33,16 @@ public class Environment {
      */
     @ExpectPlatform
     public static boolean isProduction() {
+        throw new AssertionError();
+    }
+    
+    /**
+     * Checks if the environment is in development mode.
+     *
+     * @return true if in development, false if in production
+     */
+    @ExpectPlatform
+    public static boolean isDevelopment() {
         throw new AssertionError();
     }
 
@@ -69,7 +77,16 @@ public class Environment {
     public static Optional<MinecraftServer> getCurrentServer() {
         throw new AssertionError();
     }
-
+    
+    /**
+     * Gets the current Registry Access, if available.
+     *
+     * @return an Optional containing the server's Registry Access, or empty if unavailable
+     */
+    public static Optional<RegistryAccess> getRegistryAccess() {
+        return getCurrentServer().map(MinecraftServer::registryAccess);
+    }
+    
     /**
      * Gets the game's main thread executor.
      *
@@ -102,7 +119,7 @@ public class Environment {
     }
 
     /**
-     * Registers a configuration with a custom filename in a platform-safe manner.
+     * Registers a configuration with a custom filename.
      *
      * @param modId the mod ID for the configuration
      * @param type the configuration type
@@ -111,14 +128,13 @@ public class Environment {
      * @param <T> the type of configuration object
      * @return the created configuration object
      */
+    @ExpectPlatform
     public static <T> T registerConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
-        Pair<T, SimpleConfigSpec> pair = new SimpleConfigBuilder().configure(spec);
-        new ModConfig(type, pair.getRight(), modId, fileName);
-        return pair.getLeft();
+        throw new AssertionError();
     }
 
     /**
-     * Registers a configuration in a platform-safe manner.
+     * Registers a configuration.
      *
      * @param modId the mod ID for the configuration
      * @param type the configuration type
@@ -129,27 +145,12 @@ public class Environment {
     public static <T> T registerConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
         return registerConfig(modId, type, defaultConfigName(type, modId), spec);
     }
-
-    @Deprecated(forRemoval = true)
-    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
-        return registerConfig(modId, type, spec);
+    
+    @ExpectPlatform
+    public static Optional<ModConfig> get(String modId, ModConfig.Type type) {
+        throw new AssertionError();
     }
-
-    @Deprecated(forRemoval = true)
-    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
-        return registerConfig(modId, type, fileName, spec);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
-        return registerConfig(modId, type, fileName, spec);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
-        return registerConfig(modId, type, spec);
-    }
-
+    
     private static String defaultConfigName(ModConfig.Type type, String modId) {
         return String.format("%s-%s.toml", modId, type.extension());
     }
@@ -186,4 +187,26 @@ public class Environment {
      * Enum representing the supported mod loaders.
      */
     public enum Loader { FORGE, FABRIC }
+    
+    // For Removal
+    
+    @Deprecated(forRemoval = true)
+    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
+        return registerConfig(modId, type, spec);
+    }
+    
+    @Deprecated(forRemoval = true)
+    public static <T> T registerSafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
+        return registerConfig(modId, type, fileName, spec);
+    }
+    
+    @Deprecated(forRemoval = true)
+    public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, String fileName, Function<ConfigBuilder, T> spec) {
+        return registerConfig(modId, type, fileName, spec);
+    }
+    
+    @Deprecated(forRemoval = true)
+    public static <T> T registerUnsafeConfig(String modId, ModConfig.Type type, Function<ConfigBuilder, T> spec) {
+        return registerConfig(modId, type, spec);
+    }
 }

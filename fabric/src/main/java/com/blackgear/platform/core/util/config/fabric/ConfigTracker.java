@@ -1,7 +1,8 @@
-package com.blackgear.platform.core.util.config;
+package com.blackgear.platform.core.util.config.fabric;
 
 import com.blackgear.platform.core.events.ConfigEvents;
 import com.blackgear.platform.core.networking.packet.ClientboundConfigSyncPayload;
+import com.blackgear.platform.core.util.config.ModConfig;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;
@@ -9,6 +10,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
@@ -20,17 +22,17 @@ import java.util.stream.Collectors;
 public class ConfigTracker {
     public static final ConfigTracker INSTANCE = new ConfigTracker();
     public static final Logger LOGGER = LogManager.getLogger();
-    private final ConcurrentHashMap<String, ModConfig> fileMap = new ConcurrentHashMap<>();
-    private final EnumMap<ModConfig.Type, Set<ModConfig>> configSets = new EnumMap<>(ModConfig.Type.class);
-    private final ConcurrentHashMap<String, Map<ModConfig.Type, ModConfig>> configsByMod = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ModConfigImpl> fileMap = new ConcurrentHashMap<>();
+    private final EnumMap<ModConfig.Type, Set<ModConfigImpl>> configSets = new EnumMap<>(ModConfig.Type.class);
+    private final ConcurrentHashMap<String, Map<ModConfig.Type, ModConfigImpl>> configsByMod = new ConcurrentHashMap<>();
 
     private ConfigTracker() {
-        for (var type : ModConfig.Type.values()) {
+        for (ModConfig.Type type : ModConfig.Type.values()) {
             this.configSets.put(type, Collections.synchronizedSet(new LinkedHashSet<>()));
         }
     }
     
-    public void trackConfig(ModConfig config) {
+    public void trackConfig(ModConfigImpl config) {
         if (this.fileMap.containsKey(config.getFileName())) {
             LOGGER.error("Detected config file conflict {} between {} and {}", config.getFileName(), this.fileMap.get(config.getFileName()).getModId(), config.getModId());
             throw new RuntimeException("Config conflict detected!");
@@ -53,7 +55,7 @@ public class ConfigTracker {
     }
 
     public List<Pair<String, ClientboundConfigSyncPayload>> syncConfigs(boolean isLocal) { // only sync configs for players joining and if the config actually exists
-        return isLocal ? Collections.emptyList() : this.configSets.get(ModConfig.Type.SERVER).stream().filter(mc -> mc.getFullPath() != null).map(mc -> {
+        return isLocal ? Collections.emptyList() : this.configSets.get(ModConfigImpl.Type.SERVER).stream().filter(mc -> mc.getFullPath() != null).map(mc -> {
             try {
                 return Pair.of("Config " + mc.getFileName(), new ClientboundConfigSyncPayload(mc.getFileName(), Files.readAllBytes(mc.getFullPath())));
             } catch (Exception exception) {
@@ -63,14 +65,14 @@ public class ConfigTracker {
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    private void openConfig(ModConfig config, Path configBasePath) {
+    private void openConfig(ModConfigImpl config, Path configBasePath) {
         CommentedFileConfig configData = config.getHandler().reader(configBasePath).apply(config);
         config.setConfigData(configData);
         ConfigEvents.LOADING.invoker().accept(config);
         config.save();
     }
     
-    private void closeConfig(ModConfig config, Path configBasePath) {
+    private void closeConfig(ModConfigImpl config, Path configBasePath) {
         if (config.getConfigData() != null) {
             config.save();
             config.getHandler().unload(configBasePath, config);
@@ -80,14 +82,14 @@ public class ConfigTracker {
 
     public void receiveSyncedConfig(ClientboundConfigSyncPayload payload) {
         if (!Minecraft.getInstance().isLocalServer() && this.fileMap.containsKey(payload.name())) {
-            ModConfig config = this.fileMap.get(payload.name());
+            ModConfigImpl config = this.fileMap.get(payload.name());
             config.setConfigData((TomlFormat.instance().createParser().parse(new ByteArrayInputStream(payload.data()))));
             ConfigEvents.RELOADING.invoker().accept(config);
         }
     }
 
     public void loadDefaultServerConfigs() {
-        configSets.get(ModConfig.Type.SERVER).forEach(config -> {
+        this.configSets.get(ModConfig.Type.SERVER).forEach(config -> {
             CommentedConfig commentedConfig = CommentedConfig.inMemory();
             config.getSpec().correct(commentedConfig);
             config.setConfigData(commentedConfig);
@@ -95,14 +97,12 @@ public class ConfigTracker {
         });
     }
 
+    @Nullable
     public String getConfigFileName(String modId, ModConfig.Type type) {
-        return Optional.ofNullable(this.configsByMod.getOrDefault(modId, Collections.emptyMap()).getOrDefault(type, null))
-            .flatMap(config -> Optional.ofNullable(config.getFullPath()))
-            .map(Object::toString)
-            .orElse(null);
+        return Optional.ofNullable(this.configsByMod.getOrDefault(modId, Collections.emptyMap()).getOrDefault(type, null)).flatMap(config -> Optional.ofNullable(config.getFullPath())).map(Object::toString).orElse(null);
     }
 
-    public Optional<ModConfig> getConfig(String modId, ModConfig.Type type) {
+    public Optional<ModConfigImpl> getConfig(String modId, ModConfig.Type type) {
         return Optional.ofNullable(this.configsByMod.getOrDefault(modId, Collections.emptyMap()).getOrDefault(type, null));
     }
 }

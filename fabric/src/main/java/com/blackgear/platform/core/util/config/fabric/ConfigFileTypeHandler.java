@@ -1,6 +1,7 @@
-package com.blackgear.platform.core.util.config;
+package com.blackgear.platform.core.util.config.fabric;
 
 import com.blackgear.platform.core.events.ConfigEvents;
+import com.blackgear.platform.core.util.config.ConfigLoader;
 import com.electronwill.nightconfig.core.ConfigFormat;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.file.FileWatcher;
@@ -47,7 +48,7 @@ public class ConfigFileTypeHandler {
         }
     }
 
-    public Function<ModConfig, CommentedFileConfig> reader(Path configBasePath) {
+    public Function<ModConfigImpl, CommentedFileConfig> reader(Path configBasePath) {
         return config -> {
             Path configPath = configBasePath.resolve(config.getFileName());
             CommentedFileConfig configData = CommentedFileConfig.builder(configPath)
@@ -80,7 +81,7 @@ public class ConfigFileTypeHandler {
         };
     }
 
-    public void unload(Path configBasePath, ModConfig config) {
+    public void unload(Path configBasePath, ModConfigImpl config) {
         Path configPath = configBasePath.resolve(config.getFileName());
         try {
             FileWatcher.defaultInstance().removeWatch(configBasePath.resolve(config.getFileName()));
@@ -89,7 +90,7 @@ public class ConfigFileTypeHandler {
         }
     }
 
-    private boolean setupConfigFile(ModConfig config, Path file, ConfigFormat<?> format) throws IOException {
+    private boolean setupConfigFile(ModConfigImpl config, Path file, ConfigFormat<?> format) throws IOException {
         Files.createDirectories(file.getParent());
         Path path = ConfigLoader.getDefaultConfigsDirectory().resolve(config.getFileName());
         if (Files.exists(path)) {
@@ -103,11 +104,11 @@ public class ConfigFileTypeHandler {
     }
 
     private static class ConfigWatcher implements Runnable {
-        private final ModConfig modConfig;
+        private final ModConfigImpl modConfig;
         private final CommentedFileConfig commentedFileConfig;
         private final ClassLoader realClassLoader;
         
-        ConfigWatcher(final ModConfig modConfig, final CommentedFileConfig commentedFileConfig, final ClassLoader classLoader) {
+        ConfigWatcher(final ModConfigImpl modConfig, final CommentedFileConfig commentedFileConfig, final ClassLoader classLoader) {
             this.modConfig = modConfig;
             this.commentedFileConfig = commentedFileConfig;
             this.realClassLoader = classLoader;
@@ -138,7 +139,7 @@ public class ConfigFileTypeHandler {
     }
     
     private static class ConfigLoadingException extends RuntimeException {
-        public ConfigLoadingException(ModConfig config, Exception cause) {
+        public ConfigLoadingException(ModConfigImpl config, Exception cause) {
             super("Failed loading config file " + config.getFileName() + " of type " + config.getType() + " for modid " + config.getModId(), cause);
         }
     }

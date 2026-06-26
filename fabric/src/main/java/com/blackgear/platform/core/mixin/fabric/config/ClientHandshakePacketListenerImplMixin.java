@@ -1,9 +1,9 @@
-package com.blackgear.platform.core.mixin.config;
+package com.blackgear.platform.core.mixin.fabric.config;
 
-import com.blackgear.platform.core.util.config.ConfigTracker;
+import com.blackgear.platform.core.util.config.fabric.ConfigTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
-import net.minecraft.network.protocol.login.ClientboundGameProfilePacket;
+import net.minecraft.network.protocol.login.ClientboundCustomQueryPacket;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,14 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ClientHandshakePacketListenerImplMixin {
     @Shadow @Final private Minecraft minecraft;
     @Unique private boolean hasLoadedConfigs;
-
-    @Inject(
-        method = "handleGameProfile",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/network/Connection;setupOutboundProtocol(Lnet/minecraft/network/ProtocolInfo;)V"
-        ))
-    public void handleCustomQuery(ClientboundGameProfilePacket packet, CallbackInfo ci) {
+    
+    @Inject(method = "handleCustomQuery", at = @At("HEAD"))
+    public void handleCustomQuery(ClientboundCustomQueryPacket packet, CallbackInfo ci) {
         if (!this.hasLoadedConfigs && !this.minecraft.hasSingleplayerServer()) {
             ConfigTracker.INSTANCE.loadDefaultServerConfigs();
             this.hasLoadedConfigs = true;

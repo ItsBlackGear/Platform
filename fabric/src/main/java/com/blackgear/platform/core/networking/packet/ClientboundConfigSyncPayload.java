@@ -2,7 +2,7 @@ package com.blackgear.platform.core.networking.packet;
 
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.core.networking.PayloadContext;
-import com.blackgear.platform.core.util.config.ConfigTracker;
+import com.blackgear.platform.core.util.config.fabric.ConfigTracker;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
