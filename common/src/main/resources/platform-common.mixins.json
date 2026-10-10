@@ -24,6 +24,8 @@
     "access.ScreenAccessor",
     "client.AbstractClientPlayerMixin",
     "client.AbstractContainerScreenMixin",
+    "client.BlockRenderDispatcherMixin",
+    "client.BlockStateModelLoaderMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",

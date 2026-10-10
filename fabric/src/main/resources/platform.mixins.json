@@ -6,7 +6,7 @@
   "client": [
     "CreateWorldScreenMixin",
     "client.AbstractContainerScreenMixin",
-    "config.ClientHandshakePacketListenerImplMixin",
+    "client.BlockModelShaperMixin",
     "client.ClientLevelMixin",
     "client.ClientPlayerAttackMixin",
     "client.ClientPlayerPacketListenerMixin",
@@ -19,6 +19,7 @@
     "client.SkullBlockRendererMixin",
     "client.input.MouseHandlerMixin",
     "client.renderer.BoatRendererMixin",
+    "config.ClientHandshakePacketListenerImplMixin",
     "server.IntegratedServerMixin"
   ],
   "mixins": [
@@ -29,9 +30,9 @@
     "ServerEntityMixin",
     "ServerLevelMixin",
     "ServerPacksSourceMixin",
-    "server.DedicatedServerMixin",
     "loot.LootPoolMixin",
-    "loot.LootTableBuilderAccessor"
+    "loot.LootTableBuilderAccessor",
+    "server.DedicatedServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
