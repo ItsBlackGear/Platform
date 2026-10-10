@@ -1,9 +1,6 @@
 package com.blackgear.platform.client;
 
-import com.blackgear.platform.client.v2.render.BuiltinItemRendererRegistry;
-import com.blackgear.platform.client.v2.render.DynamicItemRenderer;
-import com.blackgear.platform.client.v2.render.HandHeldItemRenderer;
-import com.blackgear.platform.client.v2.render.ItemRendererRegistry;
+import com.blackgear.platform.client.v2.render.*;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -124,6 +121,14 @@ public class GameRendering {
     }
 
     public interface BlockRendererEvent {
+        default void registerRenderer(BlockRendererRegistry.Renderer renderer, Block entry) {
+            BlockRendererRegistry.INSTANCE.get().register(entry, renderer);
+        }
+
+        default void registerRenderer(BlockRendererRegistry.Renderer renderer, Collection<? extends Block> entries) {
+            entries.forEach(block -> registerRenderer(renderer, block));
+        }
+
         void register(RenderType type, Block... blocks);
 
         void register(RenderType type, Fluid... fluids);

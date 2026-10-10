@@ -28,9 +28,11 @@
     "access.ScreenAccessor",
     "client.AbstractClientPlayerMixin",
     "client.AbstractContainerScreenMixin",
+    "client.BlockRenderDispatcherMixin",
     "client.ItemRendererMixin",
     "client.MinecraftMixin",
     "client.ModelBakeryMixin",
+    "client.BlockModelShaperMixin"
   ],
   "injectors": {
     "defaultRequire": 1
