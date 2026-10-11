@@ -19,6 +19,8 @@
     "common.attributes.AttributeInstanceMixin",
     "common.attributes.LivingEntityMixin",
     "common.attributes.ServerPlayerMixin",
+    "common.dynamic_recipes.RecipeManagerMixin",
+    "common.dynamic_recipes.ServerAdvancementManagerMixin",
     "common.synced_data.EntityMixin"
   ],
   "client": [

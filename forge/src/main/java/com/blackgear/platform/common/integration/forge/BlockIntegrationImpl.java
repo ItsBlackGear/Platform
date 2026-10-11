@@ -3,6 +3,8 @@ package com.blackgear.platform.common.integration.forge;
 import com.blackgear.platform.common.integration.BlockIntegration;
 import com.blackgear.platform.common.integration.BlockInteraction;
 import com.blackgear.platform.forge.CommonLoaderPipelines;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionResult;
@@ -13,7 +15,6 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.WeatheringCopper;
-import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -22,7 +23,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class BlockIntegrationImpl {
-    private static final Unsafe UNSAFE;
+    private static final Map<Block, Block> OXIDABLES = new HashMap<>();
+    private static final Map<Block, Block> WAXABLES = new HashMap<>();
     
     public static void registerIntegrations(Consumer<BlockIntegration.Event> listener) {
         listener.accept(new BlockIntegration.Event() {
@@ -62,43 +64,67 @@ public class BlockIntegrationImpl {
             
             @Override
             public void registerOxidableBlock(Block less, Block more) {
-                Map<Block, Block> mutable = new HashMap<>(WeatheringCopper.NEXT_BY_BLOCK.get());
-                mutable.put(less, more);
-                ImmutableBiMap<Block, Block> updated = ImmutableBiMap.copyOf(mutable);
-                Supplier<?> current = WeatheringCopper.NEXT_BY_BLOCK;
-                setInterfaceSupplierField(WeatheringCopper.class, current, () -> updated);
+                OXIDABLES.put(less, more);
             }
             
             @Override
             public void registerWaxableBlock(Block unwaxed, Block waxed) {
-                Map<Block, Block> mutable = new HashMap<>(HoneycombItem.WAXABLES.get());
-                mutable.put(unwaxed, waxed);
-                ImmutableBiMap<Block, Block> updated = ImmutableBiMap.copyOf(mutable);
-                HoneycombItem.WAXABLES = () -> updated;
+                WAXABLES.put(unwaxed, waxed);
             }
         });
+        
+        injectOxidables();
+        injectWaxables();
     }
     
-    static {
+    @SuppressWarnings("unchecked")
+    private static void injectOxidables() {
+        if (OXIDABLES.isEmpty()) return;
+        
         try {
-            Field f = Unsafe.class.getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            UNSAFE = (Unsafe) f.get(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to obtain Unsafe", e);
+            Field delegateField = WeatheringCopper.NEXT_BY_BLOCK.getClass().getDeclaredField("delegate");
+            delegateField.setAccessible(true);
+            
+            Supplier<BiMap<Block, Block>> originalDelegate = (Supplier<BiMap<Block, Block>>) delegateField.get(WeatheringCopper.NEXT_BY_BLOCK);
+            
+            com.google.common.base.Supplier<BiMap<Block, Block>> newDelegate = () -> {
+                ImmutableBiMap.Builder<Block, Block> builder = ImmutableBiMap.builder();
+                builder.putAll(originalDelegate.get());
+                
+                OXIDABLES.forEach((less, more) -> {
+                    try {
+                        builder.put(less, more);
+                    } catch (IllegalArgumentException e) {
+                        /* NO-OP */
+                    }
+                });
+                return builder.build();
+            };
+            
+            delegateField.set(WeatheringCopper.NEXT_BY_BLOCK, newDelegate);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to inject custom oxidable blocks into WeatheringCopper", e);
         }
     }
     
-    private static void setInterfaceSupplierField(Class<?> iface, Supplier<?> currentValue, Supplier<?> newValue) {
-        for (Field f : iface.getDeclaredFields()) {
-            try {
-                if (f.getType() == Supplier.class && f.get(null) == currentValue) {
-                    UNSAFE.putObject(UNSAFE.staticFieldBase(f), UNSAFE.staticFieldOffset(f), newValue);
-                    return;
+    private static void injectWaxables() {
+        if (WAXABLES.isEmpty()) return;
+        
+        Supplier<BiMap<Block, Block>> originalWaxables = HoneycombItem.WAXABLES;
+        
+        HoneycombItem.WAXABLES = Suppliers.memoize(() -> {
+            ImmutableBiMap.Builder<Block, Block> builder = ImmutableBiMap.builder();
+            builder.putAll(originalWaxables.get());
+            
+            WAXABLES.forEach((unwaxed, waxed) -> {
+                try {
+                    builder.put(unwaxed, waxed);
+                } catch (IllegalArgumentException e) {
+                    /* NO-OP */
                 }
-            } catch (IllegalAccessException ignored) {
-            }
-        }
-        throw new RuntimeException("Could not find Supplier field on " + iface.getSimpleName() + " matching the given value");
+            });
+            
+            return builder.build();
+        });
     }
 }

@@ -48,7 +48,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-    include modImplementation("com.jamieswhiteshirt:reach-entity-attributes:2.4.0")
+    modImplementation(include("com.jamieswhiteshirt:reach-entity-attributes:2.4.0"))
 
     implementation('com.electronwill.night-config:core:3.6.0')
     shadowBundle("com.electronwill.night-config:core:3.6.0")

@@ -4,6 +4,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +60,16 @@ public class LootModifier {
         }
 
         default boolean addToPool(LootPoolEntryContainer... content) {
+            return this.addToPool(0, content);
+        }
+        
+        default boolean addToPool(int index, LootPoolSingletonContainer.Builder<?>... content) {
+            ArrayList<LootPoolEntryContainer> entries = new ArrayList<>();
+            for (LootPoolSingletonContainer.Builder<?> container : content) entries.add(container.build());
+            return this.addToPool(index, entries);
+        }
+        
+        default boolean addToPool(LootPoolSingletonContainer.Builder<?>... content) {
             return this.addToPool(0, content);
         }
     }

@@ -4,7 +4,6 @@ import com.blackgear.platform.Platform;
 import com.blackgear.platform.common.data.entity.SyncedDataKey.SyncMode;
 import com.blackgear.platform.common.events.EntityTrackingEvents;
 import com.blackgear.platform.common.events.TickEvents;
-import com.blackgear.platform.core.network.PacketRegistry;
 import com.blackgear.platform.core.network.packets.ClientboundEntityDataPacket;
 import com.blackgear.platform.core.network.packets.ClientboundEntityDataPacket.Entry;
 import net.minecraft.server.level.ServerPlayer;

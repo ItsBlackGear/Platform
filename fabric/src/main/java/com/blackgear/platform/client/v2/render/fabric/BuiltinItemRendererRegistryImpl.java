@@ -1,6 +1,7 @@
 package com.blackgear.platform.client.v2.render.fabric;
 
 import com.blackgear.platform.client.v2.render.BuiltinItemRendererRegistry;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.Objects;
@@ -14,7 +15,9 @@ public class BuiltinItemRendererRegistryImpl extends BuiltinItemRendererRegistry
 
     @Override
     public void register(ItemLike item, Renderer renderer) {
-        net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(item.asItem(), renderer::render);
+        if (item != null && item != Items.AIR) {
+            net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(item.asItem(), renderer::render);
+        }
     }
 
     @Override

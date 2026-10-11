@@ -9,6 +9,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ public class ItemRendererRegistry {
     private static final Map<Item, Renderer> RENDERERS = new HashMap<>();
 
     public void register(ItemLike item, Renderer renderer) {
-        RENDERERS.putIfAbsent(item.asItem(), renderer);
+        if (item != null && item != Items.AIR) RENDERERS.putIfAbsent(item.asItem(), renderer);
     }
 
     public Renderer get(ItemLike item) {

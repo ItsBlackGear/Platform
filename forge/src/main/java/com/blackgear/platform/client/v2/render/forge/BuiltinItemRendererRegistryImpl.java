@@ -2,6 +2,7 @@ package com.blackgear.platform.client.v2.render.forge;
 
 import com.blackgear.platform.client.v2.render.BuiltinItemRendererRegistry;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.HashMap;
@@ -17,7 +18,7 @@ public class BuiltinItemRendererRegistryImpl extends BuiltinItemRendererRegistry
 
     @Override
     public void register(ItemLike item, Renderer renderer) {
-        RENDERERS.putIfAbsent(item.asItem(), renderer);
+        if (item != null && item != Items.AIR) RENDERERS.putIfAbsent(item.asItem(), renderer);
     }
 
     @Override
