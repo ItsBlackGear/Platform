@@ -6,7 +6,6 @@
   "client": [
     "CreateWorldScreenMixin",
     "client.AbstractContainerScreenMixin",
-    "client.BlockModelShaperMixin",
     "client.ClientLevelMixin",
     "client.ClientPlayerAttackMixin",
     "client.ClientPlayerPacketListenerMixin",

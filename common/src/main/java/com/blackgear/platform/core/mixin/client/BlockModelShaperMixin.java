@@ -1,4 +1,4 @@
-package com.blackgear.platform.core.mixin.fabric.client;
+package com.blackgear.platform.core.mixin.client;
 
 import com.blackgear.platform.client.v2.render.BlockRendererRegistry;
 import com.blackgear.platform.core.util.event.ResultHolder;
