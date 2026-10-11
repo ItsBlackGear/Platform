@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "unused"})
 public class AttachmentRegistryImpl extends AttachmentRegistry {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Platform.MOD_ID);
     private static final Map<ResourceLocation, Supplier<AttachmentType<?>>> ATTACHMENT_SUPPLIERS = new HashMap<>();

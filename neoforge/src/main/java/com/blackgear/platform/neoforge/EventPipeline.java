@@ -2,12 +2,12 @@ package com.blackgear.platform.neoforge;
 
 import net.neoforged.bus.api.ICancellableEvent;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 public class EventPipeline<T> {
-    private final List<Consumer<T>> consumers = new ArrayList<>();
+    private final List<Consumer<T>> consumers = new CopyOnWriteArrayList<>();
     
     public void add(Consumer<T> consumer) {
         this.consumers.add(consumer);

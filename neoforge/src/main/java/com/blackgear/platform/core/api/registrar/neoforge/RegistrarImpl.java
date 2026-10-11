@@ -11,6 +11,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@SuppressWarnings("unused")
 public class RegistrarImpl<T> extends Registrar<T> {
     public RegistrarImpl(Registry<T> registry, String modId) {
         super(registry, modId);

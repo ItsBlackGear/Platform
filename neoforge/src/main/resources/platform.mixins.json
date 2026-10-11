@@ -5,10 +5,9 @@
   "minVersion": "0.8",
   "mixins": [
     "ComposterBlockMixin",
-    "HoneycombItemMixin",
+    "DataMapHooksMixin",
     "LootPoolMixin",
     "RegisterSpawnPlacementsEventMixin",
-    "WeatheringCopperMixin",
     "access.LootTableAccessor",
     "access.MergedSpawnPredicateAccessor"
   ],

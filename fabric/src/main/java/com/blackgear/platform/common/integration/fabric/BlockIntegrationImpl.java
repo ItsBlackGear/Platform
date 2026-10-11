@@ -14,38 +14,43 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.function.Consumer;
 
-public class BlockIntegrationImpl {
+@SuppressWarnings("unused")
+public final class BlockIntegrationImpl {
     public static void registerIntegrations(Consumer<BlockIntegration.Event> listener) {
-        listener.accept(new BlockIntegration.Event() {
-            @Override
-            public void registerBlockInteraction(BlockInteraction interaction) {
-                UseBlockCallback.EVENT.register((player, level, hand, hit) -> interaction.onUse(new UseOnContext(player, hand, hit)));
-            }
-
-            @Override
-            public void registerFuelItem(ItemLike item, int burnTime) {
-                FuelRegistry.INSTANCE.add(item, burnTime);
-            }
-            
-            @Override
-            public void registerFuelItem(TagKey<Item> tag, int burnTime) {
-                FuelRegistry.INSTANCE.add(tag, burnTime);
-            }
-            
-            @Override
-            public void registerCompostableItem(ItemLike item, float chance) {
-                CompostingChanceRegistry.INSTANCE.add(item, chance);
-            }
-
-            @Override
-            public void registerOxidableBlock(Block less, Block more) {
-                OxidizableBlocksRegistry.registerOxidizableBlockPair(less, more);
-            }
-
-            @Override
-            public void registerWaxableBlock(Block unwaxed, Block waxed) {
-                OxidizableBlocksRegistry.registerWaxableBlockPair(unwaxed, waxed);
-            }
-        });
+        listener.accept(FabricBlockIntegrations.INSTANCE);
+    }
+    
+    static class FabricBlockIntegrations implements BlockIntegration.Event {
+        public static FabricBlockIntegrations INSTANCE = new FabricBlockIntegrations();
+        
+        @Override
+        public void registerBlockInteraction(BlockInteraction interaction) {
+            UseBlockCallback.EVENT.register((player, level, hand, hit) -> interaction.onUse(new UseOnContext(player, hand, hit)));
+        }
+        
+        @Override
+        public void registerFuelItem(ItemLike item, int burnTime) {
+            FuelRegistry.INSTANCE.add(item, burnTime);
+        }
+        
+        @Override
+        public void registerFuelItem(TagKey<Item> tag, int burnTime) {
+            FuelRegistry.INSTANCE.add(tag, burnTime);
+        }
+        
+        @Override
+        public void registerCompostableItem(ItemLike item, float chance) {
+            CompostingChanceRegistry.INSTANCE.add(item, chance);
+        }
+        
+        @Override
+        public void registerOxidableBlock(Block less, Block more) {
+            OxidizableBlocksRegistry.registerOxidizableBlockPair(less, more);
+        }
+        
+        @Override
+        public void registerWaxableBlock(Block unwaxed, Block waxed) {
+            OxidizableBlocksRegistry.registerWaxableBlockPair(unwaxed, waxed);
+        }
     }
 }

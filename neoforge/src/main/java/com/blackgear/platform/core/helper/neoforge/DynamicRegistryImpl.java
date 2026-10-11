@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 import java.util.function.Consumer;
 
+@SuppressWarnings("unused")
 public class DynamicRegistryImpl {
     public static void onRegister(Consumer<DynamicRegistry.Registrar> listener) {
         listener.accept(new DynamicRegistry.Registrar() {

@@ -7,6 +7,7 @@ import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class ItemRegistryImpl {
     public static <T extends Mob> Item createSpawnEgg(Supplier<EntityType<T>> entity, int primaryColor, int secondaryColor, Item.Properties properties) {
         return new DeferredSpawnEggItem(entity, primaryColor, secondaryColor, properties);

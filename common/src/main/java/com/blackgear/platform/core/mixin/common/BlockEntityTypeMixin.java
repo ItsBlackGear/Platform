@@ -13,11 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockEntityType.class)
 public class BlockEntityTypeMixin {
-    @Inject(
-        method = "isValid",
-        at = @At("HEAD"),
-        cancellable = true
-    )
+    @Inject(method = "isValid", at = @At("HEAD"), cancellable = true)
     @SuppressWarnings("EqualsBetweenInconvertibleTypes")
     private void platform$isValid(BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if (BlockEntityType.SIGN.equals(this) && (state.getBlock() instanceof StandingSignBlock || state.getBlock() instanceof WallSignBlock)) {

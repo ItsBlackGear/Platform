@@ -15,39 +15,42 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.Operatio
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class MobIntegrationImpl {
     public static void registerIntegrations(Consumer<MobIntegration.Event> listener) {
-        listener.accept(new MobIntegration.Event() {
-            @Override
-            public void registerMobInteraction(MobInteraction interaction) {
-                CommonLoaderPipelines.MOB_INTERACTION.add(event -> {
-                    InteractionResult result = interaction.onInteract(event.getEntity(), event.getTarget(), event.getHand());
-                    if (result.consumesAction()) {
-                        event.setCancellationResult(result);
-                        event.setCanceled(true);
-                    }
-                });
-            }
-
-            @Override
-            public void registerAttributes(Supplier<? extends EntityType<? extends LivingEntity>> type, Supplier<AttributeSupplier.Builder> builder) {
-                CommonModPipelines.MOB_ATTRIBUTE.add(event -> {
-                    if (!DefaultAttributes.hasSupplier(type.get())) event.put(type.get(), builder.get().build());
-                });
-            }
-
-            @Override
-            public <T extends Mob> void registerPlacement(
-                Supplier<EntityType<T>> entity,
-                SpawnPlacementType spawnPlacement,
-                Heightmap.Types heightmap,
-                SpawnPlacements.SpawnPredicate<T> spawnPredicate,
-                SpawnPlacementStrategy strategy
-            ) {
-                CommonModPipelines.SPAWN_PLACEMENT.add(event -> {
-                    event.register(entity.get(), spawnPlacement, heightmap, spawnPredicate, Operation.valueOf(strategy.name()));
-                });
-            }
-        });
+        listener.accept(ForgeMobIntegrations.INSTANCE);
+    }
+    
+    static class ForgeMobIntegrations implements MobIntegration.Event {
+        public static final ForgeMobIntegrations INSTANCE = new ForgeMobIntegrations();
+        
+        @Override
+        public void registerMobInteraction(MobInteraction interaction) {
+            CommonLoaderPipelines.MOB_INTERACTION.add(event -> {
+                InteractionResult result = interaction.onInteract(event.getEntity(), event.getTarget(), event.getHand());
+                if (result.consumesAction()) {
+                    event.setCancellationResult(result);
+                    event.setCanceled(true);
+                }
+            });
+        }
+        
+        @Override
+        public void registerAttributes(Supplier<? extends EntityType<? extends LivingEntity>> type, Supplier<AttributeSupplier.Builder> builder) {
+            CommonModPipelines.MOB_ATTRIBUTE.add(event -> {
+                if (!DefaultAttributes.hasSupplier(type.get())) event.put(type.get(), builder.get().build());
+            });
+        }
+        
+        @Override
+        public <T extends Mob> void registerPlacement(
+            Supplier<EntityType<T>> entity,
+            SpawnPlacementType spawnPlacement,
+            Heightmap.Types heightmap,
+            SpawnPlacements.SpawnPredicate<T> spawnPredicate,
+            SpawnPlacementStrategy strategy
+        ) {
+            CommonModPipelines.SPAWN_PLACEMENT.add(event -> event.register(entity.get(), spawnPlacement, heightmap, spawnPredicate, Operation.valueOf(strategy.name())));
+        }
     }
 }

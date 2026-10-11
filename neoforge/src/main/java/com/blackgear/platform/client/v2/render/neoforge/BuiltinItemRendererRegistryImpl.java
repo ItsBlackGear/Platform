@@ -7,6 +7,7 @@ import net.minecraft.world.level.ItemLike;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class BuiltinItemRendererRegistryImpl extends BuiltinItemRendererRegistry {
     public static final Map<Item, Renderer> RENDERERS = new HashMap<>();
     private static final BuiltinItemRendererRegistry INSTANCE = new BuiltinItemRendererRegistryImpl();

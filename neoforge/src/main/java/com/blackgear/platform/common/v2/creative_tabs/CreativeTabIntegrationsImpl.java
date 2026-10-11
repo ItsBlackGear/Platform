@@ -33,8 +33,7 @@ public final class CreativeTabIntegrationsImpl {
             @Override
             public void addAfter(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
                 if (stack.isEmpty()) return;
-                
-                if (target.isEmpty()) {
+                if (target.isEmpty() || !this.contains(target)) {
                     event.accept(stack.copyWithCount(1), visibility);
                 } else {
                     event.insertAfter(target, stack.copyWithCount(1), visibility);
@@ -44,8 +43,7 @@ public final class CreativeTabIntegrationsImpl {
             @Override
             public void addBefore(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
                 if (stack.isEmpty()) return;
-                
-                if (target.isEmpty()) {
+                if (target.isEmpty() || !this.contains(target)) {
                     event.accept(stack.copyWithCount(1), visibility);
                 } else {
                     event.insertBefore(target, stack.copyWithCount(1), visibility);

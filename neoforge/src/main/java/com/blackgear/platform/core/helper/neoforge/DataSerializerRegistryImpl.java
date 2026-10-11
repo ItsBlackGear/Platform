@@ -7,6 +7,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public class DataSerializerRegistryImpl extends DataSerializerRegistry {
     public final CoreRegistry<EntityDataSerializer<?>> registry;
 

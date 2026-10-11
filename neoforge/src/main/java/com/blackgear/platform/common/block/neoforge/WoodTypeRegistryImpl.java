@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+@SuppressWarnings("unused")
 public class WoodTypeRegistryImpl {
     public static WoodType create(ResourceLocation location, BlockSetType blockSetType) {
         return WoodType.register(new WoodType(location.toString(), blockSetType));

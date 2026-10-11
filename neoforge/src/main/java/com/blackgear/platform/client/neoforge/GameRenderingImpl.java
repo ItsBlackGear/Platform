@@ -26,6 +26,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -34,51 +38,30 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class GameRenderingImpl {
+    private static final GameRendering.BlockRendererEvent BLOCK_RENDERER = new GameRendering.BlockRendererEvent() {
+        @Override
+        public void register(RenderType type, Block... blocks) {
+            for (Block block : blocks) ItemBlockRenderTypes.setRenderLayer(block, type);
+        }
+        
+        @Override
+        public void register(RenderType type, Fluid... fluids) {
+            for (Fluid fluid : fluids) ItemBlockRenderTypes.setRenderLayer(fluid, type);
+        }
+    };
+    
+    private static final GameRendering.ModelOverrideEvent MODEL_OVERRIDE = new GameRendering.ModelOverrideEvent() {};
+    
     public static void registerBlockColors(Consumer<GameRendering.BlockColorEvent> listener) {
-        ClientModPipelines.BLOCK_COLORS.add(event -> listener.accept(new GameRendering.BlockColorEvent() {
-            @Override
-            public void register(BlockColor color, Block... blocks) {
-                event.register(color, blocks);
-            }
-
-            @Override
-            public int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
-                return event.getBlockColors().getColor(state, level, pos, tint);
-            }
-        }));
+        ClientModPipelines.BLOCK_COLORS.add(event -> listener.accept(new ForgeBlockColors(event)));
     }
-
+    
     public static void registerItemColors(Consumer<GameRendering.ItemColorEvent> listener) {
-        ClientModPipelines.ITEM_COLORS.add(event -> listener.accept(new GameRendering.ItemColorEvent() {
-            @Override
-            public void register(ItemColor color, ItemLike... items) {
-                event.register(color, items);
-            }
-
-            @Override
-            public int getColor(ItemStack stack, int tint) {
-                if (stack.getItem() instanceof BlockItem blockItem) {
-                    BlockState state = blockItem.getBlock().defaultBlockState();
-                    return event.getBlockColors().getColor(state, null, null, tint);
-                }
-
-                return 0xFFFFFF;
-            }
-        }));
+        ClientModPipelines.ITEM_COLORS.add(event -> listener.accept(new ForgeItemColors(event)));
     }
 
     public static void registerBlockRenderers(Consumer<GameRendering.BlockRendererEvent> listener) {
-        listener.accept(new GameRendering.BlockRendererEvent() {
-            @Override
-            public void register(RenderType type, Block... blocks) {
-                for (Block block : blocks) ItemBlockRenderTypes.setRenderLayer(block, type);
-            }
-
-            @Override
-            public void register(RenderType type, Fluid... fluids) {
-                for (Fluid fluid : fluids) ItemBlockRenderTypes.setRenderLayer(fluid, type);
-            }
-        });
+        listener.accept(BLOCK_RENDERER);
     }
 
     public static void registerEntityRenderers(Consumer<GameRendering.EntityRendererEvent> listener) {
@@ -96,23 +79,21 @@ public class GameRenderingImpl {
     public static void registerItemLikeRenderers(Consumer<GameRendering.ItemLikeRenderingEvent> listener) {
         ClientModPipelines.REGISTER_ADDITIONAL.add(event -> listener.accept(GameRendering.ItemLikeRenderingEvent.INSTANCE));
     }
-
-    public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
-        ClientModPipelines.REGISTER_ADDITIONAL.add(event -> listener.accept(new GameRendering.SpecialModelEvent() {
-            @Override
-            public void register(ResourceLocation model) {
-                event.register(new ModelResourceLocation(wrapModel(model), "standalone"));
-            }
-
-            @Override
-            public void register(ResourceLocation... models) {
-                for (ResourceLocation model : models) this.register(model);
-            }
-        }));
+    
+    public static void registerSkullRenderers(Consumer<GameRendering.SkullRendererEvent> listener) {
+        ClientModPipelines.SKULL_MODELS.add(event -> listener.accept(new ForgeSkullRenderers(event)));
     }
-
+    
+    public static void registerParticleFactories(Consumer<GameRendering.ParticleFactoryEvent> listener) {
+        ClientModPipelines.PARTICLE_RENDERING.add(event -> listener.accept(new ForgeParticleFactories(event)));
+    }
+    
+    public static void registerSpecialModels(Consumer<GameRendering.SpecialModelEvent> listener) {
+        ClientModPipelines.REGISTER_ADDITIONAL.add(event -> listener.accept(new ForgeSpecialModels(event)));
+    }
+    
     public static void registerModelOverrides(Consumer<GameRendering.ModelOverrideEvent> listener) {
-        listener.accept(new GameRendering.ModelOverrideEvent() {});
+        listener.accept(MODEL_OVERRIDE);
         
         ClientModPipelines.MODIFY_BAKING.add(event -> {
             Map<ModelResourceLocation, BakedModel> registry = event.getModels();
@@ -134,36 +115,72 @@ public class GameRenderingImpl {
             }
         });
     }
-
+    
     private static ResourceLocation wrapModel(ResourceLocation model) {
         return ResourceLocation.fromNamespaceAndPath(model.getNamespace(), "item/" + model.getPath());
     }
-
-    public static void registerSkullRenderers(Consumer<GameRendering.SkullRendererEvent> listener) {
-        ClientModPipelines.SKULL_MODELS.add(event -> listener.accept(new GameRendering.SkullRendererEvent() {
-            @Override
-            public void registerSkullModel(SkullBlock.Type type, Function<ModelPart, SkullModelBase> model, ModelLayerLocation layer) {
-                event.registerSkullModel(type, model.apply(event.getEntityModelSet().bakeLayer(layer)));
-            }
-
-            @Override
-            public void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture) {
-                SkullBlockRenderer.SKIN_BY_TYPE.put(type, texture);
-            }
-        }));
+    
+    private record ForgeBlockColors(RegisterColorHandlersEvent.Block event) implements GameRendering.BlockColorEvent {
+        @Override
+        public void register(BlockColor color, Block... blocks) {
+            event.register(color, blocks);
+        }
+        
+        @Override
+        public int getColor(BlockState state, BlockAndTintGetter level, BlockPos pos, int tint) {
+            return event.getBlockColors().getColor(state, level, pos, tint);
+        }
     }
-
-    public static void registerParticleFactories(Consumer<GameRendering.ParticleFactoryEvent> listener) {
-        ClientModPipelines.PARTICLE_RENDERING.add(event -> listener.accept(new GameRendering.ParticleFactoryEvent() {
-            @Override
-            public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider) {
-                event.registerSpecial(type.get(), provider);
+    
+    private record ForgeItemColors(RegisterColorHandlersEvent.Item event) implements GameRendering.ItemColorEvent {
+        @Override
+        public void register(ItemColor color, ItemLike... items) {
+            event.register(color, items);
+        }
+        
+        @Override
+        public int getColor(ItemStack stack, int tint) {
+            if (stack.getItem() instanceof BlockItem blockItem) {
+                BlockState state = blockItem.getBlock().defaultBlockState();
+                return event.getBlockColors().getColor(state, null, null, tint);
             }
-
-            @Override
-            public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory) {
-                event.registerSpriteSet(type.get(), factory::create);
-            }
-        }));
+            return 0xFFFFFF;
+        }
+    }
+    
+    private record ForgeSpecialModels(ModelEvent.RegisterAdditional event) implements GameRendering.SpecialModelEvent {
+        @Override
+        public void register(ResourceLocation model) {
+            event.register(new ModelResourceLocation(wrapModel(model), "standalone"));
+        }
+        
+        @Override
+        public void register(ResourceLocation... models) {
+            for (ResourceLocation model : models) this.register(model);
+        }
+    }
+    
+    private record ForgeSkullRenderers(EntityRenderersEvent.CreateSkullModels event) implements GameRendering.SkullRendererEvent {
+        @Override
+        public void registerSkullModel(SkullBlock.Type type, Function<ModelPart, SkullModelBase> model, ModelLayerLocation layer) {
+            event.registerSkullModel(type, model.apply(event.getEntityModelSet().bakeLayer(layer)));
+        }
+        
+        @Override
+        public void registerSkullTexture(SkullBlock.Type type, ResourceLocation texture) {
+            SkullBlockRenderer.SKIN_BY_TYPE.put(type, texture);
+        }
+    }
+    
+    private record ForgeParticleFactories(RegisterParticleProvidersEvent event) implements GameRendering.ParticleFactoryEvent {
+        @Override
+        public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, ParticleProvider<T> provider) {
+            event.registerSpecial(type.get(), provider);
+        }
+        
+        @Override
+        public <T extends ParticleOptions, P extends ParticleType<T>> void register(Supplier<P> type, Factory<T> factory) {
+            event.registerSpriteSet(type.get(), factory::create);
+        }
     }
 }

@@ -38,14 +38,14 @@ public final class CreativeTabIntegrationsImpl {
                 
                 @Override
                 public void accept(ItemStack stack, CreativeModeTab.TabVisibility visibility) {
+                    if (stack.isEmpty()) return;
                     entries.accept(stack, visibility);
                 }
                 
                 @Override
                 public void addAfter(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
                     if (stack.isEmpty()) return;
-                    
-                    if (target.isEmpty()) {
+                    if (target.isEmpty() || !this.contains(target)) {
                         entries.accept(stack, visibility);
                     } else {
                         entries.addAfter(target, List.of(stack), visibility);
@@ -55,8 +55,7 @@ public final class CreativeTabIntegrationsImpl {
                 @Override
                 public void addBefore(ItemStack target, ItemStack stack, CreativeModeTab.TabVisibility visibility) {
                     if (stack.isEmpty()) return;
-                    
-                    if (target.isEmpty()) {
+                    if (target.isEmpty() || !this.contains(target)) {
                         entries.accept(stack, visibility);
                     } else {
                         entries.addBefore(target, List.of(stack), visibility);

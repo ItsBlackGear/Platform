@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public class BiomeManagerImpl {
     @Nullable private static MapCodec<PlatformBiomeModifier> codec = null;
     

@@ -3,6 +3,7 @@ package com.blackgear.platform.common.data.neoforge;
 import com.blackgear.platform.Platform;
 import com.blackgear.platform.common.data.LootModifier;
 import com.blackgear.platform.core.mixin.neoforge.access.LootTableAccessor;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -23,47 +24,53 @@ import java.util.function.Consumer;
 public class LootModifierImpl {
     private static final Set<Consumer<LootTableLoadEvent>> MODIFICATIONS = ConcurrentHashMap.newKeySet();
     
+    @SuppressWarnings("unused")
     public static void modify(LootModifier.LootTableModifier modifier) {
-        MODIFICATIONS.add(event -> {
-            modifier.modify(
-                ResourceKey.create(Registries.LOOT_TABLE, event.getName()),
-                new LootModifier.LootTableContext() {
-                    @Override
-                    public void addPool(LootPool.Builder pool) {
-                        ((LootTableAccessor) event.getTable()).getPools().add(pool.build());
-                    }
-
-                    @Override
-                    public boolean addToPool(int index, ArrayList<LootPoolEntryContainer> content) {
-                        LootTable table = event.getTable();
-
-                        try {
-                            List<LootPool> pools = ((LootTableAccessor) table).getPools();
-
-                            if (pools.size() > index) {
-                                LootPool pool = pools.get(index);
-
-                                List<LootPoolEntryContainer> entries = ((LootPoolAccess) pool).platform$getEntries();
-                                List<LootPoolEntryContainer> modified = new ArrayList<>(entries);
-                                modified.addAll(content);
-
-                                ((LootPoolAccess) pool).platform$setEntries(modified);
-                                return true;
-                            }
-                        } catch (Throwable t) {
-                            Platform.LOGGER.error("Failed to add content to loot pool at index {}: {}", index, t.getMessage(), t);
-                        }
-
-                        return false;
-                    }
-                },
-                true
-            );
-        });
+        MODIFICATIONS.add(event -> modifier.modify(
+            ResourceKey.create(Registries.LOOT_TABLE, event.getName()),
+            new ForgeLootTableContext(event),
+            true
+        ));
     }
     
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLootTableModify(LootTableLoadEvent event) {
         MODIFICATIONS.forEach(consumer -> consumer.accept(event));
+    }
+    
+    private record ForgeLootTableContext(LootTableLoadEvent event) implements LootModifier.LootTableContext {
+        @Override
+        public void addPool(LootPool.Builder pool) {
+            ((LootTableAccessor) this.event.getTable()).getPools().add(pool.build());
+        }
+        
+        @Override
+        public boolean addToPool(int index, ArrayList<LootPoolEntryContainer> content) {
+            LootTable table = this.event.getTable();
+            
+            try {
+                List<LootPool> pools = ((LootTableAccessor) table).getPools();
+                
+                if (pools.size() > index) {
+                    LootPool pool = pools.get(index);
+                    
+                    List<LootPoolEntryContainer> entries = ((LootPoolAccess) pool).platform$getEntries();
+                    List<LootPoolEntryContainer> modified = new ArrayList<>(entries);
+                    modified.addAll(content);
+                    
+                    ((LootPoolAccess) pool).platform$setEntries(modified);
+                    return true;
+                }
+            } catch (Throwable t) {
+                Platform.LOGGER.error("Failed to add content to loot pool at index {}: {}", index, t.getMessage(), t);
+            }
+            
+            return false;
+        }
+        
+        @Override
+        public HolderLookup.Provider registries() {
+            return this.event.getRegistries();
+        }
     }
 }
