@@ -26,6 +26,7 @@
     "access.ScreenAccessor",
     "client.AbstractClientPlayerMixin",
     "client.AbstractContainerScreenMixin",
+    "client.BlockModelShaperMixin",
     "client.BlockRenderDispatcherMixin",
     "client.BlockStateModelLoaderMixin",
     "client.ItemRendererMixin",
